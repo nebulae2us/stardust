@@ -1,138 +1,103 @@
 package org.nebulae2us.stardust.db.domain;
 
+import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 
+@Builder(destination=Table.class)
+public class TableBuilder<P> implements Wrappable<Table> {
 
-public class TableBuilder<B> implements Convertable {
+	protected final Table $$$wrapped;
 
-	private final Table $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected TableBuilder(Table table) {
-		if (table == null) {
-			throw new NullPointerException();
-		}
+	protected final P $$$parentBuilder;
 	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = table;
-	}
-
-	public TableBuilder(ConverterOption option, B parentBuilder) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
-
 	public TableBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+		this.$$$wrapped = null;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public TableBuilder(ConverterOption option) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+	public TableBuilder(P parentBuilder) {
+		this.$$$wrapped = null;
+		this.$$$parentBuilder = parentBuilder;
+	}
+
+	protected TableBuilder(Table wrapped) {
+		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public Table getSavedTarget() {
-		return this.$$$savedTarget;
-	}
-
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
-	}
-
-    protected void copyAttributes(TableBuilder<?> copy) {
-    	this.name = copy.name;
-		this.schemaName = copy.schemaName;
-		this.catalogName = copy.catalogName;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public TableBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+    public TableBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
 
+	public Table getWrappedObject() {
+		return this.$$$wrapped;
+	}
+
+	protected void verifyMutable() {
+		if (this.$$$wrapped != null) {
+    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
+		}
+	}
+
+	public P end() {
+		return this.$$$parentBuilder;
+	}
+
     public Table toTable() {
-    	return new Converter(this.$$$option).convert(this).to(Table.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Table.class);
     }
 
-    private String name;
+	private String name;
+	
+	public String getName() {
+		return name;
+	}
 
-    public String getName() {
-        return this.name;
-    }
+	public void setName(String name) {
+		verifyMutable();
+		this.name = name;
+	}
 
-    public void setName(String name) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.name = name;
-    }
+	public TableBuilder<P> name(String name) {
+		verifyMutable();
+		this.name = name;
+		return this;
+	}
 
-    public TableBuilder<B> name(String name) {
-        this.name = name;
-        return this;
-    }
+	private String schemaName;
+	
+	public String getSchemaName() {
+		return schemaName;
+	}
 
-    private String schemaName;
+	public void setSchemaName(String schemaName) {
+		verifyMutable();
+		this.schemaName = schemaName;
+	}
 
-    public String getSchemaSchemaName() {
-        return this.schemaName;
-    }
+	public TableBuilder<P> schemaName(String schemaName) {
+		verifyMutable();
+		this.schemaName = schemaName;
+		return this;
+	}
 
-    public void setSchemaName(String schemaName) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.schemaName = schemaName;
-    }
+	private String catalogName;
+	
+	public String getCatalogName() {
+		return catalogName;
+	}
 
-    public TableBuilder<B> schemaName(String schemaName) {
-        this.schemaName = schemaName;
-        return this;
-    }
+	public void setCatalogName(String catalogName) {
+		verifyMutable();
+		this.catalogName = catalogName;
+	}
 
-    private String catalogName;
-
-    public String getCatalogCatalogName() {
-        return this.catalogName;
-    }
-
-    public void setCatalogName(String catalogName) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.catalogName = catalogName;
-    }
-
-    public TableBuilder<B> catalogName(String catalogName) {
-        this.catalogName = catalogName;
-        return this;
-    }
+	public TableBuilder<P> catalogName(String catalogName) {
+		verifyMutable();
+		this.catalogName = catalogName;
+		return this;
+	}
 }

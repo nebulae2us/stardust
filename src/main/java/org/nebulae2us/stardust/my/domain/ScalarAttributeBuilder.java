@@ -1,148 +1,98 @@
 package org.nebulae2us.stardust.my.domain;
 
 import java.lang.reflect.*;
+import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.*;
 
-
-public class ScalarAttributeBuilder<B> extends AttributeBuilder<B> implements Convertable {
-
-	private final ScalarAttribute $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected ScalarAttributeBuilder(ScalarAttribute scalarAttribute) {
-		super(scalarAttribute);
-		if (scalarAttribute == null) {
-			throw new NullPointerException();
-		}
-	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = scalarAttribute;
-	}
-
-	public ScalarAttributeBuilder(ConverterOption option, B parentBuilder) {
-		super(option, parentBuilder);
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
+@Builder(destination=ScalarAttribute.class)
+public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 
 	public ScalarAttributeBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
+		super();
 	}
 	
-	public ScalarAttributeBuilder(ConverterOption option) {
-		super(option);
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
-	}
-	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public ScalarAttribute getSavedTarget() {
-		return this.$$$savedTarget;
+	public ScalarAttributeBuilder(P parentBuilder) {
+		super(parentBuilder);
 	}
 
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
+	protected ScalarAttributeBuilder(ScalarAttribute wrapped) {
+		super(wrapped);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
+	@Override
+	public ScalarAttribute getWrappedObject() {
+		return (ScalarAttribute)this.$$$wrapped;
 	}
 
-    protected void copyAttributes(ScalarAttributeBuilder<?> copy) {
-		super.copyAttributes(copy);
-    	this.scalarType = copy.scalarType;
-		this.column = copy.column;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public ScalarAttributeBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+	@Override
+    public ScalarAttributeBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
-
+	
     public ScalarAttribute toScalarAttribute() {
-    	return new Converter(this.$$$option).convert(this).to(ScalarAttribute.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ScalarAttribute.class);
     }
 
     @Override
     public ScalarAttribute toAttribute() {
-    	return new Converter(this.$$$option).convert(this).to(ScalarAttribute.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ScalarAttribute.class);
     }
 
-    private Class scalarType;
+	private Class<?> scalarType;
+	
+	public Class<?> getScalarType() {
+		return scalarType;
+	}
 
-    public Class getScalarType() {
-        return this.scalarType;
-    }
+	public void setScalarType(Class<?> scalarType) {
+		verifyMutable();
+		this.scalarType = scalarType;
+	}
 
-    public void setScalarType(Class scalarType) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.scalarType = scalarType;
-    }
+	public ScalarAttributeBuilder<P> scalarType(Class<?> scalarType) {
+		verifyMutable();
+		this.scalarType = scalarType;
+		return this;
+	}
 
-    public ScalarAttributeBuilder<B> scalarType(Class scalarType) {
-        this.scalarType = scalarType;
+	private ColumnBuilder<?> column;
+	
+	public ColumnBuilder<?> getColumn() {
+		return column;
+	}
+
+	public void setColumn(ColumnBuilder<?> column) {
+		verifyMutable();
+		this.column = column;
+	}
+
+	public ScalarAttributeBuilder<P> column(ColumnBuilder<?> column) {
+		verifyMutable();
+		this.column = column;
+		return this;
+	}
+
+	public ColumnBuilder<? extends ScalarAttributeBuilder<P>> column$begin() {
+		ColumnBuilder<ScalarAttributeBuilder<P>> result = new ColumnBuilder<ScalarAttributeBuilder<P>>(this);
+		this.column = result;
+		return result;
+	}
+
+    public ScalarAttributeBuilder<P> column$wrap(Column column) {
+    	verifyMutable();
+    	this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(column).to(ColumnBuilder.class);
         return this;
     }
-
-    private ColumnBuilder<?> column;
-
-    public ColumnBuilder<?> getColumn() {
-        return this.column;
-    }
-
-    public void setColumn(ColumnBuilder<?> column) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.column = column;
-    }
-
-    public ColumnBuilder<? extends ScalarAttributeBuilder<B>> column() {
-        ColumnBuilder<ScalarAttributeBuilder<B>> column = new ColumnBuilder<ScalarAttributeBuilder<B>>(this.$$$option, this);
-        this.column = column;
-        
-        return column;
-    }
-
-    public ScalarAttributeBuilder<B> column(ColumnBuilder<?> column) {
-        this.column = column;
-        return this;
-    }
-
-    public ScalarAttributeBuilder<B> column(Column column) {
-    	this.column = new WrapConverter(this.$$$option).convert(column).to(ColumnBuilder.class);
-        return this;
-    }
-
-    public ScalarAttributeBuilder<B> column$restoreFrom(BuilderRepository repo, int builderId) {
-        Object column = repo.get(builderId);
-        if (column == null) {
+    
+    public ScalarAttributeBuilder<P> column$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -154,32 +104,38 @@ public class ScalarAttributeBuilder<B> extends AttributeBuilder<B> implements Co
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
+        else if (!(restoredObject instanceof ColumnBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ColumnBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
         else {
-            this.column = (ColumnBuilder<?>)column;
+            this.column = (ColumnBuilder<?>)restoredObject;
         }
         return this;
     }
 
 	@Override
-    public ScalarAttributeBuilder<B> field(Field field) {
-        return (ScalarAttributeBuilder<B>)super.field(field);
+	public ScalarAttributeBuilder<P> field(Field field) {
+		return (ScalarAttributeBuilder<P>)super.field(field);
+	}
+
+	@Override
+	public ScalarAttributeBuilder<P> owningEntity(EntityBuilder<?> owningEntity) {
+		return (ScalarAttributeBuilder<P>)super.owningEntity(owningEntity);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public EntityBuilder<? extends ScalarAttributeBuilder<P>> owningEntity$begin() {
+		return (EntityBuilder<? extends ScalarAttributeBuilder<P>>)super.owningEntity$begin();
+	}
+
+	@Override
+    public ScalarAttributeBuilder<P> owningEntity$wrap(Entity owningEntity) {
+		return (ScalarAttributeBuilder<P>)super.owningEntity$wrap(owningEntity);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public EntityBuilder<? extends ScalarAttributeBuilder<B>> owningEntity() {
-        return (EntityBuilder<ScalarAttributeBuilder<B>>)super.owningEntity();
+	@Override
+    public ScalarAttributeBuilder<P> owningEntity$restoreFrom(BuilderRepository repo, Object builderId) {
+		return (ScalarAttributeBuilder<P>)super.owningEntity$restoreFrom(repo, builderId);
     }
-    
-    public ScalarAttributeBuilder<B> owningEntity(EntityBuilder<?> owningEntity) {
-		return (ScalarAttributeBuilder<B>)super.owningEntity(owningEntity);
-    }
-
-    public ScalarAttributeBuilder<B> owningEntity(Entity owningEntity) {
-		return (ScalarAttributeBuilder<B>)super.owningEntity(owningEntity);
-    }
-
-    public ScalarAttributeBuilder<B> owningEntity$restoreFrom(BuilderRepository repo, int builderId) {
-		return (ScalarAttributeBuilder<B>)super.owningEntity$restoreFrom(repo, builderId);
-    }    
 }

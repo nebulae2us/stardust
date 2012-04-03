@@ -80,7 +80,7 @@ public class ValueObjectScanner {
 							.column(ScannerUtils.extractColumnInfo(field, owningEntity.getJoinedTables()))
 							;
 					
-					result.attribute(attributeBuilder);
+					result.attributes(attributeBuilder);
 				}
 				else if (field.getAnnotation(Embedded.class) != null || field.getAnnotation(EmbeddedId.class) != null || fieldClass.getAnnotation(Embeddable.class) != null) {
 					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(owningEntity, fieldClass).produce();
@@ -91,7 +91,7 @@ public class ValueObjectScanner {
 							.owningEntity(owningEntity)
 							;
 					
-					result.attribute(attributeBuilder);
+					result.attributes(attributeBuilder);
 				}
 			}
 		}	

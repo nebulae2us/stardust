@@ -2,324 +2,324 @@ package org.nebulae2us.stardust.sql.domain;
 
 import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.expr.domain.*;
 
+@Builder(destination=SelectQuery.class)
+public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 
-public class SelectQueryBuilder<B> implements Convertable {
+	protected final SelectQuery $$$wrapped;
 
-	private final SelectQuery $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected SelectQueryBuilder(SelectQuery selectQuery) {
-		if (selectQuery == null) {
-			throw new NullPointerException();
-		}
+	protected final P $$$parentBuilder;
 	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = selectQuery;
-	}
-
-	public SelectQueryBuilder(ConverterOption option, B parentBuilder) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
-
 	public SelectQueryBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+		this.$$$wrapped = null;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public SelectQueryBuilder(ConverterOption option) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+	public SelectQueryBuilder(P parentBuilder) {
+		this.$$$wrapped = null;
+		this.$$$parentBuilder = parentBuilder;
+	}
+
+	protected SelectQueryBuilder(SelectQuery wrapped) {
+		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public SelectQuery getSavedTarget() {
-		return this.$$$savedTarget;
-	}
-
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
-	}
-
-    protected void copyAttributes(SelectQueryBuilder<?> copy) {
-    	this.entityClass = copy.entityClass;
-		this.initialAlias = copy.initialAlias;
-		this.aliasJoins = copy.aliasJoins;
-		this.expressions = copy.expressions;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public SelectQueryBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+    public SelectQueryBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
 
+	public SelectQuery getWrappedObject() {
+		return this.$$$wrapped;
+	}
+
+	protected void verifyMutable() {
+		if (this.$$$wrapped != null) {
+    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
+		}
+	}
+
+	public P end() {
+		return this.$$$parentBuilder;
+	}
+
     public SelectQuery toSelectQuery() {
-    	return new Converter(this.$$$option).convert(this).to(SelectQuery.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(SelectQuery.class);
     }
 
-    private Class entityClass;
+	private Class<?> entityClass;
+	
+	public Class<?> getEntityClass() {
+		return entityClass;
+	}
 
-    public Class getEntityClass() {
-        return this.entityClass;
+	public void setEntityClass(Class<?> entityClass) {
+		verifyMutable();
+		this.entityClass = entityClass;
+	}
+
+	public SelectQueryBuilder<P> entityClass(Class<?> entityClass) {
+		verifyMutable();
+		this.entityClass = entityClass;
+		return this;
+	}
+
+	private String initialAlias;
+	
+	public String getInitialAlias() {
+		return initialAlias;
+	}
+
+	public void setInitialAlias(String initialAlias) {
+		verifyMutable();
+		this.initialAlias = initialAlias;
+	}
+
+	public SelectQueryBuilder<P> initialAlias(String initialAlias) {
+		verifyMutable();
+		this.initialAlias = initialAlias;
+		return this;
+	}
+
+	private List<AliasJoinBuilder<?>> aliasJoins;
+	
+	public List<AliasJoinBuilder<?>> getAliasJoins() {
+		return aliasJoins;
+	}
+
+	public void setAliasJoins(List<AliasJoinBuilder<?>> aliasJoins) {
+		verifyMutable();
+		this.aliasJoins = aliasJoins;
+	}
+
+	public SelectQueryBuilder<P> aliasJoins(AliasJoinBuilder<?> ... aliasJoins) {
+		verifyMutable();
+		return aliasJoins(new ListBuilder<AliasJoinBuilder<?>>().add(aliasJoins).toList());
+	}
+	
+	public SelectQueryBuilder<P> aliasJoins(Collection<AliasJoinBuilder<?>> aliasJoins) {
+		verifyMutable();
+		if (this.aliasJoins == null) {
+			this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
+		}
+		if (aliasJoins != null) {
+			for (AliasJoinBuilder<?> e : aliasJoins) {
+				this.aliasJoins.add(e);
+			}
+		}
+		return this;
+	}
+
+	public AliasJoinBuilder<SelectQueryBuilder<P>> aliasJoins$one() {
+		verifyMutable();
+		if (this.aliasJoins == null) {
+			this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
+		}
+		
+		AliasJoinBuilder<SelectQueryBuilder<P>> result =
+				new AliasJoinBuilder<SelectQueryBuilder<P>>(this);
+		
+		this.aliasJoins.add(result);
+		
+		return result;
+	}
+
+	public class AliasJoins$$$builder {
+		
+		public AliasJoinBuilder<AliasJoins$$$builder> blank$begin() {
+			AliasJoinBuilder<AliasJoins$$$builder> result = new AliasJoinBuilder<AliasJoins$$$builder>(this);
+			SelectQueryBuilder.this.aliasJoins.add(result);
+			return result;
+		}
+		
+		public SelectQueryBuilder<P> end() {
+			return SelectQueryBuilder.this;
+		}
+	}
+	
+	public AliasJoins$$$builder aliasJoins$list() {
+		verifyMutable();
+		if (this.aliasJoins == null) {
+			this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
+		}
+		return new AliasJoins$$$builder();
+	}
+
+    public SelectQueryBuilder<P> aliasJoins$wrap(AliasJoin ... aliasJoins) {
+    	return aliasJoins$wrap(new ListBuilder<AliasJoin>().add(aliasJoins).toList());
     }
 
-    public void setEntityClass(Class entityClass) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.entityClass = entityClass;
+    public SelectQueryBuilder<P> aliasJoins$wrap(Collection<AliasJoin> aliasJoins) {
+		verifyMutable();
+
+		if (this.aliasJoins == null) {
+			this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
+		}
+		if (aliasJoins != null) {
+			for (AliasJoin e : aliasJoins) {
+				AliasJoinBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AliasJoinBuilder.class);
+				this.aliasJoins.add(wrapped);
+			}
+		}
+		return this;
+    }
+    
+    public SelectQueryBuilder<P> aliasJoins$restoreFrom(BuilderRepository repo, Object ... builderIds) {
+    	return aliasJoins$restoreFrom(repo, new ListBuilder<Object>().add(builderIds).toList());
     }
 
-    public SelectQueryBuilder<B> entityClass(Class entityClass) {
-        this.entityClass = entityClass;
+    public SelectQueryBuilder<P> aliasJoins$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
+		verifyMutable();
+
+		if (this.aliasJoins == null) {
+			this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
+		}
+		if (builderIds != null) {
+	    	for (Object builderId : builderIds) {
+	            Object restoredObject = repo.get(builderId);
+	            if (restoredObject == null) {
+	            	if (repo.isSupportLazy()) {
+	            		repo.addObjectStoredListener(builderId, new Procedure() {
+	    					public void execute(Object... arguments) {
+	    						SelectQueryBuilder.this.aliasJoins.add((AliasJoinBuilder<?>)arguments[0]);
+	    					}
+	    				});
+	            	}
+	            	else {
+	                    throw new IllegalStateException("Object does not exist with id " + builderId);
+	            	}
+	            }
+	            else if (!(restoredObject instanceof AliasJoinBuilder)) {
+	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + AliasJoinBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+	            }
+	            else {
+	                this.aliasJoins.add((AliasJoinBuilder<?>)restoredObject);
+	            }
+	    	}
+		}
         return this;
     }
 
-    private String initialAlias;
+	private List<ExpressionBuilder<?>> expressions;
+	
+	public List<ExpressionBuilder<?>> getExpressions() {
+		return expressions;
+	}
 
-    public String getInitialAlias() {
-        return this.initialAlias;
+	public void setExpressions(List<ExpressionBuilder<?>> expressions) {
+		verifyMutable();
+		this.expressions = expressions;
+	}
+
+	public SelectQueryBuilder<P> expressions(ExpressionBuilder<?> ... expressions) {
+		verifyMutable();
+		return expressions(new ListBuilder<ExpressionBuilder<?>>().add(expressions).toList());
+	}
+	
+	public SelectQueryBuilder<P> expressions(Collection<ExpressionBuilder<?>> expressions) {
+		verifyMutable();
+		if (this.expressions == null) {
+			this.expressions = new ArrayList<ExpressionBuilder<?>>();
+		}
+		if (expressions != null) {
+			for (ExpressionBuilder<?> e : expressions) {
+				this.expressions.add(e);
+			}
+		}
+		return this;
+	}
+
+	public ExpressionBuilder<SelectQueryBuilder<P>> expressions$one() {
+		verifyMutable();
+		if (this.expressions == null) {
+			this.expressions = new ArrayList<ExpressionBuilder<?>>();
+		}
+		
+		ExpressionBuilder<SelectQueryBuilder<P>> result =
+				new ExpressionBuilder<SelectQueryBuilder<P>>(this);
+		
+		this.expressions.add(result);
+		
+		return result;
+	}
+
+	public class Expressions$$$builder {
+		
+		public ExpressionBuilder<Expressions$$$builder> blank$begin() {
+			ExpressionBuilder<Expressions$$$builder> result = new ExpressionBuilder<Expressions$$$builder>(this);
+			SelectQueryBuilder.this.expressions.add(result);
+			return result;
+		}
+		
+		public SelectQueryBuilder<P> end() {
+			return SelectQueryBuilder.this;
+		}
+	}
+	
+	public Expressions$$$builder expressions$list() {
+		verifyMutable();
+		if (this.expressions == null) {
+			this.expressions = new ArrayList<ExpressionBuilder<?>>();
+		}
+		return new Expressions$$$builder();
+	}
+
+    public SelectQueryBuilder<P> expressions$wrap(Expression ... expressions) {
+    	return expressions$wrap(new ListBuilder<Expression>().add(expressions).toList());
     }
 
-    public void setInitialAlias(String initialAlias) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.initialAlias = initialAlias;
+    public SelectQueryBuilder<P> expressions$wrap(Collection<Expression> expressions) {
+		verifyMutable();
+
+		if (this.expressions == null) {
+			this.expressions = new ArrayList<ExpressionBuilder<?>>();
+		}
+		if (expressions != null) {
+			for (Expression e : expressions) {
+				ExpressionBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ExpressionBuilder.class);
+				this.expressions.add(wrapped);
+			}
+		}
+		return this;
+    }
+    
+    public SelectQueryBuilder<P> expressions$restoreFrom(BuilderRepository repo, Object ... builderIds) {
+    	return expressions$restoreFrom(repo, new ListBuilder<Object>().add(builderIds).toList());
     }
 
-    public SelectQueryBuilder<B> initialAlias(String initialAlias) {
-        this.initialAlias = initialAlias;
+    public SelectQueryBuilder<P> expressions$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
+		verifyMutable();
+
+		if (this.expressions == null) {
+			this.expressions = new ArrayList<ExpressionBuilder<?>>();
+		}
+		if (builderIds != null) {
+	    	for (Object builderId : builderIds) {
+	            Object restoredObject = repo.get(builderId);
+	            if (restoredObject == null) {
+	            	if (repo.isSupportLazy()) {
+	            		repo.addObjectStoredListener(builderId, new Procedure() {
+	    					public void execute(Object... arguments) {
+	    						SelectQueryBuilder.this.expressions.add((ExpressionBuilder<?>)arguments[0]);
+	    					}
+	    				});
+	            	}
+	            	else {
+	                    throw new IllegalStateException("Object does not exist with id " + builderId);
+	            	}
+	            }
+	            else if (!(restoredObject instanceof ExpressionBuilder)) {
+	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ExpressionBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+	            }
+	            else {
+	                this.expressions.add((ExpressionBuilder<?>)restoredObject);
+	            }
+	    	}
+		}
         return this;
-    }
-
-    private List<AliasJoinBuilder<?>> aliasJoins;
-
-    public List<AliasJoinBuilder<?>> getAliasJoins() {
-        return this.aliasJoins;
-    }
-
-    public void setAliasJoins(List<AliasJoinBuilder<?>> aliasJoins) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.aliasJoins = aliasJoins;
-    }
-
-    public AliasJoinBuilder<SelectQueryBuilder<B>> aliasJoin() {
-        if (this.aliasJoins == null) {
-            this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
-        }
-
-        AliasJoinBuilder<SelectQueryBuilder<B>> aliasJoin = new AliasJoinBuilder<SelectQueryBuilder<B>>(this.$$$option, this);
-        
-        this.aliasJoins.add(aliasJoin);
-        
-        return aliasJoin;
-    }
-
-    public SelectQueryBuilder<B> aliasJoin(AliasJoinBuilder<?> aliasJoin) {
-        if (this.aliasJoins == null) {
-            this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
-        }
-        this.aliasJoins.add(aliasJoin);
-        return this;
-    }
-
-    public SelectQueryBuilder<B> aliasJoin(AliasJoin aliasJoin) {
-        if (this.aliasJoins == null) {
-            this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
-        }
-    	AliasJoinBuilder<?> wrap = new WrapConverter(this.$$$option).convert(aliasJoin).to(AliasJoinBuilder.class);
-        this.aliasJoins.add(wrap);
-        return this;
-    }
-
-    public SelectQueryBuilder<B> aliasJoins(AliasJoinBuilder<?> ... aliasJoins) {
-        if (this.aliasJoins == null) {
-            this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
-        }
-        for (AliasJoinBuilder<?> o : aliasJoins) {
-            this.aliasJoins.add(o);
-        }
-        return this;
-    }
-
-    public SelectQueryBuilder<B> aliasJoins(AliasJoin ... aliasJoins) {
-        if (this.aliasJoins == null) {
-            this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
-        }
-        for (AliasJoin o : aliasJoins) {
-	    	AliasJoinBuilder<?> wrap = new WrapConverter(this.$$$option).convert(o).to(AliasJoinBuilder.class);
-            this.aliasJoins.add(wrap);
-        }
-        return this;
-    }
-
-    public SelectQueryBuilder<B> aliasJoin$restoreFrom(BuilderRepository repo, int builderId) {
-        Object aliasJoin = repo.get(builderId);
-        if (this.aliasJoins == null) {
-            this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
-        }
-
-        if (aliasJoin == null) {
-        	if (repo.isSupportLazy()) {
-                
-        		final int size = this.aliasJoins.size();
-        		this.aliasJoins.add(null);
-
-        		repo.addObjectStoredListener(builderId, new Procedure() {
-					public void execute(Object... arguments) {
-						SelectQueryBuilder.this.aliasJoins.set(size, (AliasJoinBuilder<?>)arguments[0]);
-					}
-				});
-        	}
-        	else {
-                throw new IllegalStateException("Object does not exist with id " + builderId);
-        	}
-        }
-        else {
-            this.aliasJoins.add((AliasJoinBuilder<?>)aliasJoin);
-        }
-    	
-    	return this;
-    }
-
-    public SelectQueryBuilder<B> aliasJoins$restoreFrom(BuilderRepository repo, int ... builderIds) {
-
-    	for (int builderId : builderIds) {
-    		aliasJoin$restoreFrom(repo, builderId);
-    	}
-    	
-    	return this;
-    }
-
-    private List<ExpressionBuilder<?>> expressions;
-
-    public List<ExpressionBuilder<?>> getExpressions() {
-        return this.expressions;
-    }
-
-    public void setExpressions(List<ExpressionBuilder<?>> expressions) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.expressions = expressions;
-    }
-
-    public ExpressionBuilder<SelectQueryBuilder<B>> expression() {
-        if (this.expressions == null) {
-            this.expressions = new ArrayList<ExpressionBuilder<?>>();
-        }
-
-        ExpressionBuilder<SelectQueryBuilder<B>> expression = new ExpressionBuilder<SelectQueryBuilder<B>>(this.$$$option, this);
-        
-        this.expressions.add(expression);
-        
-        return expression;
-    }
-
-    public SelectQueryBuilder<B> expression(ExpressionBuilder<?> expression) {
-        if (this.expressions == null) {
-            this.expressions = new ArrayList<ExpressionBuilder<?>>();
-        }
-        this.expressions.add(expression);
-        return this;
-    }
-
-    public SelectQueryBuilder<B> expression(Expression expression) {
-        if (this.expressions == null) {
-            this.expressions = new ArrayList<ExpressionBuilder<?>>();
-        }
-    	ExpressionBuilder<?> wrap = new WrapConverter(this.$$$option).convert(expression).to(ExpressionBuilder.class);
-        this.expressions.add(wrap);
-        return this;
-    }
-
-    public SelectQueryBuilder<B> expressions(ExpressionBuilder<?> ... expressions) {
-        if (this.expressions == null) {
-            this.expressions = new ArrayList<ExpressionBuilder<?>>();
-        }
-        for (ExpressionBuilder<?> o : expressions) {
-            this.expressions.add(o);
-        }
-        return this;
-    }
-
-    public SelectQueryBuilder<B> expressions(Expression ... expressions) {
-        if (this.expressions == null) {
-            this.expressions = new ArrayList<ExpressionBuilder<?>>();
-        }
-        for (Expression o : expressions) {
-	    	ExpressionBuilder<?> wrap = new WrapConverter(this.$$$option).convert(o).to(ExpressionBuilder.class);
-            this.expressions.add(wrap);
-        }
-        return this;
-    }
-
-    public SelectQueryBuilder<B> expression$restoreFrom(BuilderRepository repo, int builderId) {
-        Object expression = repo.get(builderId);
-        if (this.expressions == null) {
-            this.expressions = new ArrayList<ExpressionBuilder<?>>();
-        }
-
-        if (expression == null) {
-        	if (repo.isSupportLazy()) {
-                
-        		final int size = this.expressions.size();
-        		this.expressions.add(null);
-
-        		repo.addObjectStoredListener(builderId, new Procedure() {
-					public void execute(Object... arguments) {
-						SelectQueryBuilder.this.expressions.set(size, (ExpressionBuilder<?>)arguments[0]);
-					}
-				});
-        	}
-        	else {
-                throw new IllegalStateException("Object does not exist with id " + builderId);
-        	}
-        }
-        else {
-            this.expressions.add((ExpressionBuilder<?>)expression);
-        }
-    	
-    	return this;
-    }
-
-    public SelectQueryBuilder<B> expressions$restoreFrom(BuilderRepository repo, int ... builderIds) {
-
-    	for (int builderId : builderIds) {
-    		expression$restoreFrom(repo, builderId);
-    	}
-    	
-    	return this;
     }
 }

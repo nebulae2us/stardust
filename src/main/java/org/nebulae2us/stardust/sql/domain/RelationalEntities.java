@@ -71,7 +71,7 @@ public class RelationalEntities {
 		
 		
 		RelationalEntitiesBuilder<?> result = relationalEntities()
-			.entity(entity)
+			.entity$wrap(entity)
 			;
 		
 		Map<String, EntityJoinBuilder<?>> entityJoins = new HashMap<String, EntityJoinBuilder<?>>();
@@ -100,11 +100,11 @@ public class RelationalEntities {
 			if (attribute instanceof EntityAttribute) {
 				EntityJoinBuilder<?> entityJoin = entityJoin()
 					.alias(aliasJoin.getAlias())
-					.attribute((EntityAttribute)attribute)
+					.attribute$wrap((EntityAttribute)attribute)
 					.joinType(aliasJoin.getJoinType())
 					;
 				
-				result.entityJoin(entityJoin);
+				result.entityJoins(entityJoin);
 				
 				entityJoins.put(aliasJoin.getAlias(), entityJoin);
 				

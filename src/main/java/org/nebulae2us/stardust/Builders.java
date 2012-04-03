@@ -44,7 +44,7 @@ import org.nebulae2us.stardust.my.domain.ValueObjectAttributeBuilder;
 
 public class Builders {
 
-	public static final ConverterOption CONVERTER_OPTIONS_IMMUTABLE = new ConverterOption(
+	public static final DestinationClassResolver DESTINATION_CLASS_RESOLVER = new DestinationClassResolverByMap(
 			new MapBuilder<Class<?>, Class<?>> ()
 				.put(Column.class, ColumnBuilder.class)
 				.put(JoinedTables.class, JoinedTablesBuilder.class)
@@ -65,18 +65,12 @@ public class Builders {
 				.put(ScalarAttribute.class, ScalarAttributeBuilder.class)
 				.put(ValueObject.class, ValueObjectBuilder.class)
 				.put(ValueObjectAttribute.class, ValueObjectAttributeBuilder.class)
-			.toMap(),
-			true
-			);
-
-	public static final ConverterOption CONVERTER_OPTIONS_MUTABLE = new ConverterOption(
-			CONVERTER_OPTIONS_IMMUTABLE.getAssociates(),
-			false
+			.toMap()
 			);
 
 
     public static ColumnBuilder<?> column() {
-        return new ColumnBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new ColumnBuilder<Object>();
     }
 
     public static ColumnBuilder<?> column$restoreFrom(BuilderRepository repo, int builderId) {
@@ -84,13 +78,12 @@ public class Builders {
     }
 
     public static ColumnBuilder<?> column$copyFrom(Column column) {
-    	ColumnBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(column).to(ColumnBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	ColumnBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(column).to(ColumnBuilder.class);
     	return result;
     }
 
     public static JoinedTablesBuilder<?> joinedTables() {
-        return new JoinedTablesBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new JoinedTablesBuilder<Object>();
     }
 
     public static JoinedTablesBuilder<?> joinedTables$restoreFrom(BuilderRepository repo, int builderId) {
@@ -98,13 +91,12 @@ public class Builders {
     }
 
     public static JoinedTablesBuilder<?> joinedTables$copyFrom(JoinedTables joinedTables) {
-    	JoinedTablesBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(joinedTables).to(JoinedTablesBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	JoinedTablesBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(joinedTables).to(JoinedTablesBuilder.class);
     	return result;
     }
 
     public static TableBuilder<?> table() {
-        return new TableBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new TableBuilder<Object>();
     }
 
     public static TableBuilder<?> table$restoreFrom(BuilderRepository repo, int builderId) {
@@ -112,13 +104,12 @@ public class Builders {
     }
 
     public static TableBuilder<?> table$copyFrom(Table table) {
-    	TableBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(table).to(TableBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	TableBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(table).to(TableBuilder.class);
     	return result;
     }
 
     public static TableJoinBuilder<?> tableJoin() {
-        return new TableJoinBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new TableJoinBuilder<Object>();
     }
 
     public static TableJoinBuilder<?> tableJoin$restoreFrom(BuilderRepository repo, int builderId) {
@@ -126,13 +117,12 @@ public class Builders {
     }
 
     public static TableJoinBuilder<?> tableJoin$copyFrom(TableJoin tableJoin) {
-    	TableJoinBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(tableJoin).to(TableJoinBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	TableJoinBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(tableJoin).to(TableJoinBuilder.class);
     	return result;
     }
 
     public static ExpressionBuilder<?> expression() {
-        return new ExpressionBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new ExpressionBuilder<Object>();
     }
 
     public static ExpressionBuilder<?> expression$restoreFrom(BuilderRepository repo, int builderId) {
@@ -140,13 +130,12 @@ public class Builders {
     }
 
     public static ExpressionBuilder<?> expression$copyFrom(Expression expression) {
-    	ExpressionBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(expression).to(ExpressionBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	ExpressionBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(expression).to(ExpressionBuilder.class);
     	return result;
     }
 
     public static AttributeBuilder<?> attribute() {
-        return new AttributeBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new AttributeBuilder<Object>();
     }
 
     public static AttributeBuilder<?> attribute$restoreFrom(BuilderRepository repo, int builderId) {
@@ -154,13 +143,12 @@ public class Builders {
     }
 
     public static AttributeBuilder<?> attribute$copyFrom(Attribute attribute) {
-    	AttributeBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(attribute).to(AttributeBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	AttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(attribute).to(AttributeBuilder.class);
     	return result;
     }
 
     public static AttributeHolderBuilder<?> attributeHolder() {
-        return new AttributeHolderBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new AttributeHolderBuilder<Object>();
     }
 
     public static AttributeHolderBuilder<?> attributeHolder$restoreFrom(BuilderRepository repo, int builderId) {
@@ -168,13 +156,12 @@ public class Builders {
     }
 
     public static AttributeHolderBuilder<?> attributeHolder$copyFrom(AttributeHolder attributeHolder) {
-    	AttributeHolderBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(attributeHolder).to(AttributeHolderBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	AttributeHolderBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(attributeHolder).to(AttributeHolderBuilder.class);
     	return result;
     }
 
     public static EntityIdentifierBuilder<?> entityIdentifier() {
-        return new EntityIdentifierBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new EntityIdentifierBuilder<Object>();
     }
 
     public static EntityIdentifierBuilder<?> entityIdentifier$restoreFrom(BuilderRepository repo, int builderId) {
@@ -182,13 +169,12 @@ public class Builders {
     }
 
     public static EntityIdentifierBuilder<?> entityIdentifier$copyFrom(EntityIdentifier entityIdentifier) {
-    	EntityIdentifierBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(entityIdentifier).to(EntityIdentifierBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	EntityIdentifierBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityIdentifier).to(EntityIdentifierBuilder.class);
     	return result;
     }
 
     public static AliasJoinBuilder<?> aliasJoin() {
-        return new AliasJoinBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new AliasJoinBuilder<Object>();
     }
 
     public static AliasJoinBuilder<?> aliasJoin$restoreFrom(BuilderRepository repo, int builderId) {
@@ -196,13 +182,12 @@ public class Builders {
     }
 
     public static AliasJoinBuilder<?> aliasJoin$copyFrom(AliasJoin aliasJoin) {
-    	AliasJoinBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(aliasJoin).to(AliasJoinBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	AliasJoinBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(aliasJoin).to(AliasJoinBuilder.class);
     	return result;
     }
 
     public static EntityJoinBuilder<?> entityJoin() {
-        return new EntityJoinBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new EntityJoinBuilder<Object>();
     }
 
     public static EntityJoinBuilder<?> entityJoin$restoreFrom(BuilderRepository repo, int builderId) {
@@ -210,13 +195,12 @@ public class Builders {
     }
 
     public static EntityJoinBuilder<?> entityJoin$copyFrom(EntityJoin entityJoin) {
-    	EntityJoinBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(entityJoin).to(EntityJoinBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	EntityJoinBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityJoin).to(EntityJoinBuilder.class);
     	return result;
     }
 
     public static RelationalEntitiesBuilder<?> relationalEntities() {
-        return new RelationalEntitiesBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new RelationalEntitiesBuilder<Object>();
     }
 
     public static RelationalEntitiesBuilder<?> relationalEntities$restoreFrom(BuilderRepository repo, int builderId) {
@@ -224,13 +208,12 @@ public class Builders {
     }
 
     public static RelationalEntitiesBuilder<?> relationalEntities$copyFrom(RelationalEntities relationalEntities) {
-    	RelationalEntitiesBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(relationalEntities).to(RelationalEntitiesBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	RelationalEntitiesBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(relationalEntities).to(RelationalEntitiesBuilder.class);
     	return result;
     }
 
     public static SelectQueryBuilder<?> selectQuery() {
-        return new SelectQueryBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new SelectQueryBuilder<Object>();
     }
 
     public static SelectQueryBuilder<?> selectQuery$restoreFrom(BuilderRepository repo, int builderId) {
@@ -238,13 +221,12 @@ public class Builders {
     }
 
     public static SelectQueryBuilder<?> selectQuery$copyFrom(SelectQuery selectQuery) {
-    	SelectQueryBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(selectQuery).to(SelectQueryBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	SelectQueryBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(selectQuery).to(SelectQueryBuilder.class);
     	return result;
     }
 
     public static SelectQueryParseResultBuilder<?> selectQueryParseResult() {
-        return new SelectQueryParseResultBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new SelectQueryParseResultBuilder<Object>();
     }
 
     public static SelectQueryParseResultBuilder<?> selectQueryParseResult$restoreFrom(BuilderRepository repo, int builderId) {
@@ -252,13 +234,12 @@ public class Builders {
     }
 
     public static SelectQueryParseResultBuilder<?> selectQueryParseResult$copyFrom(SelectQueryParseResult selectQueryParseResult) {
-    	SelectQueryParseResultBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(selectQueryParseResult).to(SelectQueryParseResultBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	SelectQueryParseResultBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(selectQueryParseResult).to(SelectQueryParseResultBuilder.class);
     	return result;
     }
 
     public static LogicalExpressionBuilder<?> logicalExpression() {
-        return new LogicalExpressionBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new LogicalExpressionBuilder<Object>();
     }
 
     public static LogicalExpressionBuilder<?> logicalExpression$restoreFrom(BuilderRepository repo, int builderId) {
@@ -266,13 +247,12 @@ public class Builders {
     }
 
     public static LogicalExpressionBuilder<?> logicalExpression$copyFrom(LogicalExpression logicalExpression) {
-    	LogicalExpressionBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(logicalExpression).to(LogicalExpressionBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	LogicalExpressionBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(logicalExpression).to(LogicalExpressionBuilder.class);
     	return result;
     }
 
     public static EntityBuilder<?> entity() {
-        return new EntityBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new EntityBuilder<Object>();
     }
 
     public static EntityBuilder<?> entity$restoreFrom(BuilderRepository repo, int builderId) {
@@ -280,13 +260,12 @@ public class Builders {
     }
 
     public static EntityBuilder<?> entity$copyFrom(Entity entity) {
-    	EntityBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(entity).to(EntityBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	EntityBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entity).to(EntityBuilder.class);
     	return result;
     }
 
     public static EntityAttributeBuilder<?> entityAttribute() {
-        return new EntityAttributeBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new EntityAttributeBuilder<Object>();
     }
 
     public static EntityAttributeBuilder<?> entityAttribute$restoreFrom(BuilderRepository repo, int builderId) {
@@ -294,13 +273,12 @@ public class Builders {
     }
 
     public static EntityAttributeBuilder<?> entityAttribute$copyFrom(EntityAttribute entityAttribute) {
-    	EntityAttributeBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(entityAttribute).to(EntityAttributeBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	EntityAttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityAttribute).to(EntityAttributeBuilder.class);
     	return result;
     }
 
     public static ScalarAttributeBuilder<?> scalarAttribute() {
-        return new ScalarAttributeBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new ScalarAttributeBuilder<Object>();
     }
 
     public static ScalarAttributeBuilder<?> scalarAttribute$restoreFrom(BuilderRepository repo, int builderId) {
@@ -308,13 +286,12 @@ public class Builders {
     }
 
     public static ScalarAttributeBuilder<?> scalarAttribute$copyFrom(ScalarAttribute scalarAttribute) {
-    	ScalarAttributeBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(scalarAttribute).to(ScalarAttributeBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	ScalarAttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(scalarAttribute).to(ScalarAttributeBuilder.class);
     	return result;
     }
 
     public static ValueObjectBuilder<?> valueObject() {
-        return new ValueObjectBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new ValueObjectBuilder<Object>();
     }
 
     public static ValueObjectBuilder<?> valueObject$restoreFrom(BuilderRepository repo, int builderId) {
@@ -322,13 +299,12 @@ public class Builders {
     }
 
     public static ValueObjectBuilder<?> valueObject$copyFrom(ValueObject valueObject) {
-    	ValueObjectBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(valueObject).to(ValueObjectBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	ValueObjectBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(valueObject).to(ValueObjectBuilder.class);
     	return result;
     }
 
     public static ValueObjectAttributeBuilder<?> valueObjectAttribute() {
-        return new ValueObjectAttributeBuilder<Object>(CONVERTER_OPTIONS_IMMUTABLE);
+        return new ValueObjectAttributeBuilder<Object>();
     }
 
     public static ValueObjectAttributeBuilder<?> valueObjectAttribute$restoreFrom(BuilderRepository repo, int builderId) {
@@ -336,8 +312,7 @@ public class Builders {
     }
 
     public static ValueObjectAttributeBuilder<?> valueObjectAttribute$copyFrom(ValueObjectAttribute valueObjectAttribute) {
-    	ValueObjectAttributeBuilder<?> result = new Converter(CONVERTER_OPTIONS_MUTABLE).convert(valueObjectAttribute).to(ValueObjectAttributeBuilder.class);
-    	result.setConverterOption(CONVERTER_OPTIONS_IMMUTABLE);
+    	ValueObjectAttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(valueObjectAttribute).to(ValueObjectAttributeBuilder.class);
     	return result;
     }
 }

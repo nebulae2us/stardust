@@ -22,6 +22,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.nebulae2us.electron.Converter;
 import org.nebulae2us.electron.util.ListBuilder;
+import org.nebulae2us.stardust.Builders;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.jpa.group1.*;
 import org.nebulae2us.stardust.my.domain.Entity;
@@ -53,7 +54,7 @@ public class RelationalEntitiesTest {
 				aliasJoin().name("owners").alias("o")
 				});
 
-		List<AliasJoin> aliasJoins = new Converter(CONVERTER_OPTIONS_IMMUTABLE).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
+		List<AliasJoin> aliasJoins = new Converter(Builders.DESTINATION_CLASS_RESOLVER, true).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
 		
 		RelationalEntities relationalEntities = RelationalEntities.newInstance(house, "", aliasJoins);
 		
@@ -75,7 +76,7 @@ public class RelationalEntitiesTest {
 				aliasJoin().name("h.owners").alias("o").joinType(JoinType.LEFT_JOIN)
 			).toList();
 		
-		List<AliasJoin> aliasJoins = new Converter(CONVERTER_OPTIONS_IMMUTABLE).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
+		List<AliasJoin> aliasJoins = new Converter(Builders.DESTINATION_CLASS_RESOLVER, true).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
 		
 		RelationalEntities relationalEntities = RelationalEntities.newInstance(person, "", aliasJoins);
 		

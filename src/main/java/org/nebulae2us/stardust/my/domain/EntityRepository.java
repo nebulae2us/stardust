@@ -22,7 +22,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.nebulae2us.electron.Converter;
-import static org.nebulae2us.stardust.Builders.*;
+import org.nebulae2us.stardust.Builders;
 
 
 /**
@@ -74,7 +74,7 @@ public class EntityRepository {
 			
 			Map<Class<?>, EntityBuilder<?>> entityBuilders = scanner.getScannedEntityBuilders();
 			List<Entity> entities = 
-					new Converter(CONVERTER_OPTIONS_IMMUTABLE).convert(entityBuilders.values()).toListOf(Entity.class);
+					new Converter(Builders.DESTINATION_CLASS_RESOLVER, true).convert(entityBuilders.values()).toListOf(Entity.class);
 			
 			for (Entity e : entities) {
 				if (!this.entities.containsKey(e.getDeclaringClass())) {

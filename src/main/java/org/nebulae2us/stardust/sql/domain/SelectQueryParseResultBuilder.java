@@ -2,121 +2,89 @@ package org.nebulae2us.stardust.sql.domain;
 
 import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.*;
 
+@Builder(destination=SelectQueryParseResult.class)
+public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryParseResult> {
 
-public class SelectQueryParseResultBuilder<B> implements Convertable {
+	protected final SelectQueryParseResult $$$wrapped;
 
-	private final SelectQueryParseResult $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected SelectQueryParseResultBuilder(SelectQueryParseResult selectQueryParseResult) {
-		if (selectQueryParseResult == null) {
-			throw new NullPointerException();
-		}
+	protected final P $$$parentBuilder;
 	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = selectQueryParseResult;
-	}
-
-	public SelectQueryParseResultBuilder(ConverterOption option, B parentBuilder) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
-
 	public SelectQueryParseResultBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+		this.$$$wrapped = null;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public SelectQueryParseResultBuilder(ConverterOption option) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+	public SelectQueryParseResultBuilder(P parentBuilder) {
+		this.$$$wrapped = null;
+		this.$$$parentBuilder = parentBuilder;
+	}
+
+	protected SelectQueryParseResultBuilder(SelectQueryParseResult wrapped) {
+		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public SelectQueryParseResult getSavedTarget() {
-		return this.$$$savedTarget;
-	}
-
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
-	}
-
-    protected void copyAttributes(SelectQueryParseResultBuilder<?> copy) {
-    	this.relationalEntities = copy.relationalEntities;
-		this.joinedTables = copy.joinedTables;
-		this.columns = copy.columns;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public SelectQueryParseResultBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+    public SelectQueryParseResultBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
 
-    public SelectQueryParseResult toSelectQueryParseResult() {
-    	return new Converter(this.$$$option).convert(this).to(SelectQueryParseResult.class);
-    }
+	public SelectQueryParseResult getWrappedObject() {
+		return this.$$$wrapped;
+	}
 
-    private RelationalEntitiesBuilder<?> relationalEntities;
-
-    public RelationalEntitiesBuilder<?> getRelationalEntities() {
-        return this.relationalEntities;
-    }
-
-    public void setRelationalEntities(RelationalEntitiesBuilder<?> relationalEntities) {
-    	if (this.$$$savedTarget != null) {
+	protected void verifyMutable() {
+		if (this.$$$wrapped != null) {
     		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.relationalEntities = relationalEntities;
+		}
+	}
+
+	public P end() {
+		return this.$$$parentBuilder;
+	}
+
+    public SelectQueryParseResult toSelectQueryParseResult() {
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(SelectQueryParseResult.class);
     }
 
-    public RelationalEntitiesBuilder<? extends SelectQueryParseResultBuilder<B>> relationalEntities() {
-        RelationalEntitiesBuilder<SelectQueryParseResultBuilder<B>> relationalEntities = new RelationalEntitiesBuilder<SelectQueryParseResultBuilder<B>>(this.$$$option, this);
-        this.relationalEntities = relationalEntities;
-        
-        return relationalEntities;
-    }
+	private RelationalEntitiesBuilder<?> relationalEntities;
+	
+	public RelationalEntitiesBuilder<?> getRelationalEntities() {
+		return relationalEntities;
+	}
 
-    public SelectQueryParseResultBuilder<B> relationalEntities(RelationalEntitiesBuilder<?> relationalEntities) {
-        this.relationalEntities = relationalEntities;
+	public void setRelationalEntities(RelationalEntitiesBuilder<?> relationalEntities) {
+		verifyMutable();
+		this.relationalEntities = relationalEntities;
+	}
+
+	public SelectQueryParseResultBuilder<P> relationalEntities(RelationalEntitiesBuilder<?> relationalEntities) {
+		verifyMutable();
+		this.relationalEntities = relationalEntities;
+		return this;
+	}
+
+	public RelationalEntitiesBuilder<? extends SelectQueryParseResultBuilder<P>> relationalEntities$begin() {
+		RelationalEntitiesBuilder<SelectQueryParseResultBuilder<P>> result = new RelationalEntitiesBuilder<SelectQueryParseResultBuilder<P>>(this);
+		this.relationalEntities = result;
+		return result;
+	}
+
+    public SelectQueryParseResultBuilder<P> relationalEntities$wrap(RelationalEntities relationalEntities) {
+    	verifyMutable();
+    	this.relationalEntities = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(relationalEntities).to(RelationalEntitiesBuilder.class);
         return this;
     }
-
-    public SelectQueryParseResultBuilder<B> relationalEntities(RelationalEntities relationalEntities) {
-    	this.relationalEntities = new WrapConverter(this.$$$option).convert(relationalEntities).to(RelationalEntitiesBuilder.class);
-        return this;
-    }
-
-    public SelectQueryParseResultBuilder<B> relationalEntities$restoreFrom(BuilderRepository repo, int builderId) {
-        Object relationalEntities = repo.get(builderId);
-        if (relationalEntities == null) {
+    
+    public SelectQueryParseResultBuilder<P> relationalEntities$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -128,45 +96,49 @@ public class SelectQueryParseResultBuilder<B> implements Convertable {
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
+        else if (!(restoredObject instanceof RelationalEntitiesBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + RelationalEntitiesBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
         else {
-            this.relationalEntities = (RelationalEntitiesBuilder<?>)relationalEntities;
+            this.relationalEntities = (RelationalEntitiesBuilder<?>)restoredObject;
         }
         return this;
     }
 
-    private JoinedTablesBuilder<?> joinedTables;
+	private JoinedTablesBuilder<?> joinedTables;
+	
+	public JoinedTablesBuilder<?> getJoinedTables() {
+		return joinedTables;
+	}
 
-    public JoinedTablesBuilder<?> getJoinedTables() {
-        return this.joinedTables;
-    }
+	public void setJoinedTables(JoinedTablesBuilder<?> joinedTables) {
+		verifyMutable();
+		this.joinedTables = joinedTables;
+	}
 
-    public void setJoinedTables(JoinedTablesBuilder<?> joinedTables) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.joinedTables = joinedTables;
-    }
+	public SelectQueryParseResultBuilder<P> joinedTables(JoinedTablesBuilder<?> joinedTables) {
+		verifyMutable();
+		this.joinedTables = joinedTables;
+		return this;
+	}
 
-    public JoinedTablesBuilder<? extends SelectQueryParseResultBuilder<B>> joinedTables() {
-        JoinedTablesBuilder<SelectQueryParseResultBuilder<B>> joinedTables = new JoinedTablesBuilder<SelectQueryParseResultBuilder<B>>(this.$$$option, this);
-        this.joinedTables = joinedTables;
-        
-        return joinedTables;
-    }
+	public JoinedTablesBuilder<? extends SelectQueryParseResultBuilder<P>> joinedTables$begin() {
+		JoinedTablesBuilder<SelectQueryParseResultBuilder<P>> result = new JoinedTablesBuilder<SelectQueryParseResultBuilder<P>>(this);
+		this.joinedTables = result;
+		return result;
+	}
 
-    public SelectQueryParseResultBuilder<B> joinedTables(JoinedTablesBuilder<?> joinedTables) {
-        this.joinedTables = joinedTables;
+    public SelectQueryParseResultBuilder<P> joinedTables$wrap(JoinedTables joinedTables) {
+    	verifyMutable();
+    	this.joinedTables = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(joinedTables).to(JoinedTablesBuilder.class);
         return this;
     }
-
-    public SelectQueryParseResultBuilder<B> joinedTables(JoinedTables joinedTables) {
-    	this.joinedTables = new WrapConverter(this.$$$option).convert(joinedTables).to(JoinedTablesBuilder.class);
-        return this;
-    }
-
-    public SelectQueryParseResultBuilder<B> joinedTables$restoreFrom(BuilderRepository repo, int builderId) {
-        Object joinedTables = repo.get(builderId);
-        if (joinedTables == null) {
+    
+    public SelectQueryParseResultBuilder<P> joinedTables$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -178,110 +150,131 @@ public class SelectQueryParseResultBuilder<B> implements Convertable {
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
-        else {
-            this.joinedTables = (JoinedTablesBuilder<?>)joinedTables;
-        }
-        return this;
-    }
-
-    private List<ColumnBuilder<?>> columns;
-
-    public List<ColumnBuilder<?>> getColumns() {
-        return this.columns;
-    }
-
-    public void setColumns(List<ColumnBuilder<?>> columns) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.columns = columns;
-    }
-
-    public ColumnBuilder<SelectQueryParseResultBuilder<B>> column() {
-        if (this.columns == null) {
-            this.columns = new ArrayList<ColumnBuilder<?>>();
-        }
-
-        ColumnBuilder<SelectQueryParseResultBuilder<B>> column = new ColumnBuilder<SelectQueryParseResultBuilder<B>>(this.$$$option, this);
-        
-        this.columns.add(column);
-        
-        return column;
-    }
-
-    public SelectQueryParseResultBuilder<B> column(ColumnBuilder<?> column) {
-        if (this.columns == null) {
-            this.columns = new ArrayList<ColumnBuilder<?>>();
-        }
-        this.columns.add(column);
-        return this;
-    }
-
-    public SelectQueryParseResultBuilder<B> column(Column column) {
-        if (this.columns == null) {
-            this.columns = new ArrayList<ColumnBuilder<?>>();
-        }
-    	ColumnBuilder<?> wrap = new WrapConverter(this.$$$option).convert(column).to(ColumnBuilder.class);
-        this.columns.add(wrap);
-        return this;
-    }
-
-    public SelectQueryParseResultBuilder<B> columns(ColumnBuilder<?> ... columns) {
-        if (this.columns == null) {
-            this.columns = new ArrayList<ColumnBuilder<?>>();
-        }
-        for (ColumnBuilder<?> o : columns) {
-            this.columns.add(o);
-        }
-        return this;
-    }
-
-    public SelectQueryParseResultBuilder<B> columns(Column ... columns) {
-        if (this.columns == null) {
-            this.columns = new ArrayList<ColumnBuilder<?>>();
-        }
-        for (Column o : columns) {
-	    	ColumnBuilder<?> wrap = new WrapConverter(this.$$$option).convert(o).to(ColumnBuilder.class);
-            this.columns.add(wrap);
-        }
-        return this;
-    }
-
-    public SelectQueryParseResultBuilder<B> column$restoreFrom(BuilderRepository repo, int builderId) {
-        Object column = repo.get(builderId);
-        if (this.columns == null) {
-            this.columns = new ArrayList<ColumnBuilder<?>>();
-        }
-
-        if (column == null) {
-        	if (repo.isSupportLazy()) {
-                
-        		final int size = this.columns.size();
-        		this.columns.add(null);
-
-        		repo.addObjectStoredListener(builderId, new Procedure() {
-					public void execute(Object... arguments) {
-						SelectQueryParseResultBuilder.this.columns.set(size, (ColumnBuilder<?>)arguments[0]);
-					}
-				});
-        	}
-        	else {
-                throw new IllegalStateException("Object does not exist with id " + builderId);
-        	}
+        else if (!(restoredObject instanceof JoinedTablesBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + JoinedTablesBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
         }
         else {
-            this.columns.add((ColumnBuilder<?>)column);
+            this.joinedTables = (JoinedTablesBuilder<?>)restoredObject;
         }
-    	
-    	return this;
+        return this;
     }
 
-    public SelectQueryParseResultBuilder<B> columns$restoreFrom(BuilderRepository repo, int ... builderIds) {
+	private List<ColumnBuilder<?>> columns;
+	
+	public List<ColumnBuilder<?>> getColumns() {
+		return columns;
+	}
 
-    	for (int builderId : builderIds) {
-    		column$restoreFrom(repo, builderId);
-    	}
-    	
-    	return this;
+	public void setColumns(List<ColumnBuilder<?>> columns) {
+		verifyMutable();
+		this.columns = columns;
+	}
+
+	public SelectQueryParseResultBuilder<P> columns(ColumnBuilder<?> ... columns) {
+		verifyMutable();
+		return columns(new ListBuilder<ColumnBuilder<?>>().add(columns).toList());
+	}
+	
+	public SelectQueryParseResultBuilder<P> columns(Collection<ColumnBuilder<?>> columns) {
+		verifyMutable();
+		if (this.columns == null) {
+			this.columns = new ArrayList<ColumnBuilder<?>>();
+		}
+		if (columns != null) {
+			for (ColumnBuilder<?> e : columns) {
+				this.columns.add(e);
+			}
+		}
+		return this;
+	}
+
+	public ColumnBuilder<SelectQueryParseResultBuilder<P>> columns$one() {
+		verifyMutable();
+		if (this.columns == null) {
+			this.columns = new ArrayList<ColumnBuilder<?>>();
+		}
+		
+		ColumnBuilder<SelectQueryParseResultBuilder<P>> result =
+				new ColumnBuilder<SelectQueryParseResultBuilder<P>>(this);
+		
+		this.columns.add(result);
+		
+		return result;
+	}
+
+	public class Columns$$$builder {
+		
+		public ColumnBuilder<Columns$$$builder> blank$begin() {
+			ColumnBuilder<Columns$$$builder> result = new ColumnBuilder<Columns$$$builder>(this);
+			SelectQueryParseResultBuilder.this.columns.add(result);
+			return result;
+		}
+		
+		public SelectQueryParseResultBuilder<P> end() {
+			return SelectQueryParseResultBuilder.this;
+		}
+	}
+	
+	public Columns$$$builder columns$list() {
+		verifyMutable();
+		if (this.columns == null) {
+			this.columns = new ArrayList<ColumnBuilder<?>>();
+		}
+		return new Columns$$$builder();
+	}
+
+    public SelectQueryParseResultBuilder<P> columns$wrap(Column ... columns) {
+    	return columns$wrap(new ListBuilder<Column>().add(columns).toList());
+    }
+
+    public SelectQueryParseResultBuilder<P> columns$wrap(Collection<Column> columns) {
+		verifyMutable();
+
+		if (this.columns == null) {
+			this.columns = new ArrayList<ColumnBuilder<?>>();
+		}
+		if (columns != null) {
+			for (Column e : columns) {
+				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ColumnBuilder.class);
+				this.columns.add(wrapped);
+			}
+		}
+		return this;
+    }
+    
+    public SelectQueryParseResultBuilder<P> columns$restoreFrom(BuilderRepository repo, Object ... builderIds) {
+    	return columns$restoreFrom(repo, new ListBuilder<Object>().add(builderIds).toList());
+    }
+
+    public SelectQueryParseResultBuilder<P> columns$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
+		verifyMutable();
+
+		if (this.columns == null) {
+			this.columns = new ArrayList<ColumnBuilder<?>>();
+		}
+		if (builderIds != null) {
+	    	for (Object builderId : builderIds) {
+	            Object restoredObject = repo.get(builderId);
+	            if (restoredObject == null) {
+	            	if (repo.isSupportLazy()) {
+	            		repo.addObjectStoredListener(builderId, new Procedure() {
+	    					public void execute(Object... arguments) {
+	    						SelectQueryParseResultBuilder.this.columns.add((ColumnBuilder<?>)arguments[0]);
+	    					}
+	    				});
+	            	}
+	            	else {
+	                    throw new IllegalStateException("Object does not exist with id " + builderId);
+	            	}
+	            }
+	            else if (!(restoredObject instanceof ColumnBuilder)) {
+	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ColumnBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+	            }
+	            else {
+	                this.columns.add((ColumnBuilder<?>)restoredObject);
+	            }
+	    	}
+		}
+        return this;
     }
 }

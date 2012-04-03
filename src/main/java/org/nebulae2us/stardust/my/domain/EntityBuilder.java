@@ -2,133 +2,79 @@ package org.nebulae2us.stardust.my.domain;
 
 import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.*;
 
-
-public class EntityBuilder<B> extends AttributeHolderBuilder<B> implements Convertable {
-
-	private final Entity $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected EntityBuilder(Entity entity) {
-		super(entity);
-		if (entity == null) {
-			throw new NullPointerException();
-		}
-	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = entity;
-	}
-
-	public EntityBuilder(ConverterOption option, B parentBuilder) {
-		super(option, parentBuilder);
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
+@Builder(destination=Entity.class)
+public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 
 	public EntityBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
+		super();
 	}
 	
-	public EntityBuilder(ConverterOption option) {
-		super(option);
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
-	}
-	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public Entity getSavedTarget() {
-		return this.$$$savedTarget;
+	public EntityBuilder(P parentBuilder) {
+		super(parentBuilder);
 	}
 
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
+	protected EntityBuilder(Entity wrapped) {
+		super(wrapped);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
+	@Override
+	public Entity getWrappedObject() {
+		return (Entity)this.$$$wrapped;
 	}
 
-    protected void copyAttributes(EntityBuilder<?> copy) {
-		super.copyAttributes(copy);
-    	this.joinedTables = copy.joinedTables;
-		this.entityIdentifier = copy.entityIdentifier;
-		this.rootEntity = copy.rootEntity;
-		this.inheritanceType = copy.inheritanceType;
-		this.discriminator = copy.discriminator;
-		this.discriminatorValue = copy.discriminatorValue;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public EntityBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+	@Override
+    public EntityBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
-
+	
     public Entity toEntity() {
-    	return new Converter(this.$$$option).convert(this).to(Entity.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Entity.class);
     }
 
     @Override
     public Entity toAttributeHolder() {
-    	return new Converter(this.$$$option).convert(this).to(Entity.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Entity.class);
     }
 
-    private JoinedTablesBuilder<?> joinedTables;
+	private JoinedTablesBuilder<?> joinedTables;
+	
+	public JoinedTablesBuilder<?> getJoinedTables() {
+		return joinedTables;
+	}
 
-    public JoinedTablesBuilder<?> getJoinedTables() {
-        return this.joinedTables;
-    }
+	public void setJoinedTables(JoinedTablesBuilder<?> joinedTables) {
+		verifyMutable();
+		this.joinedTables = joinedTables;
+	}
 
-    public void setJoinedTables(JoinedTablesBuilder<?> joinedTables) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.joinedTables = joinedTables;
-    }
+	public EntityBuilder<P> joinedTables(JoinedTablesBuilder<?> joinedTables) {
+		verifyMutable();
+		this.joinedTables = joinedTables;
+		return this;
+	}
 
-    public JoinedTablesBuilder<? extends EntityBuilder<B>> joinedTables() {
-        JoinedTablesBuilder<EntityBuilder<B>> joinedTables = new JoinedTablesBuilder<EntityBuilder<B>>(this.$$$option, this);
-        this.joinedTables = joinedTables;
-        
-        return joinedTables;
-    }
+	public JoinedTablesBuilder<? extends EntityBuilder<P>> joinedTables$begin() {
+		JoinedTablesBuilder<EntityBuilder<P>> result = new JoinedTablesBuilder<EntityBuilder<P>>(this);
+		this.joinedTables = result;
+		return result;
+	}
 
-    public EntityBuilder<B> joinedTables(JoinedTablesBuilder<?> joinedTables) {
-        this.joinedTables = joinedTables;
+    public EntityBuilder<P> joinedTables$wrap(JoinedTables joinedTables) {
+    	verifyMutable();
+    	this.joinedTables = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(joinedTables).to(JoinedTablesBuilder.class);
         return this;
     }
-
-    public EntityBuilder<B> joinedTables(JoinedTables joinedTables) {
-    	this.joinedTables = new WrapConverter(this.$$$option).convert(joinedTables).to(JoinedTablesBuilder.class);
-        return this;
-    }
-
-    public EntityBuilder<B> joinedTables$restoreFrom(BuilderRepository repo, int builderId) {
-        Object joinedTables = repo.get(builderId);
-        if (joinedTables == null) {
+    
+    public EntityBuilder<P> joinedTables$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -140,45 +86,49 @@ public class EntityBuilder<B> extends AttributeHolderBuilder<B> implements Conve
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
+        else if (!(restoredObject instanceof JoinedTablesBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + JoinedTablesBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
         else {
-            this.joinedTables = (JoinedTablesBuilder<?>)joinedTables;
+            this.joinedTables = (JoinedTablesBuilder<?>)restoredObject;
         }
         return this;
     }
 
-    private EntityIdentifierBuilder<?> entityIdentifier;
+	private EntityIdentifierBuilder<?> entityIdentifier;
+	
+	public EntityIdentifierBuilder<?> getEntityIdentifier() {
+		return entityIdentifier;
+	}
 
-    public EntityIdentifierBuilder<?> getEntityIdentifier() {
-        return this.entityIdentifier;
-    }
+	public void setEntityIdentifier(EntityIdentifierBuilder<?> entityIdentifier) {
+		verifyMutable();
+		this.entityIdentifier = entityIdentifier;
+	}
 
-    public void setEntityIdentifier(EntityIdentifierBuilder<?> entityIdentifier) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.entityIdentifier = entityIdentifier;
-    }
+	public EntityBuilder<P> entityIdentifier(EntityIdentifierBuilder<?> entityIdentifier) {
+		verifyMutable();
+		this.entityIdentifier = entityIdentifier;
+		return this;
+	}
 
-    public EntityIdentifierBuilder<? extends EntityBuilder<B>> entityIdentifier() {
-        EntityIdentifierBuilder<EntityBuilder<B>> entityIdentifier = new EntityIdentifierBuilder<EntityBuilder<B>>(this.$$$option, this);
-        this.entityIdentifier = entityIdentifier;
-        
-        return entityIdentifier;
-    }
+	public EntityIdentifierBuilder<? extends EntityBuilder<P>> entityIdentifier$begin() {
+		EntityIdentifierBuilder<EntityBuilder<P>> result = new EntityIdentifierBuilder<EntityBuilder<P>>(this);
+		this.entityIdentifier = result;
+		return result;
+	}
 
-    public EntityBuilder<B> entityIdentifier(EntityIdentifierBuilder<?> entityIdentifier) {
-        this.entityIdentifier = entityIdentifier;
+    public EntityBuilder<P> entityIdentifier$wrap(EntityIdentifier entityIdentifier) {
+    	verifyMutable();
+    	this.entityIdentifier = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(entityIdentifier).to(EntityIdentifierBuilder.class);
         return this;
     }
-
-    public EntityBuilder<B> entityIdentifier(EntityIdentifier entityIdentifier) {
-    	this.entityIdentifier = new WrapConverter(this.$$$option).convert(entityIdentifier).to(EntityIdentifierBuilder.class);
-        return this;
-    }
-
-    public EntityBuilder<B> entityIdentifier$restoreFrom(BuilderRepository repo, int builderId) {
-        Object entityIdentifier = repo.get(builderId);
-        if (entityIdentifier == null) {
+    
+    public EntityBuilder<P> entityIdentifier$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -190,45 +140,49 @@ public class EntityBuilder<B> extends AttributeHolderBuilder<B> implements Conve
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
+        else if (!(restoredObject instanceof EntityIdentifierBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + EntityIdentifierBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
         else {
-            this.entityIdentifier = (EntityIdentifierBuilder<?>)entityIdentifier;
+            this.entityIdentifier = (EntityIdentifierBuilder<?>)restoredObject;
         }
         return this;
     }
 
-    private EntityBuilder<?> rootEntity;
+	private EntityBuilder<?> rootEntity;
+	
+	public EntityBuilder<?> getRootEntity() {
+		return rootEntity;
+	}
 
-    public EntityBuilder<?> getRootEntity() {
-        return this.rootEntity;
-    }
+	public void setRootEntity(EntityBuilder<?> rootEntity) {
+		verifyMutable();
+		this.rootEntity = rootEntity;
+	}
 
-    public void setRootEntity(EntityBuilder<?> rootEntity) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.rootEntity = rootEntity;
-    }
+	public EntityBuilder<P> rootEntity(EntityBuilder<?> rootEntity) {
+		verifyMutable();
+		this.rootEntity = rootEntity;
+		return this;
+	}
 
-    public EntityBuilder<? extends EntityBuilder<B>> rootEntity() {
-        EntityBuilder<EntityBuilder<B>> rootEntity = new EntityBuilder<EntityBuilder<B>>(this.$$$option, this);
-        this.rootEntity = rootEntity;
-        
-        return rootEntity;
-    }
+	public EntityBuilder<? extends EntityBuilder<P>> rootEntity$begin() {
+		EntityBuilder<EntityBuilder<P>> result = new EntityBuilder<EntityBuilder<P>>(this);
+		this.rootEntity = result;
+		return result;
+	}
 
-    public EntityBuilder<B> rootEntity(EntityBuilder<?> rootEntity) {
-        this.rootEntity = rootEntity;
+    public EntityBuilder<P> rootEntity$wrap(Entity rootEntity) {
+    	verifyMutable();
+    	this.rootEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(rootEntity).to(EntityBuilder.class);
         return this;
     }
-
-    public EntityBuilder<B> rootEntity(Entity rootEntity) {
-    	this.rootEntity = new WrapConverter(this.$$$option).convert(rootEntity).to(EntityBuilder.class);
-        return this;
-    }
-
-    public EntityBuilder<B> rootEntity$restoreFrom(BuilderRepository repo, int builderId) {
-        Object entity = repo.get(builderId);
-        if (entity == null) {
+    
+    public EntityBuilder<P> rootEntity$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -240,63 +194,66 @@ public class EntityBuilder<B> extends AttributeHolderBuilder<B> implements Conve
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
+        else if (!(restoredObject instanceof EntityBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + EntityBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
         else {
-            this.rootEntity = (EntityBuilder<?>)entity;
+            this.rootEntity = (EntityBuilder<?>)restoredObject;
         }
         return this;
     }
 
-    private InheritanceType inheritanceType;
+	private InheritanceType inheritanceType;
+	
+	public InheritanceType getInheritanceType() {
+		return inheritanceType;
+	}
 
-    public InheritanceType getInheritanceType() {
-        return this.inheritanceType;
-    }
+	public void setInheritanceType(InheritanceType inheritanceType) {
+		verifyMutable();
+		this.inheritanceType = inheritanceType;
+	}
 
-    public void setInheritanceType(InheritanceType inheritanceType) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.inheritanceType = inheritanceType;
-    }
+	public EntityBuilder<P> inheritanceType(InheritanceType inheritanceType) {
+		verifyMutable();
+		this.inheritanceType = inheritanceType;
+		return this;
+	}
 
-    public EntityBuilder<B> inheritanceType(InheritanceType inheritanceType) {
-        this.inheritanceType = inheritanceType;
+	private ScalarAttributeBuilder<?> discriminator;
+	
+	public ScalarAttributeBuilder<?> getDiscriminator() {
+		return discriminator;
+	}
+
+	public void setDiscriminator(ScalarAttributeBuilder<?> discriminator) {
+		verifyMutable();
+		this.discriminator = discriminator;
+	}
+
+	public EntityBuilder<P> discriminator(ScalarAttributeBuilder<?> discriminator) {
+		verifyMutable();
+		this.discriminator = discriminator;
+		return this;
+	}
+
+	public ScalarAttributeBuilder<? extends EntityBuilder<P>> discriminator$begin() {
+		ScalarAttributeBuilder<EntityBuilder<P>> result = new ScalarAttributeBuilder<EntityBuilder<P>>(this);
+		this.discriminator = result;
+		return result;
+	}
+
+    public EntityBuilder<P> discriminator$wrap(ScalarAttribute discriminator) {
+    	verifyMutable();
+    	this.discriminator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(discriminator).to(ScalarAttributeBuilder.class);
         return this;
     }
-
-    private ScalarAttributeBuilder<?> discriminator;
-
-    public ScalarAttributeBuilder<?> getDiscriminator() {
-        return this.discriminator;
-    }
-
-    public void setDiscriminator(ScalarAttributeBuilder<?> discriminator) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.discriminator = discriminator;
-    }
-
-    public ScalarAttributeBuilder<? extends EntityBuilder<B>> discriminator() {
-        ScalarAttributeBuilder<EntityBuilder<B>> discriminator = new ScalarAttributeBuilder<EntityBuilder<B>>(this.$$$option, this);
-        this.discriminator = discriminator;
-        
-        return discriminator;
-    }
-
-    public EntityBuilder<B> discriminator(ScalarAttributeBuilder<?> discriminator) {
-        this.discriminator = discriminator;
-        return this;
-    }
-
-    public EntityBuilder<B> discriminator(ScalarAttribute discriminator) {
-    	this.discriminator = new WrapConverter(this.$$$option).convert(discriminator).to(ScalarAttributeBuilder.class);
-        return this;
-    }
-
-    public EntityBuilder<B> discriminator$restoreFrom(BuilderRepository repo, int builderId) {
-        Object scalarAttribute = repo.get(builderId);
-        if (scalarAttribute == null) {
+    
+    public EntityBuilder<P> discriminator$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -308,32 +265,64 @@ public class EntityBuilder<B> extends AttributeHolderBuilder<B> implements Conve
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
+        else if (!(restoredObject instanceof ScalarAttributeBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ScalarAttributeBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
         else {
-            this.discriminator = (ScalarAttributeBuilder<?>)scalarAttribute;
+            this.discriminator = (ScalarAttributeBuilder<?>)restoredObject;
         }
         return this;
     }
 
-    private String discriminatorValue;
+	private String discriminatorValue;
+	
+	public String getDiscriminatorValue() {
+		return discriminatorValue;
+	}
 
-    public String getDiscriminatorValue() {
-        return this.discriminatorValue;
-    }
+	public void setDiscriminatorValue(String discriminatorValue) {
+		verifyMutable();
+		this.discriminatorValue = discriminatorValue;
+	}
 
-    public void setDiscriminatorValue(String discriminatorValue) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.discriminatorValue = discriminatorValue;
-    }
+	public EntityBuilder<P> discriminatorValue(String discriminatorValue) {
+		verifyMutable();
+		this.discriminatorValue = discriminatorValue;
+		return this;
+	}
 
-    public EntityBuilder<B> discriminatorValue(String discriminatorValue) {
-        this.discriminatorValue = discriminatorValue;
-        return this;
+	@Override
+	public EntityBuilder<P> declaringClass(Class<?> declaringClass) {
+		return (EntityBuilder<P>)super.declaringClass(declaringClass);
+	}
+
+	@Override
+	public EntityBuilder<P> attributes(AttributeBuilder<?> ... attributes) {
+		return (EntityBuilder<P>)super.attributes(attributes);
+	}
+
+	@Override
+	public EntityBuilder<P> attributes(Collection<AttributeBuilder<?>> attributes) {
+		return (EntityBuilder<P>)super.attributes(attributes);
+	}
+
+	@Override
+    public EntityBuilder<P> attributes$wrap(Attribute ... attributes) {
+		return (EntityBuilder<P>)super.attributes$wrap(attributes);
     }
 
 	@Override
-    public EntityBuilder<B> declaringClass(Class declaringClass) {
-        return (EntityBuilder<B>)super.declaringClass(declaringClass);
+    public EntityBuilder<P> attributes$wrap(Collection<Attribute> attributes) {
+		return (EntityBuilder<P>)super.attributes$wrap(attributes);
+    }
+
+	@Override
+    public EntityBuilder<P> attributes$restoreFrom(BuilderRepository repo, Object ... builderIds) {
+		return (EntityBuilder<P>)super.attributes$restoreFrom(repo, builderIds);
+    }
+
+	@Override
+    public EntityBuilder<P> attributes$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
+		return (EntityBuilder<P>)super.attributes$restoreFrom(repo, builderIds);
     }
 }

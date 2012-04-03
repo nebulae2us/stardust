@@ -1,100 +1,69 @@
 package org.nebulae2us.stardust.expr.domain;
 
+import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 
+@Builder(destination=Expression.class)
+public class ExpressionBuilder<P> implements Wrappable<Expression> {
 
-public class ExpressionBuilder<B> implements Convertable {
+	protected final Expression $$$wrapped;
 
-	private final Expression $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected ExpressionBuilder(Expression expression) {
-		if (expression == null) {
-			throw new NullPointerException();
-		}
+	protected final P $$$parentBuilder;
 	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = expression;
-	}
-
-	public ExpressionBuilder(ConverterOption option, B parentBuilder) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
-
 	public ExpressionBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+		this.$$$wrapped = null;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ExpressionBuilder(ConverterOption option) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+	public ExpressionBuilder(P parentBuilder) {
+		this.$$$wrapped = null;
+		this.$$$parentBuilder = parentBuilder;
+	}
+
+	protected ExpressionBuilder(Expression wrapped) {
+		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public Expression getSavedTarget() {
-		return this.$$$savedTarget;
-	}
-
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
-	}
-
-    protected void copyAttributes(ExpressionBuilder<?> copy) {
-    	this.negated = copy.negated;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public ExpressionBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+    public ExpressionBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
 
-    public Expression toExpression() {
-    	return new Converter(this.$$$option).convert(this).to(Expression.class);
-    }
+	public Expression getWrappedObject() {
+		return this.$$$wrapped;
+	}
 
-    private boolean negated;
-
-    public boolean isNegated() {
-        return this.negated;
-    }
-
-    public void setNegated(boolean negated) {
-    	if (this.$$$savedTarget != null) {
+	protected void verifyMutable() {
+		if (this.$$$wrapped != null) {
     		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.negated = negated;
+		}
+	}
+
+	public P end() {
+		return this.$$$parentBuilder;
+	}
+
+    public Expression toExpression() {
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Expression.class);
     }
 
-    public ExpressionBuilder<B> negated(boolean negated) {
-        this.negated = negated;
-        return this;
-    }
+	private boolean negated;
+	
+	public boolean getNegated() {
+		return negated;
+	}
+
+	public void setNegated(boolean negated) {
+		verifyMutable();
+		this.negated = negated;
+	}
+
+	public ExpressionBuilder<P> negated(boolean negated) {
+		verifyMutable();
+		this.negated = negated;
+		return this;
+	}
 }

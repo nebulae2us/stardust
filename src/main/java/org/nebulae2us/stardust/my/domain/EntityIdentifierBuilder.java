@@ -2,183 +2,170 @@ package org.nebulae2us.stardust.my.domain;
 
 import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 
+@Builder(destination=EntityIdentifier.class)
+public class EntityIdentifierBuilder<P> implements Wrappable<EntityIdentifier> {
 
-public class EntityIdentifierBuilder<B> implements Convertable {
+	protected final EntityIdentifier $$$wrapped;
 
-	private final EntityIdentifier $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected EntityIdentifierBuilder(EntityIdentifier entityIdentifier) {
-		if (entityIdentifier == null) {
-			throw new NullPointerException();
-		}
+	protected final P $$$parentBuilder;
 	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = entityIdentifier;
-	}
-
-	public EntityIdentifierBuilder(ConverterOption option, B parentBuilder) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
-
 	public EntityIdentifierBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+		this.$$$wrapped = null;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public EntityIdentifierBuilder(ConverterOption option) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+	public EntityIdentifierBuilder(P parentBuilder) {
+		this.$$$wrapped = null;
+		this.$$$parentBuilder = parentBuilder;
+	}
+
+	protected EntityIdentifierBuilder(EntityIdentifier wrapped) {
+		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public EntityIdentifier getSavedTarget() {
-		return this.$$$savedTarget;
-	}
-
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
-	}
-
-    protected void copyAttributes(EntityIdentifierBuilder<?> copy) {
-    	this.attributes = copy.attributes;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public EntityIdentifierBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+    public EntityIdentifierBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
 
-    public EntityIdentifier toEntityIdentifier() {
-    	return new Converter(this.$$$option).convert(this).to(EntityIdentifier.class);
-    }
+	public EntityIdentifier getWrappedObject() {
+		return this.$$$wrapped;
+	}
 
-    private List<AttributeBuilder<?>> attributes;
-
-    public List<AttributeBuilder<?>> getAttributes() {
-        return this.attributes;
-    }
-
-    public void setAttributes(List<AttributeBuilder<?>> attributes) {
-    	if (this.$$$savedTarget != null) {
+	protected void verifyMutable() {
+		if (this.$$$wrapped != null) {
     		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.attributes = attributes;
+		}
+	}
+
+	public P end() {
+		return this.$$$parentBuilder;
+	}
+
+    public EntityIdentifier toEntityIdentifier() {
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(EntityIdentifier.class);
     }
 
-    public AttributeBuilder<EntityIdentifierBuilder<B>> attribute() {
-        if (this.attributes == null) {
-            this.attributes = new ArrayList<AttributeBuilder<?>>();
-        }
+	private List<AttributeBuilder<?>> attributes;
+	
+	public List<AttributeBuilder<?>> getAttributes() {
+		return attributes;
+	}
 
-        AttributeBuilder<EntityIdentifierBuilder<B>> attribute = new AttributeBuilder<EntityIdentifierBuilder<B>>(this.$$$option, this);
-        
-        this.attributes.add(attribute);
-        
-        return attribute;
+	public void setAttributes(List<AttributeBuilder<?>> attributes) {
+		verifyMutable();
+		this.attributes = attributes;
+	}
+
+	public EntityIdentifierBuilder<P> attributes(AttributeBuilder<?> ... attributes) {
+		verifyMutable();
+		return attributes(new ListBuilder<AttributeBuilder<?>>().add(attributes).toList());
+	}
+	
+	public EntityIdentifierBuilder<P> attributes(Collection<AttributeBuilder<?>> attributes) {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		if (attributes != null) {
+			for (AttributeBuilder<?> e : attributes) {
+				this.attributes.add(e);
+			}
+		}
+		return this;
+	}
+
+	public AttributeBuilder<EntityIdentifierBuilder<P>> attributes$one() {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		
+		AttributeBuilder<EntityIdentifierBuilder<P>> result =
+				new AttributeBuilder<EntityIdentifierBuilder<P>>(this);
+		
+		this.attributes.add(result);
+		
+		return result;
+	}
+
+	public class Attributes$$$builder {
+		
+		public AttributeBuilder<Attributes$$$builder> blank$begin() {
+			AttributeBuilder<Attributes$$$builder> result = new AttributeBuilder<Attributes$$$builder>(this);
+			EntityIdentifierBuilder.this.attributes.add(result);
+			return result;
+		}
+		
+		public EntityIdentifierBuilder<P> end() {
+			return EntityIdentifierBuilder.this;
+		}
+	}
+	
+	public Attributes$$$builder attributes$list() {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		return new Attributes$$$builder();
+	}
+
+    public EntityIdentifierBuilder<P> attributes$wrap(Attribute ... attributes) {
+    	return attributes$wrap(new ListBuilder<Attribute>().add(attributes).toList());
     }
 
-    public EntityIdentifierBuilder<B> attribute(AttributeBuilder<?> attribute) {
-        if (this.attributes == null) {
-            this.attributes = new ArrayList<AttributeBuilder<?>>();
-        }
-        this.attributes.add(attribute);
+    public EntityIdentifierBuilder<P> attributes$wrap(Collection<Attribute> attributes) {
+		verifyMutable();
+
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		if (attributes != null) {
+			for (Attribute e : attributes) {
+				AttributeBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AttributeBuilder.class);
+				this.attributes.add(wrapped);
+			}
+		}
+		return this;
+    }
+    
+    public EntityIdentifierBuilder<P> attributes$restoreFrom(BuilderRepository repo, Object ... builderIds) {
+    	return attributes$restoreFrom(repo, new ListBuilder<Object>().add(builderIds).toList());
+    }
+
+    public EntityIdentifierBuilder<P> attributes$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
+		verifyMutable();
+
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		if (builderIds != null) {
+	    	for (Object builderId : builderIds) {
+	            Object restoredObject = repo.get(builderId);
+	            if (restoredObject == null) {
+	            	if (repo.isSupportLazy()) {
+	            		repo.addObjectStoredListener(builderId, new Procedure() {
+	    					public void execute(Object... arguments) {
+	    						EntityIdentifierBuilder.this.attributes.add((AttributeBuilder<?>)arguments[0]);
+	    					}
+	    				});
+	            	}
+	            	else {
+	                    throw new IllegalStateException("Object does not exist with id " + builderId);
+	            	}
+	            }
+	            else if (!(restoredObject instanceof AttributeBuilder)) {
+	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + AttributeBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+	            }
+	            else {
+	                this.attributes.add((AttributeBuilder<?>)restoredObject);
+	            }
+	    	}
+		}
         return this;
-    }
-
-    public EntityIdentifierBuilder<B> attribute(Attribute attribute) {
-        if (this.attributes == null) {
-            this.attributes = new ArrayList<AttributeBuilder<?>>();
-        }
-    	AttributeBuilder<?> wrap = new WrapConverter(this.$$$option).convert(attribute).to(AttributeBuilder.class);
-        this.attributes.add(wrap);
-        return this;
-    }
-
-    public EntityIdentifierBuilder<B> attributes(AttributeBuilder<?> ... attributes) {
-        if (this.attributes == null) {
-            this.attributes = new ArrayList<AttributeBuilder<?>>();
-        }
-        for (AttributeBuilder<?> o : attributes) {
-            this.attributes.add(o);
-        }
-        return this;
-    }
-
-    public EntityIdentifierBuilder<B> attributes(Attribute ... attributes) {
-        if (this.attributes == null) {
-            this.attributes = new ArrayList<AttributeBuilder<?>>();
-        }
-        for (Attribute o : attributes) {
-	    	AttributeBuilder<?> wrap = new WrapConverter(this.$$$option).convert(o).to(AttributeBuilder.class);
-            this.attributes.add(wrap);
-        }
-        return this;
-    }
-
-    public EntityIdentifierBuilder<B> attribute$restoreFrom(BuilderRepository repo, int builderId) {
-        Object attribute = repo.get(builderId);
-        if (this.attributes == null) {
-            this.attributes = new ArrayList<AttributeBuilder<?>>();
-        }
-
-        if (attribute == null) {
-        	if (repo.isSupportLazy()) {
-                
-        		final int size = this.attributes.size();
-        		this.attributes.add(null);
-
-        		repo.addObjectStoredListener(builderId, new Procedure() {
-					public void execute(Object... arguments) {
-						EntityIdentifierBuilder.this.attributes.set(size, (AttributeBuilder<?>)arguments[0]);
-					}
-				});
-        	}
-        	else {
-                throw new IllegalStateException("Object does not exist with id " + builderId);
-        	}
-        }
-        else {
-            this.attributes.add((AttributeBuilder<?>)attribute);
-        }
-    	
-    	return this;
-    }
-
-    public EntityIdentifierBuilder<B> attributes$restoreFrom(BuilderRepository repo, int ... builderIds) {
-
-    	for (int builderId : builderIds) {
-    		attribute$restoreFrom(repo, builderId);
-    	}
-    	
-    	return this;
     }
 }

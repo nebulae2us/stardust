@@ -52,7 +52,7 @@ public class ScannerUtils {
 		if (field.getAnnotation(javax.persistence.Column.class) != null) {
 			javax.persistence.Column column = field.getAnnotation(javax.persistence.Column.class);
 			result.name(column.name())
-				.table()
+				.table$begin()
 					.name(column.table())
 				.end();
 			
@@ -60,10 +60,9 @@ public class ScannerUtils {
 		else if (field.getAnnotation(JoinColumn.class) != null) {
 			JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
 			result.name(joinColumn.name())
-				.table()
+				.table$begin()
 					.name(joinColumn.table())
 				.end();
-			
 		}
 		else {
 			result.name(NameUtils.camelCaseToUpperCase(field.getName()));
@@ -96,7 +95,7 @@ public class ScannerUtils {
 			if (attribute instanceof ScalarAttributeBuilder) {
 				result.add((ScalarAttributeBuilder<?>)attribute);
 			}
-			else if (attribute instanceof ValueObjectAttributeBuilder<?>) {
+			else if (attribute instanceof ValueObjectAttributeBuilder) {
 				ValueObjectAttributeBuilder<?> valueObjectAttribute = (ValueObjectAttributeBuilder<?>)attribute;
 				ValueObjectBuilder<?> valueObject = valueObjectAttribute.getValueObject();
 				result.addAll(extractScalarAttributes(valueObject.getAttributes()));
@@ -115,15 +114,17 @@ public class ScannerUtils {
 		javax.persistence.Table table = entityClass.getAnnotation(javax.persistence.Table.class);
 		
 		if (table != null) {
-			result.table()
-				.name(table.name())
-				.schemaName(table.schema())
-				.catalogName(table.catalog())
+			result.table$begin()
+					.name(table.name())
+					.schemaName(table.schema())
+					.catalogName(table.catalog())
+				.end()
 				;
 		}
 		else {
-			result.table()
-				.name(NameUtils.camelCaseToUpperCase(entityClass.getSimpleName()))
+			result.table$begin()
+					.name(NameUtils.camelCaseToUpperCase(entityClass.getSimpleName()))
+				.end()
 				;
 		}
 
@@ -138,10 +139,10 @@ public class ScannerUtils {
 		}
 		
 		for (SecondaryTable secondaryTable : secondaryTables) {
-			TableJoinBuilder<?> tableJoin = result.tableJoin()
+			TableJoinBuilder<?> tableJoin = result.tableJoins$one()
 				.joinType(JoinType.LEFT_JOIN)
 				.leftTable(result.getTable())
-				.rightTable()
+				.rightTable$begin()
 					.name(secondaryTable.name())
 					.schemaName(secondaryTable.schema())
 					.catalogName(secondaryTable.catalog())
@@ -150,14 +151,18 @@ public class ScannerUtils {
 			
 			if (secondaryTable.pkJoinColumns() != null || secondaryTable.pkJoinColumns().length > 0) {
 				for (PrimaryKeyJoinColumn pk : secondaryTable.pkJoinColumns()) {
-					tableJoin.rightColumn()
-						.table(tableJoin.getRightTable())
-						.name(pk.name())
+					tableJoin
+						.rightColumns$one()
+							.table(tableJoin.getRightTable())
+							.name(pk.name())
+						.end()
 						;
 					
-					tableJoin.leftColumn()
-						.table(tableJoin.getLeftTable())
-						.name(pk.referencedColumnName())
+					tableJoin
+						.leftColumns$one()
+							.table(tableJoin.getLeftTable())
+							.name(pk.referencedColumnName())
+						.end()
 						;
 				}
 			}
@@ -205,17 +210,15 @@ public class ScannerUtils {
 			}
 			
 			for (PrimaryKeyJoinColumn pkColumn : pkColumns) {
-				tableJoin.rightColumn()
-					.name(pkColumn.name())
-					.table(tableJoin.getRightTable());
+				tableJoin
+					.rightColumns$one()
+						.name(pkColumn.name())
+						.table(tableJoin.getRightTable())
+					.end();
 			}
 			
-			result.tableJoin(tableJoin);
-			if (ObjectUtils.notEmpty(joinedTables.getTableJoins())) {
-				for (TableJoinBuilder<?> tj : joinedTables.getTableJoins()) {
-					result.tableJoin(tj);
-				}
-			}
+			result.tableJoins(tableJoin);
+			result.tableJoins(joinedTables.getTableJoins());
 		}
 		
 		

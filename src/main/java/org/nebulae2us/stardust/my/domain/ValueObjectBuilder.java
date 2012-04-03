@@ -2,127 +2,78 @@ package org.nebulae2us.stardust.my.domain;
 
 import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 
-
-public class ValueObjectBuilder<B> extends AttributeHolderBuilder<B> implements Convertable {
-
-	private final ValueObject $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected ValueObjectBuilder(ValueObject valueObject) {
-		super(valueObject);
-		if (valueObject == null) {
-			throw new NullPointerException();
-		}
-	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = valueObject;
-	}
-
-	public ValueObjectBuilder(ConverterOption option, B parentBuilder) {
-		super(option, parentBuilder);
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
+@Builder(destination=ValueObject.class)
+public class ValueObjectBuilder<P> extends AttributeHolderBuilder<P> {
 
 	public ValueObjectBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
+		super();
 	}
 	
-	public ValueObjectBuilder(ConverterOption option) {
-		super(option);
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
-	}
-	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public ValueObject getSavedTarget() {
-		return this.$$$savedTarget;
+	public ValueObjectBuilder(P parentBuilder) {
+		super(parentBuilder);
 	}
 
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
+	protected ValueObjectBuilder(ValueObject wrapped) {
+		super(wrapped);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
+	@Override
+	public ValueObject getWrappedObject() {
+		return (ValueObject)this.$$$wrapped;
 	}
 
-    protected void copyAttributes(ValueObjectBuilder<?> copy) {
-		super.copyAttributes(copy);
-    	this.superValueObject = copy.superValueObject;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public ValueObjectBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+	@Override
+    public ValueObjectBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
-
+	
     public ValueObject toValueObject() {
-    	return new Converter(this.$$$option).convert(this).to(ValueObject.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ValueObject.class);
     }
 
     @Override
     public ValueObject toAttributeHolder() {
-    	return new Converter(this.$$$option).convert(this).to(ValueObject.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ValueObject.class);
     }
 
-    private ValueObjectBuilder<?> superValueObject;
+	private ValueObjectBuilder<?> superValueObject;
+	
+	public ValueObjectBuilder<?> getSuperValueObject() {
+		return superValueObject;
+	}
 
-    public ValueObjectBuilder<?> getSuperValueObject() {
-        return this.superValueObject;
-    }
+	public void setSuperValueObject(ValueObjectBuilder<?> superValueObject) {
+		verifyMutable();
+		this.superValueObject = superValueObject;
+	}
 
-    public void setSuperValueObject(ValueObjectBuilder<?> superValueObject) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.superValueObject = superValueObject;
-    }
+	public ValueObjectBuilder<P> superValueObject(ValueObjectBuilder<?> superValueObject) {
+		verifyMutable();
+		this.superValueObject = superValueObject;
+		return this;
+	}
 
-    public ValueObjectBuilder<? extends ValueObjectBuilder<B>> superValueObject() {
-        ValueObjectBuilder<ValueObjectBuilder<B>> superValueObject = new ValueObjectBuilder<ValueObjectBuilder<B>>(this.$$$option, this);
-        this.superValueObject = superValueObject;
-        
-        return superValueObject;
-    }
+	public ValueObjectBuilder<? extends ValueObjectBuilder<P>> superValueObject$begin() {
+		ValueObjectBuilder<ValueObjectBuilder<P>> result = new ValueObjectBuilder<ValueObjectBuilder<P>>(this);
+		this.superValueObject = result;
+		return result;
+	}
 
-    public ValueObjectBuilder<B> superValueObject(ValueObjectBuilder<?> superValueObject) {
-        this.superValueObject = superValueObject;
+    public ValueObjectBuilder<P> superValueObject$wrap(ValueObject superValueObject) {
+    	verifyMutable();
+    	this.superValueObject = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(superValueObject).to(ValueObjectBuilder.class);
         return this;
     }
-
-    public ValueObjectBuilder<B> superValueObject(ValueObject superValueObject) {
-    	this.superValueObject = new WrapConverter(this.$$$option).convert(superValueObject).to(ValueObjectBuilder.class);
-        return this;
-    }
-
-    public ValueObjectBuilder<B> superValueObject$restoreFrom(BuilderRepository repo, int builderId) {
-        Object valueObject = repo.get(builderId);
-        if (valueObject == null) {
+    
+    public ValueObjectBuilder<P> superValueObject$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -134,14 +85,47 @@ public class ValueObjectBuilder<B> extends AttributeHolderBuilder<B> implements 
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
+        else if (!(restoredObject instanceof ValueObjectBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ValueObjectBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
         else {
-            this.superValueObject = (ValueObjectBuilder<?>)valueObject;
+            this.superValueObject = (ValueObjectBuilder<?>)restoredObject;
         }
         return this;
     }
 
 	@Override
-    public ValueObjectBuilder<B> declaringClass(Class declaringClass) {
-        return (ValueObjectBuilder<B>)super.declaringClass(declaringClass);
+	public ValueObjectBuilder<P> declaringClass(Class<?> declaringClass) {
+		return (ValueObjectBuilder<P>)super.declaringClass(declaringClass);
+	}
+
+	@Override
+	public ValueObjectBuilder<P> attributes(AttributeBuilder<?> ... attributes) {
+		return (ValueObjectBuilder<P>)super.attributes(attributes);
+	}
+
+	@Override
+	public ValueObjectBuilder<P> attributes(Collection<AttributeBuilder<?>> attributes) {
+		return (ValueObjectBuilder<P>)super.attributes(attributes);
+	}
+
+	@Override
+    public ValueObjectBuilder<P> attributes$wrap(Attribute ... attributes) {
+		return (ValueObjectBuilder<P>)super.attributes$wrap(attributes);
+    }
+
+	@Override
+    public ValueObjectBuilder<P> attributes$wrap(Collection<Attribute> attributes) {
+		return (ValueObjectBuilder<P>)super.attributes$wrap(attributes);
+    }
+
+	@Override
+    public ValueObjectBuilder<P> attributes$restoreFrom(BuilderRepository repo, Object ... builderIds) {
+		return (ValueObjectBuilder<P>)super.attributes$restoreFrom(repo, builderIds);
+    }
+
+	@Override
+    public ValueObjectBuilder<P> attributes$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
+		return (ValueObjectBuilder<P>)super.attributes$restoreFrom(repo, builderIds);
     }
 }

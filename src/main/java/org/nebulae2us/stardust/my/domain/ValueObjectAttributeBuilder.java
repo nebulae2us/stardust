@@ -1,128 +1,80 @@
 package org.nebulae2us.stardust.my.domain;
 
 import java.lang.reflect.*;
+import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 
-
-public class ValueObjectAttributeBuilder<B> extends AttributeBuilder<B> implements Convertable {
-
-	private final ValueObjectAttribute $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected ValueObjectAttributeBuilder(ValueObjectAttribute valueObjectAttribute) {
-		super(valueObjectAttribute);
-		if (valueObjectAttribute == null) {
-			throw new NullPointerException();
-		}
-	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = valueObjectAttribute;
-	}
-
-	public ValueObjectAttributeBuilder(ConverterOption option, B parentBuilder) {
-		super(option, parentBuilder);
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
+@Builder(destination=ValueObjectAttribute.class)
+public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
 
 	public ValueObjectAttributeBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
+		super();
 	}
 	
-	public ValueObjectAttributeBuilder(ConverterOption option) {
-		super(option);
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
-	}
-	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public ValueObjectAttribute getSavedTarget() {
-		return this.$$$savedTarget;
+	public ValueObjectAttributeBuilder(P parentBuilder) {
+		super(parentBuilder);
 	}
 
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
+	protected ValueObjectAttributeBuilder(ValueObjectAttribute wrapped) {
+		super(wrapped);
 	}
 
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
+	@Override
+	public ValueObjectAttribute getWrappedObject() {
+		return (ValueObjectAttribute)this.$$$wrapped;
 	}
 
-    protected void copyAttributes(ValueObjectAttributeBuilder<?> copy) {
-		super.copyAttributes(copy);
-    	this.valueObject = copy.valueObject;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public ValueObjectAttributeBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+	@Override
+    public ValueObjectAttributeBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
-
+	
     public ValueObjectAttribute toValueObjectAttribute() {
-    	return new Converter(this.$$$option).convert(this).to(ValueObjectAttribute.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ValueObjectAttribute.class);
     }
 
     @Override
     public ValueObjectAttribute toAttribute() {
-    	return new Converter(this.$$$option).convert(this).to(ValueObjectAttribute.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ValueObjectAttribute.class);
     }
 
-    private ValueObjectBuilder<?> valueObject;
+	private ValueObjectBuilder<?> valueObject;
+	
+	public ValueObjectBuilder<?> getValueObject() {
+		return valueObject;
+	}
 
-    public ValueObjectBuilder<?> getValueObject() {
-        return this.valueObject;
-    }
+	public void setValueObject(ValueObjectBuilder<?> valueObject) {
+		verifyMutable();
+		this.valueObject = valueObject;
+	}
 
-    public void setValueObject(ValueObjectBuilder<?> valueObject) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.valueObject = valueObject;
-    }
+	public ValueObjectAttributeBuilder<P> valueObject(ValueObjectBuilder<?> valueObject) {
+		verifyMutable();
+		this.valueObject = valueObject;
+		return this;
+	}
 
-    public ValueObjectBuilder<? extends ValueObjectAttributeBuilder<B>> valueObject() {
-        ValueObjectBuilder<ValueObjectAttributeBuilder<B>> valueObject = new ValueObjectBuilder<ValueObjectAttributeBuilder<B>>(this.$$$option, this);
-        this.valueObject = valueObject;
-        
-        return valueObject;
-    }
+	public ValueObjectBuilder<? extends ValueObjectAttributeBuilder<P>> valueObject$begin() {
+		ValueObjectBuilder<ValueObjectAttributeBuilder<P>> result = new ValueObjectBuilder<ValueObjectAttributeBuilder<P>>(this);
+		this.valueObject = result;
+		return result;
+	}
 
-    public ValueObjectAttributeBuilder<B> valueObject(ValueObjectBuilder<?> valueObject) {
-        this.valueObject = valueObject;
+    public ValueObjectAttributeBuilder<P> valueObject$wrap(ValueObject valueObject) {
+    	verifyMutable();
+    	this.valueObject = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(valueObject).to(ValueObjectBuilder.class);
         return this;
     }
-
-    public ValueObjectAttributeBuilder<B> valueObject(ValueObject valueObject) {
-    	this.valueObject = new WrapConverter(this.$$$option).convert(valueObject).to(ValueObjectBuilder.class);
-        return this;
-    }
-
-    public ValueObjectAttributeBuilder<B> valueObject$restoreFrom(BuilderRepository repo, int builderId) {
-        Object valueObject = repo.get(builderId);
-        if (valueObject == null) {
+    
+    public ValueObjectAttributeBuilder<P> valueObject$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -134,32 +86,38 @@ public class ValueObjectAttributeBuilder<B> extends AttributeBuilder<B> implemen
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
+        else if (!(restoredObject instanceof ValueObjectBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ValueObjectBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
         else {
-            this.valueObject = (ValueObjectBuilder<?>)valueObject;
+            this.valueObject = (ValueObjectBuilder<?>)restoredObject;
         }
         return this;
     }
 
 	@Override
-    public ValueObjectAttributeBuilder<B> field(Field field) {
-        return (ValueObjectAttributeBuilder<B>)super.field(field);
+	public ValueObjectAttributeBuilder<P> field(Field field) {
+		return (ValueObjectAttributeBuilder<P>)super.field(field);
+	}
+
+	@Override
+	public ValueObjectAttributeBuilder<P> owningEntity(EntityBuilder<?> owningEntity) {
+		return (ValueObjectAttributeBuilder<P>)super.owningEntity(owningEntity);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public EntityBuilder<? extends ValueObjectAttributeBuilder<P>> owningEntity$begin() {
+		return (EntityBuilder<? extends ValueObjectAttributeBuilder<P>>)super.owningEntity$begin();
+	}
+
+	@Override
+    public ValueObjectAttributeBuilder<P> owningEntity$wrap(Entity owningEntity) {
+		return (ValueObjectAttributeBuilder<P>)super.owningEntity$wrap(owningEntity);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public EntityBuilder<? extends ValueObjectAttributeBuilder<B>> owningEntity() {
-        return (EntityBuilder<ValueObjectAttributeBuilder<B>>)super.owningEntity();
+	@Override
+    public ValueObjectAttributeBuilder<P> owningEntity$restoreFrom(BuilderRepository repo, Object builderId) {
+		return (ValueObjectAttributeBuilder<P>)super.owningEntity$restoreFrom(repo, builderId);
     }
-    
-    public ValueObjectAttributeBuilder<B> owningEntity(EntityBuilder<?> owningEntity) {
-		return (ValueObjectAttributeBuilder<B>)super.owningEntity(owningEntity);
-    }
-
-    public ValueObjectAttributeBuilder<B> owningEntity(Entity owningEntity) {
-		return (ValueObjectAttributeBuilder<B>)super.owningEntity(owningEntity);
-    }
-
-    public ValueObjectAttributeBuilder<B> owningEntity$restoreFrom(BuilderRepository repo, int builderId) {
-		return (ValueObjectAttributeBuilder<B>)super.owningEntity$restoreFrom(repo, builderId);
-    }    
 }

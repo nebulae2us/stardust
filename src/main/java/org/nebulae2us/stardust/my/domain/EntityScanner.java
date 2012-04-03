@@ -48,8 +48,6 @@ import org.nebulae2us.stardust.internal.util.ObjectUtils;
 
 import static org.nebulae2us.stardust.Builders.*;
 
-import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
-
 /**
  * @author Trung Phan
  *
@@ -93,18 +91,18 @@ public class EntityScanner {
 			fixEntityAttributes(entityBuilder);
 		}
 		
-//		for (EntityBuilder<?> entityBuilder : scannedEntityBuilders.values()) {
+//		for (EntityBuilder entityBuilder : scannedEntityBuilders.values()) {
 //			System.out.println("**** " + entityBuilder.getDeclaringClass());
 //			
-//			for (AttributeBuilder<?> attribute : entityBuilder.getAttributes()) {
+//			for (AttributeBuilder attribute : entityBuilder.getAttributes()) {
 //				System.out.println(" ----" + attribute.getField().getName());
 //				if (attribute instanceof ScalarAttributeBuilder) {
-//					ScalarAttributeBuilder<?> scalarAttribute = (ScalarAttributeBuilder<?>)attribute;
+//					ScalarAttributeBuilder scalarAttribute = (ScalarAttributeBuilder)attribute;
 //					System.out.println("column: " + scalarAttribute.getColumn().getName());
 //					System.out.println("table: " + scalarAttribute.getColumn().getTable().getName());
 //				}
 //				else if (attribute instanceof EntityAttributeBuilder) {
-//					EntityAttributeBuilder<?> entityAttribute = (EntityAttributeBuilder<?>)attribute;
+//					EntityAttributeBuilder entityAttribute = (EntityAttributeBuilder)attribute;
 //					System.out.println("left columns: " + entityAttribute.getLeftColumns());
 //					System.out.println("right columns: " + entityAttribute.getLeftColumns());
 //				}
@@ -117,7 +115,7 @@ public class EntityScanner {
 	 * @param result
 	 */
 	private void fixEntityAttributes(EntityBuilder<?> entity) {
-		for (EntityAttributeBuilder<?> entityAttribute : ScannerUtils.extractEntityAttributes(entity.getAttributes())) {
+		for (EntityAttributeBuilder<?>entityAttribute : ScannerUtils.extractEntityAttributes(entity.getAttributes())) {
 			Field field = entityAttribute.getField();
 
 			List<ScalarAttributeBuilder<?>> idAttributes = ScannerUtils.extractScalarAttributes(entityAttribute.getEntity().getEntityIdentifier().getAttributes());
@@ -146,14 +144,16 @@ public class EntityScanner {
 					for (int i = 0; i < annotJoinColumns.size(); i++) {
 						JoinColumn annotJoinColumn = annotJoinColumns.get(i);
 						ScalarAttributeBuilder<?> idAttribute = idAttributes.get(i);
+						
+						
 						entityAttribute
-							.rightColumn()
+							.rightColumns$one()
 								.name(annotJoinColumn.name())
-								.table()
+								.table$begin()
 									.name(annotJoinColumn.table())
 								.end()
 							.end()
-							.leftColumn(idAttribute.getColumn())
+							.leftColumns(idAttribute.getColumn())
 							;
 					}
 					
@@ -186,18 +186,24 @@ public class EntityScanner {
 			for (TableJoinBuilder<?> tableJoin : result.getJoinedTables().getTableJoins()) {
 				if (ObjectUtils.isEmpty(tableJoin.getLeftColumns())) {
 					for (ScalarAttributeBuilder<?> idAttribute : idAttributes) {
-						tableJoin.leftColumn()
-							.name(idAttribute.getColumn().getName())
-							.table()
-								.name(idAttribute.getColumn().getTable().getName());
+						tableJoin
+							.leftColumns$one()
+								.name(idAttribute.getColumn().getName())
+								.table$begin()
+									.name(idAttribute.getColumn().getTable().getName())
+								.end()
+							.end();
 					}
 				}
 				if (ObjectUtils.isEmpty(tableJoin.getRightColumns())) {
 					for (ScalarAttributeBuilder<?> idAttribute : idAttributes) {
-						tableJoin.rightColumn()
-							.name(idAttribute.getColumn().getName())
-							.table()
-								.name(idAttribute.getColumn().getTable().getName());
+						tableJoin
+							.rightColumns$one()
+								.name(idAttribute.getColumn().getName())
+								.table$begin()
+									.name(idAttribute.getColumn().getTable().getName())
+								.end()
+							.end();
 					}
 				}
 			}
@@ -212,7 +218,7 @@ public class EntityScanner {
 		
 		if (scannedEntities.containsKey(entityClass)) {
 			Entity scannedEntity = scannedEntities.get(entityClass);
-			EntityBuilder<?> wrap = new WrapConverter(CONVERTER_OPTIONS_MUTABLE).convert(scannedEntity).to(EntityBuilder.class);
+			EntityBuilder<?> wrap = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(scannedEntity).to(EntityBuilder.class);
 			return wrap;
 		}
 
@@ -261,14 +267,14 @@ public class EntityScanner {
 							.column(ScannerUtils.extractColumnInfo(field, result.getJoinedTables()))
 							;
 					
-					result.attribute(attributeBuilder);
+					result.attributes(attributeBuilder);
 					
 					if (field.getAnnotation(Id.class) != null) {
 						if (entityIdentifierBuilder != null || result.getEntityIdentifier() == null) {
 							if (entityIdentifierBuilder == null) {
 								entityIdentifierBuilder = Builders.entityIdentifier();
 							}
-							entityIdentifierBuilder.attribute(attributeBuilder);
+							entityIdentifierBuilder.attributes(attributeBuilder);
 						}
 					}
 					
@@ -282,14 +288,14 @@ public class EntityScanner {
 							.owningEntity(result)
 							;
 					
-					result.attribute(attributeBuilder);
+					result.attributes(attributeBuilder);
 					
 					if (field.getAnnotation(Id.class) != null || field.getAnnotation(EmbeddedId.class) != null) {
 						if (entityIdentifierBuilder != null || result.getEntityIdentifier() == null) {
 							if (entityIdentifierBuilder == null) {
 								entityIdentifierBuilder = Builders.entityIdentifier();
 							}
-							entityIdentifierBuilder.attribute(attributeBuilder);
+							entityIdentifierBuilder.attributes(attributeBuilder);
 						}
 					}
 				
@@ -313,7 +319,7 @@ public class EntityScanner {
 								.owningEntity(result)
 								;
 						
-						result.attribute(attributeBuilder);
+						result.attributes(attributeBuilder);
 					}
 					
 				}
@@ -326,7 +332,7 @@ public class EntityScanner {
 							.owningEntity(result)
 							;
 					
-					result.attribute(attributeBuilder);
+					result.attributes(attributeBuilder);
 				}
 			}
 			

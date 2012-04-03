@@ -1,138 +1,107 @@
 package org.nebulae2us.stardust.my.domain;
 
 import java.lang.reflect.*;
+import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 
+@Builder(destination=Attribute.class)
+public class AttributeBuilder<P> implements Wrappable<Attribute> {
 
-public class AttributeBuilder<B> implements Convertable {
+	protected final Attribute $$$wrapped;
 
-	private final Attribute $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected AttributeBuilder(Attribute attribute) {
-		if (attribute == null) {
-			throw new NullPointerException();
-		}
+	protected final P $$$parentBuilder;
 	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = attribute;
-	}
-
-	public AttributeBuilder(ConverterOption option, B parentBuilder) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
-
 	public AttributeBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+		this.$$$wrapped = null;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public AttributeBuilder(ConverterOption option) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+	public AttributeBuilder(P parentBuilder) {
+		this.$$$wrapped = null;
+		this.$$$parentBuilder = parentBuilder;
+	}
+
+	protected AttributeBuilder(Attribute wrapped) {
+		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public Attribute getSavedTarget() {
-		return this.$$$savedTarget;
-	}
-
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
-	}
-
-    protected void copyAttributes(AttributeBuilder<?> copy) {
-    	this.field = copy.field;
-		this.owningEntity = copy.owningEntity;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public AttributeBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+    public AttributeBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
 
+	public Attribute getWrappedObject() {
+		return this.$$$wrapped;
+	}
+
+	protected void verifyMutable() {
+		if (this.$$$wrapped != null) {
+    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
+		}
+	}
+
+	public P end() {
+		return this.$$$parentBuilder;
+	}
+
     public Attribute toAttribute() {
-    	return new Converter(this.$$$option).convert(this).to(Attribute.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Attribute.class);
     }
 
-    private Field field;
+	private Field field;
+	
+	public Field getField() {
+		return field;
+	}
 
-    public Field getField() {
-        return this.field;
-    }
+	public void setField(Field field) {
+		verifyMutable();
+		this.field = field;
+	}
 
-    public void setField(Field field) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.field = field;
-    }
+	public AttributeBuilder<P> field(Field field) {
+		verifyMutable();
+		this.field = field;
+		return this;
+	}
 
-    public AttributeBuilder<B> field(Field field) {
-        this.field = field;
+	private EntityBuilder<?> owningEntity;
+	
+	public EntityBuilder<?> getOwningEntity() {
+		return owningEntity;
+	}
+
+	public void setOwningEntity(EntityBuilder<?> owningEntity) {
+		verifyMutable();
+		this.owningEntity = owningEntity;
+	}
+
+	public AttributeBuilder<P> owningEntity(EntityBuilder<?> owningEntity) {
+		verifyMutable();
+		this.owningEntity = owningEntity;
+		return this;
+	}
+
+	public EntityBuilder<? extends AttributeBuilder<P>> owningEntity$begin() {
+		EntityBuilder<AttributeBuilder<P>> result = new EntityBuilder<AttributeBuilder<P>>(this);
+		this.owningEntity = result;
+		return result;
+	}
+
+    public AttributeBuilder<P> owningEntity$wrap(Entity owningEntity) {
+    	verifyMutable();
+    	this.owningEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(owningEntity).to(EntityBuilder.class);
         return this;
     }
-
-    private EntityBuilder<?> owningEntity;
-
-    public EntityBuilder<?> getOwningEntity() {
-        return this.owningEntity;
-    }
-
-    public void setOwningEntity(EntityBuilder<?> owningEntity) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.owningEntity = owningEntity;
-    }
-
-    public EntityBuilder<? extends AttributeBuilder<B>> owningEntity() {
-        EntityBuilder<AttributeBuilder<B>> owningEntity = new EntityBuilder<AttributeBuilder<B>>(this.$$$option, this);
-        this.owningEntity = owningEntity;
-        
-        return owningEntity;
-    }
-
-    public AttributeBuilder<B> owningEntity(EntityBuilder<?> owningEntity) {
-        this.owningEntity = owningEntity;
-        return this;
-    }
-
-    public AttributeBuilder<B> owningEntity(Entity owningEntity) {
-    	this.owningEntity = new WrapConverter(this.$$$option).convert(owningEntity).to(EntityBuilder.class);
-        return this;
-    }
-
-    public AttributeBuilder<B> owningEntity$restoreFrom(BuilderRepository repo, int builderId) {
-        Object entity = repo.get(builderId);
-        if (entity == null) {
+    
+    public AttributeBuilder<P> owningEntity$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -144,8 +113,11 @@ public class AttributeBuilder<B> implements Convertable {
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
+        else if (!(restoredObject instanceof EntityBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + EntityBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
         else {
-            this.owningEntity = (EntityBuilder<?>)entity;
+            this.owningEntity = (EntityBuilder<?>)restoredObject;
         }
         return this;
     }

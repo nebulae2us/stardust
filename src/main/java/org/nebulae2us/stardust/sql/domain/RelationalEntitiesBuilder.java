@@ -2,120 +2,89 @@ package org.nebulae2us.stardust.sql.domain;
 
 import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.my.domain.*;
 
+@Builder(destination=RelationalEntities.class)
+public class RelationalEntitiesBuilder<P> implements Wrappable<RelationalEntities> {
 
-public class RelationalEntitiesBuilder<B> implements Convertable {
+	protected final RelationalEntities $$$wrapped;
 
-	private final RelationalEntities $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected RelationalEntitiesBuilder(RelationalEntities relationalEntities) {
-		if (relationalEntities == null) {
-			throw new NullPointerException();
-		}
+	protected final P $$$parentBuilder;
 	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = relationalEntities;
-	}
-
-	public RelationalEntitiesBuilder(ConverterOption option, B parentBuilder) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
-
 	public RelationalEntitiesBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+		this.$$$wrapped = null;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public RelationalEntitiesBuilder(ConverterOption option) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+	public RelationalEntitiesBuilder(P parentBuilder) {
+		this.$$$wrapped = null;
+		this.$$$parentBuilder = parentBuilder;
+	}
+
+	protected RelationalEntitiesBuilder(RelationalEntities wrapped) {
+		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public RelationalEntities getSavedTarget() {
-		return this.$$$savedTarget;
-	}
-
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
-	}
-
-    protected void copyAttributes(RelationalEntitiesBuilder<?> copy) {
-    	this.entity = copy.entity;
-		this.entityJoins = copy.entityJoins;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public RelationalEntitiesBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+    public RelationalEntitiesBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
 
-    public RelationalEntities toRelationalEntities() {
-    	return new Converter(this.$$$option).convert(this).to(RelationalEntities.class);
-    }
+	public RelationalEntities getWrappedObject() {
+		return this.$$$wrapped;
+	}
 
-    private EntityBuilder<?> entity;
-
-    public EntityBuilder<?> getEntity() {
-        return this.entity;
-    }
-
-    public void setEntity(EntityBuilder<?> entity) {
-    	if (this.$$$savedTarget != null) {
+	protected void verifyMutable() {
+		if (this.$$$wrapped != null) {
     		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.entity = entity;
+		}
+	}
+
+	public P end() {
+		return this.$$$parentBuilder;
+	}
+
+    public RelationalEntities toRelationalEntities() {
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(RelationalEntities.class);
     }
 
-    public EntityBuilder<? extends RelationalEntitiesBuilder<B>> entity() {
-        EntityBuilder<RelationalEntitiesBuilder<B>> entity = new EntityBuilder<RelationalEntitiesBuilder<B>>(this.$$$option, this);
-        this.entity = entity;
-        
-        return entity;
-    }
+	private EntityBuilder<?> entity;
+	
+	public EntityBuilder<?> getEntity() {
+		return entity;
+	}
 
-    public RelationalEntitiesBuilder<B> entity(EntityBuilder<?> entity) {
-        this.entity = entity;
+	public void setEntity(EntityBuilder<?> entity) {
+		verifyMutable();
+		this.entity = entity;
+	}
+
+	public RelationalEntitiesBuilder<P> entity(EntityBuilder<?> entity) {
+		verifyMutable();
+		this.entity = entity;
+		return this;
+	}
+
+	public EntityBuilder<? extends RelationalEntitiesBuilder<P>> entity$begin() {
+		EntityBuilder<RelationalEntitiesBuilder<P>> result = new EntityBuilder<RelationalEntitiesBuilder<P>>(this);
+		this.entity = result;
+		return result;
+	}
+
+    public RelationalEntitiesBuilder<P> entity$wrap(Entity entity) {
+    	verifyMutable();
+    	this.entity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(entity).to(EntityBuilder.class);
         return this;
     }
-
-    public RelationalEntitiesBuilder<B> entity(Entity entity) {
-    	this.entity = new WrapConverter(this.$$$option).convert(entity).to(EntityBuilder.class);
-        return this;
-    }
-
-    public RelationalEntitiesBuilder<B> entity$restoreFrom(BuilderRepository repo, int builderId) {
-        Object entity = repo.get(builderId);
-        if (entity == null) {
+    
+    public RelationalEntitiesBuilder<P> entity$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -127,110 +96,131 @@ public class RelationalEntitiesBuilder<B> implements Convertable {
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
-        else {
-            this.entity = (EntityBuilder<?>)entity;
-        }
-        return this;
-    }
-
-    private List<EntityJoinBuilder<?>> entityJoins;
-
-    public List<EntityJoinBuilder<?>> getEntityJoins() {
-        return this.entityJoins;
-    }
-
-    public void setEntityJoins(List<EntityJoinBuilder<?>> entityJoins) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.entityJoins = entityJoins;
-    }
-
-    public EntityJoinBuilder<RelationalEntitiesBuilder<B>> entityJoin() {
-        if (this.entityJoins == null) {
-            this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
-        }
-
-        EntityJoinBuilder<RelationalEntitiesBuilder<B>> entityJoin = new EntityJoinBuilder<RelationalEntitiesBuilder<B>>(this.$$$option, this);
-        
-        this.entityJoins.add(entityJoin);
-        
-        return entityJoin;
-    }
-
-    public RelationalEntitiesBuilder<B> entityJoin(EntityJoinBuilder<?> entityJoin) {
-        if (this.entityJoins == null) {
-            this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
-        }
-        this.entityJoins.add(entityJoin);
-        return this;
-    }
-
-    public RelationalEntitiesBuilder<B> entityJoin(EntityJoin entityJoin) {
-        if (this.entityJoins == null) {
-            this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
-        }
-    	EntityJoinBuilder<?> wrap = new WrapConverter(this.$$$option).convert(entityJoin).to(EntityJoinBuilder.class);
-        this.entityJoins.add(wrap);
-        return this;
-    }
-
-    public RelationalEntitiesBuilder<B> entityJoins(EntityJoinBuilder<?> ... entityJoins) {
-        if (this.entityJoins == null) {
-            this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
-        }
-        for (EntityJoinBuilder<?> o : entityJoins) {
-            this.entityJoins.add(o);
-        }
-        return this;
-    }
-
-    public RelationalEntitiesBuilder<B> entityJoins(EntityJoin ... entityJoins) {
-        if (this.entityJoins == null) {
-            this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
-        }
-        for (EntityJoin o : entityJoins) {
-	    	EntityJoinBuilder<?> wrap = new WrapConverter(this.$$$option).convert(o).to(EntityJoinBuilder.class);
-            this.entityJoins.add(wrap);
-        }
-        return this;
-    }
-
-    public RelationalEntitiesBuilder<B> entityJoin$restoreFrom(BuilderRepository repo, int builderId) {
-        Object entityJoin = repo.get(builderId);
-        if (this.entityJoins == null) {
-            this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
-        }
-
-        if (entityJoin == null) {
-        	if (repo.isSupportLazy()) {
-                
-        		final int size = this.entityJoins.size();
-        		this.entityJoins.add(null);
-
-        		repo.addObjectStoredListener(builderId, new Procedure() {
-					public void execute(Object... arguments) {
-						RelationalEntitiesBuilder.this.entityJoins.set(size, (EntityJoinBuilder<?>)arguments[0]);
-					}
-				});
-        	}
-        	else {
-                throw new IllegalStateException("Object does not exist with id " + builderId);
-        	}
+        else if (!(restoredObject instanceof EntityBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + EntityBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
         }
         else {
-            this.entityJoins.add((EntityJoinBuilder<?>)entityJoin);
+            this.entity = (EntityBuilder<?>)restoredObject;
         }
-    	
-    	return this;
+        return this;
     }
 
-    public RelationalEntitiesBuilder<B> entityJoins$restoreFrom(BuilderRepository repo, int ... builderIds) {
+	private List<EntityJoinBuilder<?>> entityJoins;
+	
+	public List<EntityJoinBuilder<?>> getEntityJoins() {
+		return entityJoins;
+	}
 
-    	for (int builderId : builderIds) {
-    		entityJoin$restoreFrom(repo, builderId);
-    	}
-    	
-    	return this;
+	public void setEntityJoins(List<EntityJoinBuilder<?>> entityJoins) {
+		verifyMutable();
+		this.entityJoins = entityJoins;
+	}
+
+	public RelationalEntitiesBuilder<P> entityJoins(EntityJoinBuilder<?> ... entityJoins) {
+		verifyMutable();
+		return entityJoins(new ListBuilder<EntityJoinBuilder<?>>().add(entityJoins).toList());
+	}
+	
+	public RelationalEntitiesBuilder<P> entityJoins(Collection<EntityJoinBuilder<?>> entityJoins) {
+		verifyMutable();
+		if (this.entityJoins == null) {
+			this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
+		}
+		if (entityJoins != null) {
+			for (EntityJoinBuilder<?> e : entityJoins) {
+				this.entityJoins.add(e);
+			}
+		}
+		return this;
+	}
+
+	public EntityJoinBuilder<RelationalEntitiesBuilder<P>> entityJoins$one() {
+		verifyMutable();
+		if (this.entityJoins == null) {
+			this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
+		}
+		
+		EntityJoinBuilder<RelationalEntitiesBuilder<P>> result =
+				new EntityJoinBuilder<RelationalEntitiesBuilder<P>>(this);
+		
+		this.entityJoins.add(result);
+		
+		return result;
+	}
+
+	public class EntityJoins$$$builder {
+		
+		public EntityJoinBuilder<EntityJoins$$$builder> blank$begin() {
+			EntityJoinBuilder<EntityJoins$$$builder> result = new EntityJoinBuilder<EntityJoins$$$builder>(this);
+			RelationalEntitiesBuilder.this.entityJoins.add(result);
+			return result;
+		}
+		
+		public RelationalEntitiesBuilder<P> end() {
+			return RelationalEntitiesBuilder.this;
+		}
+	}
+	
+	public EntityJoins$$$builder entityJoins$list() {
+		verifyMutable();
+		if (this.entityJoins == null) {
+			this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
+		}
+		return new EntityJoins$$$builder();
+	}
+
+    public RelationalEntitiesBuilder<P> entityJoins$wrap(EntityJoin ... entityJoins) {
+    	return entityJoins$wrap(new ListBuilder<EntityJoin>().add(entityJoins).toList());
+    }
+
+    public RelationalEntitiesBuilder<P> entityJoins$wrap(Collection<EntityJoin> entityJoins) {
+		verifyMutable();
+
+		if (this.entityJoins == null) {
+			this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
+		}
+		if (entityJoins != null) {
+			for (EntityJoin e : entityJoins) {
+				EntityJoinBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(EntityJoinBuilder.class);
+				this.entityJoins.add(wrapped);
+			}
+		}
+		return this;
+    }
+    
+    public RelationalEntitiesBuilder<P> entityJoins$restoreFrom(BuilderRepository repo, Object ... builderIds) {
+    	return entityJoins$restoreFrom(repo, new ListBuilder<Object>().add(builderIds).toList());
+    }
+
+    public RelationalEntitiesBuilder<P> entityJoins$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
+		verifyMutable();
+
+		if (this.entityJoins == null) {
+			this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
+		}
+		if (builderIds != null) {
+	    	for (Object builderId : builderIds) {
+	            Object restoredObject = repo.get(builderId);
+	            if (restoredObject == null) {
+	            	if (repo.isSupportLazy()) {
+	            		repo.addObjectStoredListener(builderId, new Procedure() {
+	    					public void execute(Object... arguments) {
+	    						RelationalEntitiesBuilder.this.entityJoins.add((EntityJoinBuilder<?>)arguments[0]);
+	    					}
+	    				});
+	            	}
+	            	else {
+	                    throw new IllegalStateException("Object does not exist with id " + builderId);
+	            	}
+	            }
+	            else if (!(restoredObject instanceof EntityJoinBuilder)) {
+	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + EntityJoinBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+	            }
+	            else {
+	                this.entityJoins.add((EntityJoinBuilder<?>)restoredObject);
+	            }
+	    	}
+		}
+        return this;
     }
 }

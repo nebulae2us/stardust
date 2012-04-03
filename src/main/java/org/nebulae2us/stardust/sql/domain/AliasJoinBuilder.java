@@ -1,139 +1,104 @@
 package org.nebulae2us.stardust.sql.domain;
 
+import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.*;
 
+@Builder(destination=AliasJoin.class)
+public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
 
-public class AliasJoinBuilder<B> implements Convertable {
+	protected final AliasJoin $$$wrapped;
 
-	private final AliasJoin $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected AliasJoinBuilder(AliasJoin aliasJoin) {
-		if (aliasJoin == null) {
-			throw new NullPointerException();
-		}
+	protected final P $$$parentBuilder;
 	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = aliasJoin;
-	}
-
-	public AliasJoinBuilder(ConverterOption option, B parentBuilder) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
-
 	public AliasJoinBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+		this.$$$wrapped = null;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public AliasJoinBuilder(ConverterOption option) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+	public AliasJoinBuilder(P parentBuilder) {
+		this.$$$wrapped = null;
+		this.$$$parentBuilder = parentBuilder;
+	}
+
+	protected AliasJoinBuilder(AliasJoin wrapped) {
+		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public AliasJoin getSavedTarget() {
-		return this.$$$savedTarget;
-	}
-
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
-	}
-
-    protected void copyAttributes(AliasJoinBuilder<?> copy) {
-    	this.name = copy.name;
-		this.alias = copy.alias;
-		this.joinType = copy.joinType;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public AliasJoinBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+    public AliasJoinBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
 
+	public AliasJoin getWrappedObject() {
+		return this.$$$wrapped;
+	}
+
+	protected void verifyMutable() {
+		if (this.$$$wrapped != null) {
+    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
+		}
+	}
+
+	public P end() {
+		return this.$$$parentBuilder;
+	}
+
     public AliasJoin toAliasJoin() {
-    	return new Converter(this.$$$option).convert(this).to(AliasJoin.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(AliasJoin.class);
     }
 
-    private String name;
+	private String name;
+	
+	public String getName() {
+		return name;
+	}
 
-    public String getName() {
-        return this.name;
-    }
+	public void setName(String name) {
+		verifyMutable();
+		this.name = name;
+	}
 
-    public void setName(String name) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.name = name;
-    }
+	public AliasJoinBuilder<P> name(String name) {
+		verifyMutable();
+		this.name = name;
+		return this;
+	}
 
-    public AliasJoinBuilder<B> name(String name) {
-        this.name = name;
-        return this;
-    }
+	private String alias;
+	
+	public String getAlias() {
+		return alias;
+	}
 
-    private String alias;
+	public void setAlias(String alias) {
+		verifyMutable();
+		this.alias = alias;
+	}
 
-    public String getAlias() {
-        return this.alias;
-    }
+	public AliasJoinBuilder<P> alias(String alias) {
+		verifyMutable();
+		this.alias = alias;
+		return this;
+	}
 
-    public void setAlias(String alias) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.alias = alias;
-    }
+	private JoinType joinType;
+	
+	public JoinType getJoinType() {
+		return joinType;
+	}
 
-    public AliasJoinBuilder<B> alias(String alias) {
-        this.alias = alias;
-        return this;
-    }
+	public void setJoinType(JoinType joinType) {
+		verifyMutable();
+		this.joinType = joinType;
+	}
 
-    private JoinType joinType;
-
-    public JoinType getJoinType() {
-        return this.joinType;
-    }
-
-    public void setJoinType(JoinType joinType) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.joinType = joinType;
-    }
-
-    public AliasJoinBuilder<B> joinType(JoinType joinType) {
-        this.joinType = joinType;
-        return this;
-    }
+	public AliasJoinBuilder<P> joinType(JoinType joinType) {
+		verifyMutable();
+		this.joinType = joinType;
+		return this;
+	}
 }

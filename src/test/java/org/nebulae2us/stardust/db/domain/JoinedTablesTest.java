@@ -36,7 +36,7 @@ public class JoinedTablesTest {
 		
 		JoinedTables joinedTables =
 				joinedTables()
-				.table()
+				.table$begin()
 					.name("Person")
 				.end()
 				.toJoinedTables();
@@ -44,19 +44,19 @@ public class JoinedTablesTest {
 		BuilderRepository repo = new BuilderRepository();
 		
 		TableJoin tableJoin = tableJoin()
-			.leftTable()
+			.leftTable$begin()
 				.storeTo(repo, 1)
 				.name("Person")
 			.end()
-			.rightTable()
+			.rightTable$begin()
 				.storeTo(repo, 2)
 				.name("Speech")
 			.end()
-			.leftColumn()
+			.leftColumns$one()
 				.name("person_id")
 				.table$restoreFrom(repo, 1)
 			.end()
-			.rightColumn()
+			.rightColumns$one()
 				.name("speaker_id")
 				.table$restoreFrom(repo, 2)
 			.end()

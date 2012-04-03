@@ -1,137 +1,106 @@
 package org.nebulae2us.stardust.db.domain;
 
+import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 
+@Builder(destination=Column.class)
+public class ColumnBuilder<P> implements Wrappable<Column> {
 
-public class ColumnBuilder<B> implements Convertable {
+	protected final Column $$$wrapped;
 
-	private final Column $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected ColumnBuilder(Column column) {
-		if (column == null) {
-			throw new NullPointerException();
-		}
+	protected final P $$$parentBuilder;
 	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = column;
-	}
-
-	public ColumnBuilder(ConverterOption option, B parentBuilder) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
-
 	public ColumnBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+		this.$$$wrapped = null;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ColumnBuilder(ConverterOption option) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+	public ColumnBuilder(P parentBuilder) {
+		this.$$$wrapped = null;
+		this.$$$parentBuilder = parentBuilder;
+	}
+
+	protected ColumnBuilder(Column wrapped) {
+		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public Column getSavedTarget() {
-		return this.$$$savedTarget;
-	}
-
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
-	}
-
-    protected void copyAttributes(ColumnBuilder<?> copy) {
-    	this.name = copy.name;
-		this.table = copy.table;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public ColumnBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+    public ColumnBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
 
+	public Column getWrappedObject() {
+		return this.$$$wrapped;
+	}
+
+	protected void verifyMutable() {
+		if (this.$$$wrapped != null) {
+    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
+		}
+	}
+
+	public P end() {
+		return this.$$$parentBuilder;
+	}
+
     public Column toColumn() {
-    	return new Converter(this.$$$option).convert(this).to(Column.class);
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Column.class);
     }
 
-    private String name;
+	private String name;
+	
+	public String getName() {
+		return name;
+	}
 
-    public String getName() {
-        return this.name;
-    }
+	public void setName(String name) {
+		verifyMutable();
+		this.name = name;
+	}
 
-    public void setName(String name) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.name = name;
-    }
+	public ColumnBuilder<P> name(String name) {
+		verifyMutable();
+		this.name = name;
+		return this;
+	}
 
-    public ColumnBuilder<B> name(String name) {
-        this.name = name;
+	private TableBuilder<?> table;
+	
+	public TableBuilder<?> getTable() {
+		return table;
+	}
+
+	public void setTable(TableBuilder<?> table) {
+		verifyMutable();
+		this.table = table;
+	}
+
+	public ColumnBuilder<P> table(TableBuilder<?> table) {
+		verifyMutable();
+		this.table = table;
+		return this;
+	}
+
+	public TableBuilder<? extends ColumnBuilder<P>> table$begin() {
+		TableBuilder<ColumnBuilder<P>> result = new TableBuilder<ColumnBuilder<P>>(this);
+		this.table = result;
+		return result;
+	}
+
+    public ColumnBuilder<P> table$wrap(Table table) {
+    	verifyMutable();
+    	this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(table).to(TableBuilder.class);
         return this;
     }
-
-    private TableBuilder<?> table;
-
-    public TableBuilder<?> getTable() {
-        return this.table;
-    }
-
-    public void setTable(TableBuilder<?> table) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.table = table;
-    }
-
-    public TableBuilder<? extends ColumnBuilder<B>> table() {
-        TableBuilder<ColumnBuilder<B>> table = new TableBuilder<ColumnBuilder<B>>(this.$$$option, this);
-        this.table = table;
-        
-        return table;
-    }
-
-    public ColumnBuilder<B> table(TableBuilder<?> table) {
-        this.table = table;
-        return this;
-    }
-
-    public ColumnBuilder<B> table(Table table) {
-    	this.table = new WrapConverter(this.$$$option).convert(table).to(TableBuilder.class);
-        return this;
-    }
-
-    public ColumnBuilder<B> table$restoreFrom(BuilderRepository repo, int builderId) {
-        Object table = repo.get(builderId);
-        if (table == null) {
+    
+    public ColumnBuilder<P> table$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -143,8 +112,11 @@ public class ColumnBuilder<B> implements Convertable {
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
+        else if (!(restoredObject instanceof TableBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + TableBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
         else {
-            this.table = (TableBuilder<?>)table;
+            this.table = (TableBuilder<?>)restoredObject;
         }
         return this;
     }

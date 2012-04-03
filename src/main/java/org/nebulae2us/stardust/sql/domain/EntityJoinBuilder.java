@@ -1,122 +1,91 @@
 package org.nebulae2us.stardust.sql.domain;
 
+import java.util.*;
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.*;
+import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.*;
 import org.nebulae2us.stardust.my.domain.*;
 
+@Builder(destination=EntityJoin.class)
+public class EntityJoinBuilder<P> implements Wrappable<EntityJoin> {
 
-public class EntityJoinBuilder<B> implements Convertable {
+	protected final EntityJoin $$$wrapped;
 
-	private final EntityJoin $$$savedTarget;
-
-	private ConverterOption $$$option;
-
-	private final B $$$parentBuilder;
-
-	protected EntityJoinBuilder(EntityJoin entityJoin) {
-		if (entityJoin == null) {
-			throw new NullPointerException();
-		}
+	protected final P $$$parentBuilder;
 	
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = null;
-		this.$$$savedTarget = entityJoin;
-	}
-
-	public EntityJoinBuilder(ConverterOption option, B parentBuilder) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
-		this.$$$parentBuilder = parentBuilder;
-		this.$$$savedTarget = null;
-	}
-
 	public EntityJoinBuilder() {
-		this.$$$option = ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+		this.$$$wrapped = null;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public EntityJoinBuilder(ConverterOption option) {
-		this.$$$option = option != null ? option : ConverterOptions.EMPTY_IMMUTABLE_OPTION;
+	public EntityJoinBuilder(P parentBuilder) {
+		this.$$$wrapped = null;
+		this.$$$parentBuilder = parentBuilder;
+	}
+
+	protected EntityJoinBuilder(EntityJoin wrapped) {
+		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
-		this.$$$savedTarget = null;
 	}
 	
-	public ConverterOption getConverterOption() {
-		return this.$$$option;
-	}
-	
-	public void setConverterOption(ConverterOption option) {
-		this.$$$option = option;
-	}
-	
-	public EntityJoin getSavedTarget() {
-		return this.$$$savedTarget;
-	}
-
-	public boolean convertableTo(Class<?> c) {
-		return this.$$$savedTarget != null && c.isAssignableFrom(this.$$$savedTarget.getClass());
-	}
-
-	@SuppressWarnings("unchecked")
-	public <T> T convertTo(Class<T> c) {
-		if (!convertableTo(c)) {
-			throw new IllegalArgumentException();
-		}
-		return (T)this.$$$savedTarget;
-	}
-
-    protected void copyAttributes(EntityJoinBuilder<?> copy) {
-    	this.attribute = copy.attribute;
-		this.alias = copy.alias;
-		this.joinType = copy.joinType;
-    }
-
-    public B end() {
-        return this.$$$parentBuilder;
-    }
-
-    public EntityJoinBuilder<B> storeTo(BuilderRepository repo, int builderId) {
+    public EntityJoinBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
 
-    public EntityJoin toEntityJoin() {
-    	return new Converter(this.$$$option).convert(this).to(EntityJoin.class);
-    }
+	public EntityJoin getWrappedObject() {
+		return this.$$$wrapped;
+	}
 
-    private EntityAttributeBuilder<?> attribute;
-
-    public EntityAttributeBuilder<?> getAttribute() {
-        return this.attribute;
-    }
-
-    public void setAttribute(EntityAttributeBuilder<?> attribute) {
-    	if (this.$$$savedTarget != null) {
+	protected void verifyMutable() {
+		if (this.$$$wrapped != null) {
     		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.attribute = attribute;
+		}
+	}
+
+	public P end() {
+		return this.$$$parentBuilder;
+	}
+
+    public EntityJoin toEntityJoin() {
+    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(EntityJoin.class);
     }
 
-    public EntityAttributeBuilder<? extends EntityJoinBuilder<B>> attribute() {
-        EntityAttributeBuilder<EntityJoinBuilder<B>> attribute = new EntityAttributeBuilder<EntityJoinBuilder<B>>(this.$$$option, this);
-        this.attribute = attribute;
-        
-        return attribute;
-    }
+	private EntityAttributeBuilder<?> attribute;
+	
+	public EntityAttributeBuilder<?> getAttribute() {
+		return attribute;
+	}
 
-    public EntityJoinBuilder<B> attribute(EntityAttributeBuilder<?> attribute) {
-        this.attribute = attribute;
+	public void setAttribute(EntityAttributeBuilder<?> attribute) {
+		verifyMutable();
+		this.attribute = attribute;
+	}
+
+	public EntityJoinBuilder<P> attribute(EntityAttributeBuilder<?> attribute) {
+		verifyMutable();
+		this.attribute = attribute;
+		return this;
+	}
+
+	public EntityAttributeBuilder<? extends EntityJoinBuilder<P>> attribute$begin() {
+		EntityAttributeBuilder<EntityJoinBuilder<P>> result = new EntityAttributeBuilder<EntityJoinBuilder<P>>(this);
+		this.attribute = result;
+		return result;
+	}
+
+    public EntityJoinBuilder<P> attribute$wrap(EntityAttribute attribute) {
+    	verifyMutable();
+    	this.attribute = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(attribute).to(EntityAttributeBuilder.class);
         return this;
     }
-
-    public EntityJoinBuilder<B> attribute(EntityAttribute attribute) {
-    	this.attribute = new WrapConverter(this.$$$option).convert(attribute).to(EntityAttributeBuilder.class);
-        return this;
-    }
-
-    public EntityJoinBuilder<B> attribute$restoreFrom(BuilderRepository repo, int builderId) {
-        Object entityAttribute = repo.get(builderId);
-        if (entityAttribute == null) {
+    
+    public EntityJoinBuilder<P> attribute$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
@@ -128,45 +97,46 @@ public class EntityJoinBuilder<B> implements Convertable {
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
+        else if (!(restoredObject instanceof EntityAttributeBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + EntityAttributeBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
         else {
-            this.attribute = (EntityAttributeBuilder<?>)entityAttribute;
+            this.attribute = (EntityAttributeBuilder<?>)restoredObject;
         }
         return this;
     }
 
-    private String alias;
+	private String alias;
+	
+	public String getAlias() {
+		return alias;
+	}
 
-    public String getAlias() {
-        return this.alias;
-    }
+	public void setAlias(String alias) {
+		verifyMutable();
+		this.alias = alias;
+	}
 
-    public void setAlias(String alias) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.alias = alias;
-    }
+	public EntityJoinBuilder<P> alias(String alias) {
+		verifyMutable();
+		this.alias = alias;
+		return this;
+	}
 
-    public EntityJoinBuilder<B> alias(String alias) {
-        this.alias = alias;
-        return this;
-    }
+	private JoinType joinType;
+	
+	public JoinType getJoinType() {
+		return joinType;
+	}
 
-    private JoinType joinType;
+	public void setJoinType(JoinType joinType) {
+		verifyMutable();
+		this.joinType = joinType;
+	}
 
-    public JoinType getJoinType() {
-        return this.joinType;
-    }
-
-    public void setJoinType(JoinType joinType) {
-    	if (this.$$$savedTarget != null) {
-    		throw new IllegalStateException("Cannot mutate fields of immutable objects");
-    	}
-        this.joinType = joinType;
-    }
-
-    public EntityJoinBuilder<B> joinType(JoinType joinType) {
-        this.joinType = joinType;
-        return this;
-    }
+	public EntityJoinBuilder<P> joinType(JoinType joinType) {
+		verifyMutable();
+		this.joinType = joinType;
+		return this;
+	}
 }

@@ -16,7 +16,6 @@
 package org.nebulae2us.stardust;
 
 import java.io.File;
-import java.util.Arrays;
 
 import org.nebulae2us.electron.BuilderGenerator;
 import org.nebulae2us.stardust.db.domain.*;
@@ -31,32 +30,34 @@ import org.nebulae2us.stardust.sql.domain.*;
  */
 public class GenerateBuilders {
 
-	@SuppressWarnings("unchecked")
 	public static void main(String ... arguments) {
 		File genFolder = new File("src/main/java");
 		
-		BuilderGenerator.generateBuilders(genFolder, "org.nebulae2us.stardust", 
-				Arrays.asList(
-						Table.class,
-						Column.class,
-						TableJoin.class,
-						JoinedTables.class,
-						Attribute.class,
-						AttributeHolder.class,
-						Entity.class,
-						EntityAttribute.class,
-						EntityIdentifier.class,
-						ScalarAttribute.class,
-						ValueObject.class,
-						ValueObjectAttribute.class,
-						AliasJoin.class,
-						EntityJoin.class,
-						RelationalEntities.class,
-						SelectQuery.class,
-						Expression.class,
-						LogicalExpression.class,
-						SelectQueryParseResult.class
-						));
+		new BuilderGenerator()
+			.baseFolder(genFolder)
+			.buildersClassName("org.nebulae2us.stardust.Builders")
+			.builderSuffix("Builder")
+			.generate(
+					Table.class,
+					Column.class,
+					TableJoin.class,
+					JoinedTables.class,
+					Attribute.class,
+					AttributeHolder.class,
+					Entity.class,
+					EntityAttribute.class,
+					EntityIdentifier.class,
+					ScalarAttribute.class,
+					ValueObject.class,
+					ValueObjectAttribute.class,
+					AliasJoin.class,
+					EntityJoin.class,
+					RelationalEntities.class,
+					SelectQuery.class,
+					Expression.class,
+					LogicalExpression.class,
+					SelectQueryParseResult.class
+					);
 		
 	}
 	
