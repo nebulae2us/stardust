@@ -139,7 +139,7 @@ public class ScannerUtils {
 		}
 		
 		for (SecondaryTable secondaryTable : secondaryTables) {
-			TableJoinBuilder<?> tableJoin = result.tableJoins$one()
+			TableJoinBuilder<?> tableJoin = result.tableJoins$addTableJoin()
 				.joinType(JoinType.LEFT_JOIN)
 				.leftTable(result.getTable())
 				.rightTable$begin()
@@ -152,14 +152,14 @@ public class ScannerUtils {
 			if (secondaryTable.pkJoinColumns() != null || secondaryTable.pkJoinColumns().length > 0) {
 				for (PrimaryKeyJoinColumn pk : secondaryTable.pkJoinColumns()) {
 					tableJoin
-						.rightColumns$one()
+						.rightColumns$addColumn()
 							.table(tableJoin.getRightTable())
 							.name(pk.name())
 						.end()
 						;
 					
 					tableJoin
-						.leftColumns$one()
+						.leftColumns$addColumn()
 							.table(tableJoin.getLeftTable())
 							.name(pk.referencedColumnName())
 						.end()
@@ -211,7 +211,7 @@ public class ScannerUtils {
 			
 			for (PrimaryKeyJoinColumn pkColumn : pkColumns) {
 				tableJoin
-					.rightColumns$one()
+					.rightColumns$addColumn()
 						.name(pkColumn.name())
 						.table(tableJoin.getRightTable())
 					.end();

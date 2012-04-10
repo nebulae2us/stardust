@@ -22,24 +22,27 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
 	}
 
 	@Override
-	public ValueObjectAttribute getWrappedObject() {
-		return (ValueObjectAttribute)this.$$$wrapped;
-	}
-
-	@Override
     public ValueObjectAttributeBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
-	
+
+	@Override
+	public ValueObjectAttribute getWrappedObject() {
+		return (ValueObjectAttribute)this.$$$wrapped;
+	}
+
     public ValueObjectAttribute toValueObjectAttribute() {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ValueObjectAttribute.class);
     }
+    
 
-    @Override
+	@Override
     public ValueObjectAttribute toAttribute() {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ValueObjectAttribute.class);
     }
+    
+
 
 	private ValueObjectBuilder<?> valueObject;
 	
@@ -56,12 +59,6 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
 		verifyMutable();
 		this.valueObject = valueObject;
 		return this;
-	}
-
-	public ValueObjectBuilder<? extends ValueObjectAttributeBuilder<P>> valueObject$begin() {
-		ValueObjectBuilder<ValueObjectAttributeBuilder<P>> result = new ValueObjectBuilder<ValueObjectAttributeBuilder<P>>(this);
-		this.valueObject = result;
-		return result;
 	}
 
     public ValueObjectAttributeBuilder<P> valueObject$wrap(ValueObject valueObject) {
@@ -95,6 +92,13 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
         return this;
     }
 
+	public ValueObjectBuilder<? extends ValueObjectAttributeBuilder<P>> valueObject$begin() {
+		verifyMutable();
+		ValueObjectBuilder<ValueObjectAttributeBuilder<P>> result = new ValueObjectBuilder<ValueObjectAttributeBuilder<P>>(this);
+		this.valueObject = result;
+		return result;
+	}
+
 	@Override
 	public ValueObjectAttributeBuilder<P> field(Field field) {
 		return (ValueObjectAttributeBuilder<P>)super.field(field);
@@ -103,12 +107,6 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
 	@Override
 	public ValueObjectAttributeBuilder<P> owningEntity(EntityBuilder<?> owningEntity) {
 		return (ValueObjectAttributeBuilder<P>)super.owningEntity(owningEntity);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public EntityBuilder<? extends ValueObjectAttributeBuilder<P>> owningEntity$begin() {
-		return (EntityBuilder<? extends ValueObjectAttributeBuilder<P>>)super.owningEntity$begin();
 	}
 
 	@Override
@@ -120,4 +118,10 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
     public ValueObjectAttributeBuilder<P> owningEntity$restoreFrom(BuilderRepository repo, Object builderId) {
 		return (ValueObjectAttributeBuilder<P>)super.owningEntity$restoreFrom(repo, builderId);
     }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public EntityBuilder<? extends ValueObjectAttributeBuilder<P>> owningEntity$begin() {
+		return (EntityBuilder<? extends ValueObjectAttributeBuilder<P>>)super.owningEntity$begin();
+	}
 }

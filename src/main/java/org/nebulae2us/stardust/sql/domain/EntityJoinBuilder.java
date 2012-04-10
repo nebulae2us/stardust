@@ -52,6 +52,8 @@ public class EntityJoinBuilder<P> implements Wrappable<EntityJoin> {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(EntityJoin.class);
     }
 
+
+
 	private EntityAttributeBuilder<?> attribute;
 	
 	public EntityAttributeBuilder<?> getAttribute() {
@@ -67,12 +69,6 @@ public class EntityJoinBuilder<P> implements Wrappable<EntityJoin> {
 		verifyMutable();
 		this.attribute = attribute;
 		return this;
-	}
-
-	public EntityAttributeBuilder<? extends EntityJoinBuilder<P>> attribute$begin() {
-		EntityAttributeBuilder<EntityJoinBuilder<P>> result = new EntityAttributeBuilder<EntityJoinBuilder<P>>(this);
-		this.attribute = result;
-		return result;
 	}
 
     public EntityJoinBuilder<P> attribute$wrap(EntityAttribute attribute) {
@@ -105,6 +101,13 @@ public class EntityJoinBuilder<P> implements Wrappable<EntityJoin> {
         }
         return this;
     }
+
+	public EntityAttributeBuilder<? extends EntityJoinBuilder<P>> attribute$begin() {
+		verifyMutable();
+		EntityAttributeBuilder<EntityJoinBuilder<P>> result = new EntityAttributeBuilder<EntityJoinBuilder<P>>(this);
+		this.attribute = result;
+		return result;
+	}
 
 	private String alias;
 	

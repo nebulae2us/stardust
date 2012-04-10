@@ -23,24 +23,27 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	}
 
 	@Override
-	public ScalarAttribute getWrappedObject() {
-		return (ScalarAttribute)this.$$$wrapped;
-	}
-
-	@Override
     public ScalarAttributeBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
-	
+
+	@Override
+	public ScalarAttribute getWrappedObject() {
+		return (ScalarAttribute)this.$$$wrapped;
+	}
+
     public ScalarAttribute toScalarAttribute() {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ScalarAttribute.class);
     }
+    
 
-    @Override
+	@Override
     public ScalarAttribute toAttribute() {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ScalarAttribute.class);
     }
+    
+
 
 	private Class<?> scalarType;
 	
@@ -76,12 +79,6 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 		return this;
 	}
 
-	public ColumnBuilder<? extends ScalarAttributeBuilder<P>> column$begin() {
-		ColumnBuilder<ScalarAttributeBuilder<P>> result = new ColumnBuilder<ScalarAttributeBuilder<P>>(this);
-		this.column = result;
-		return result;
-	}
-
     public ScalarAttributeBuilder<P> column$wrap(Column column) {
     	verifyMutable();
     	this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(column).to(ColumnBuilder.class);
@@ -113,6 +110,13 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
         return this;
     }
 
+	public ColumnBuilder<? extends ScalarAttributeBuilder<P>> column$begin() {
+		verifyMutable();
+		ColumnBuilder<ScalarAttributeBuilder<P>> result = new ColumnBuilder<ScalarAttributeBuilder<P>>(this);
+		this.column = result;
+		return result;
+	}
+
 	@Override
 	public ScalarAttributeBuilder<P> field(Field field) {
 		return (ScalarAttributeBuilder<P>)super.field(field);
@@ -121,12 +125,6 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	@Override
 	public ScalarAttributeBuilder<P> owningEntity(EntityBuilder<?> owningEntity) {
 		return (ScalarAttributeBuilder<P>)super.owningEntity(owningEntity);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public EntityBuilder<? extends ScalarAttributeBuilder<P>> owningEntity$begin() {
-		return (EntityBuilder<? extends ScalarAttributeBuilder<P>>)super.owningEntity$begin();
 	}
 
 	@Override
@@ -138,4 +136,10 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
     public ScalarAttributeBuilder<P> owningEntity$restoreFrom(BuilderRepository repo, Object builderId) {
 		return (ScalarAttributeBuilder<P>)super.owningEntity$restoreFrom(repo, builderId);
     }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public EntityBuilder<? extends ScalarAttributeBuilder<P>> owningEntity$begin() {
+		return (EntityBuilder<? extends ScalarAttributeBuilder<P>>)super.owningEntity$begin();
+	}
 }

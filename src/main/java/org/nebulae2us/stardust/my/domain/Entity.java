@@ -16,7 +16,9 @@
 package org.nebulae2us.stardust.my.domain;
 
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.stardust.common.domain.Links;
 import org.nebulae2us.stardust.db.domain.JoinedTables;
+import org.nebulae2us.stardust.db.domain.LinkedTable;
 
 /**
  * @author Trung Phan
@@ -26,6 +28,8 @@ public class Entity extends AttributeHolder {
 
 	
 	private final JoinedTables joinedTables;
+	
+	private final Links<LinkedTable> linkedTables;
 
 	private final EntityIdentifier entityIdentifier;
 
@@ -48,6 +52,7 @@ public class Entity extends AttributeHolder {
 		this.discriminator = mirror.to(ScalarAttribute.class, "discriminator");
 		this.discriminatorValue = mirror.toString("discriminatorValue");
 		
+		this.linkedTables = mirror.to(Links.class, "linkedTables");
 	}
 
 	public EntityIdentifier getEntityIdentifier() {
@@ -93,6 +98,10 @@ public class Entity extends AttributeHolder {
 	
 	public boolean isSupOf(Entity entity) {
 		return entity.getDeclaringClass().isAssignableFrom(declaringClass);
+	}
+
+	public Links<LinkedTable> getLinkedTables() {
+		return linkedTables;
 	}
 
 	

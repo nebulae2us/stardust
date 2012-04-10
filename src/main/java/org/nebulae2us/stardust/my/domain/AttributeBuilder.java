@@ -51,6 +51,8 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Attribute.class);
     }
 
+
+
 	private Field field;
 	
 	public Field getField() {
@@ -85,12 +87,6 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 		return this;
 	}
 
-	public EntityBuilder<? extends AttributeBuilder<P>> owningEntity$begin() {
-		EntityBuilder<AttributeBuilder<P>> result = new EntityBuilder<AttributeBuilder<P>>(this);
-		this.owningEntity = result;
-		return result;
-	}
-
     public AttributeBuilder<P> owningEntity$wrap(Entity owningEntity) {
     	verifyMutable();
     	this.owningEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(owningEntity).to(EntityBuilder.class);
@@ -121,4 +117,11 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
         }
         return this;
     }
+
+	public EntityBuilder<? extends AttributeBuilder<P>> owningEntity$begin() {
+		verifyMutable();
+		EntityBuilder<AttributeBuilder<P>> result = new EntityBuilder<AttributeBuilder<P>>(this);
+		this.owningEntity = result;
+		return result;
+	}
 }

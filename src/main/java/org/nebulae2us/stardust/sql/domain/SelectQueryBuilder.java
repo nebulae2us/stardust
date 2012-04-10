@@ -51,6 +51,8 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(SelectQuery.class);
     }
 
+
+
 	private Class<?> entityClass;
 	
 	public Class<?> getEntityClass() {
@@ -108,13 +110,13 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 		}
 		if (aliasJoins != null) {
 			for (AliasJoinBuilder<?> e : aliasJoins) {
-				this.aliasJoins.add(e);
+				CollectionUtils.addItem(this.aliasJoins, e);
 			}
 		}
 		return this;
 	}
 
-	public AliasJoinBuilder<SelectQueryBuilder<P>> aliasJoins$one() {
+	public AliasJoinBuilder<? extends SelectQueryBuilder<P>> aliasJoins$addAliasJoin() {
 		verifyMutable();
 		if (this.aliasJoins == null) {
 			this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
@@ -123,37 +125,45 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 		AliasJoinBuilder<SelectQueryBuilder<P>> result =
 				new AliasJoinBuilder<SelectQueryBuilder<P>>(this);
 		
-		this.aliasJoins.add(result);
+		CollectionUtils.addItem(this.aliasJoins, result);
 		
 		return result;
 	}
+	
 
-	public class AliasJoins$$$builder {
-		
-		public AliasJoinBuilder<AliasJoins$$$builder> blank$begin() {
-			AliasJoinBuilder<AliasJoins$$$builder> result = new AliasJoinBuilder<AliasJoins$$$builder>(this);
-			SelectQueryBuilder.this.aliasJoins.add(result);
+	public class AliasJoins$$$builder<P1 extends SelectQueryBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected AliasJoins$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public AliasJoinBuilder<AliasJoins$$$builder<P1>> aliasJoin$begin() {
+			AliasJoinBuilder<AliasJoins$$$builder<P1>> result = new AliasJoinBuilder<AliasJoins$$$builder<P1>>(this);
+			CollectionUtils.addItem(SelectQueryBuilder.this.aliasJoins, result);
 			return result;
 		}
 		
-		public SelectQueryBuilder<P> end() {
-			return SelectQueryBuilder.this;
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
 		}
 	}
 	
-	public AliasJoins$$$builder aliasJoins$list() {
+	public AliasJoins$$$builder<? extends SelectQueryBuilder<P>> aliasJoins$list() {
 		verifyMutable();
 		if (this.aliasJoins == null) {
 			this.aliasJoins = new ArrayList<AliasJoinBuilder<?>>();
 		}
-		return new AliasJoins$$$builder();
+		return new AliasJoins$$$builder<SelectQueryBuilder<P>>(this);
 	}
 
     public SelectQueryBuilder<P> aliasJoins$wrap(AliasJoin ... aliasJoins) {
     	return aliasJoins$wrap(new ListBuilder<AliasJoin>().add(aliasJoins).toList());
     }
 
-    public SelectQueryBuilder<P> aliasJoins$wrap(Collection<AliasJoin> aliasJoins) {
+    public SelectQueryBuilder<P> aliasJoins$wrap(Collection<? extends AliasJoin> aliasJoins) {
 		verifyMutable();
 
 		if (this.aliasJoins == null) {
@@ -162,7 +172,7 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 		if (aliasJoins != null) {
 			for (AliasJoin e : aliasJoins) {
 				AliasJoinBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AliasJoinBuilder.class);
-				this.aliasJoins.add(wrapped);
+				CollectionUtils.addItem(this.aliasJoins, wrapped);
 			}
 		}
 		return this;
@@ -185,7 +195,7 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						SelectQueryBuilder.this.aliasJoins.add((AliasJoinBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(SelectQueryBuilder.this.aliasJoins, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -197,12 +207,13 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + AliasJoinBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.aliasJoins.add((AliasJoinBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.aliasJoins, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 
 	private List<ExpressionBuilder<?>> expressions;
 	
@@ -227,13 +238,13 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 		}
 		if (expressions != null) {
 			for (ExpressionBuilder<?> e : expressions) {
-				this.expressions.add(e);
+				CollectionUtils.addItem(this.expressions, e);
 			}
 		}
 		return this;
 	}
 
-	public ExpressionBuilder<SelectQueryBuilder<P>> expressions$one() {
+	public ExpressionBuilder<? extends SelectQueryBuilder<P>> expressions$addExpression() {
 		verifyMutable();
 		if (this.expressions == null) {
 			this.expressions = new ArrayList<ExpressionBuilder<?>>();
@@ -242,37 +253,65 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 		ExpressionBuilder<SelectQueryBuilder<P>> result =
 				new ExpressionBuilder<SelectQueryBuilder<P>>(this);
 		
-		this.expressions.add(result);
+		CollectionUtils.addItem(this.expressions, result);
 		
 		return result;
 	}
-
-	public class Expressions$$$builder {
-		
-		public ExpressionBuilder<Expressions$$$builder> blank$begin() {
-			ExpressionBuilder<Expressions$$$builder> result = new ExpressionBuilder<Expressions$$$builder>(this);
-			SelectQueryBuilder.this.expressions.add(result);
-			return result;
-		}
-		
-		public SelectQueryBuilder<P> end() {
-			return SelectQueryBuilder.this;
-		}
-	}
 	
-	public Expressions$$$builder expressions$list() {
+	public LogicalExpressionBuilder<? extends SelectQueryBuilder<P>> expressions$addLogicalExpression() {
 		verifyMutable();
 		if (this.expressions == null) {
 			this.expressions = new ArrayList<ExpressionBuilder<?>>();
 		}
-		return new Expressions$$$builder();
+		
+		LogicalExpressionBuilder<SelectQueryBuilder<P>> result =
+				new LogicalExpressionBuilder<SelectQueryBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.expressions, result);
+		
+		return result;
+	}
+	
+
+	public class Expressions$$$builder<P1 extends SelectQueryBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected Expressions$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public ExpressionBuilder<Expressions$$$builder<P1>> expression$begin() {
+			ExpressionBuilder<Expressions$$$builder<P1>> result = new ExpressionBuilder<Expressions$$$builder<P1>>(this);
+			CollectionUtils.addItem(SelectQueryBuilder.this.expressions, result);
+			return result;
+		}
+		
+		public LogicalExpressionBuilder<Expressions$$$builder<P1>> logicalExpression$begin() {
+			LogicalExpressionBuilder<Expressions$$$builder<P1>> result = new LogicalExpressionBuilder<Expressions$$$builder<P1>>(this);
+			CollectionUtils.addItem(SelectQueryBuilder.this.expressions, result);
+			return result;
+		}
+		
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
+		}
+	}
+	
+	public Expressions$$$builder<? extends SelectQueryBuilder<P>> expressions$list() {
+		verifyMutable();
+		if (this.expressions == null) {
+			this.expressions = new ArrayList<ExpressionBuilder<?>>();
+		}
+		return new Expressions$$$builder<SelectQueryBuilder<P>>(this);
 	}
 
     public SelectQueryBuilder<P> expressions$wrap(Expression ... expressions) {
     	return expressions$wrap(new ListBuilder<Expression>().add(expressions).toList());
     }
 
-    public SelectQueryBuilder<P> expressions$wrap(Collection<Expression> expressions) {
+    public SelectQueryBuilder<P> expressions$wrap(Collection<? extends Expression> expressions) {
 		verifyMutable();
 
 		if (this.expressions == null) {
@@ -281,7 +320,7 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 		if (expressions != null) {
 			for (Expression e : expressions) {
 				ExpressionBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ExpressionBuilder.class);
-				this.expressions.add(wrapped);
+				CollectionUtils.addItem(this.expressions, wrapped);
 			}
 		}
 		return this;
@@ -304,7 +343,7 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						SelectQueryBuilder.this.expressions.add((ExpressionBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(SelectQueryBuilder.this.expressions, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -316,10 +355,11 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ExpressionBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.expressions.add((ExpressionBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.expressions, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 }

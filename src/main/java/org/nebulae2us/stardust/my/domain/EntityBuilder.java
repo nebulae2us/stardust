@@ -22,24 +22,27 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 	}
 
 	@Override
-	public Entity getWrappedObject() {
-		return (Entity)this.$$$wrapped;
-	}
-
-	@Override
     public EntityBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
-	
+
+	@Override
+	public Entity getWrappedObject() {
+		return (Entity)this.$$$wrapped;
+	}
+
     public Entity toEntity() {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Entity.class);
     }
+    
 
-    @Override
+	@Override
     public Entity toAttributeHolder() {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Entity.class);
     }
+    
+
 
 	private JoinedTablesBuilder<?> joinedTables;
 	
@@ -56,12 +59,6 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 		verifyMutable();
 		this.joinedTables = joinedTables;
 		return this;
-	}
-
-	public JoinedTablesBuilder<? extends EntityBuilder<P>> joinedTables$begin() {
-		JoinedTablesBuilder<EntityBuilder<P>> result = new JoinedTablesBuilder<EntityBuilder<P>>(this);
-		this.joinedTables = result;
-		return result;
 	}
 
     public EntityBuilder<P> joinedTables$wrap(JoinedTables joinedTables) {
@@ -95,6 +92,13 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
         return this;
     }
 
+	public JoinedTablesBuilder<? extends EntityBuilder<P>> joinedTables$begin() {
+		verifyMutable();
+		JoinedTablesBuilder<EntityBuilder<P>> result = new JoinedTablesBuilder<EntityBuilder<P>>(this);
+		this.joinedTables = result;
+		return result;
+	}
+
 	private EntityIdentifierBuilder<?> entityIdentifier;
 	
 	public EntityIdentifierBuilder<?> getEntityIdentifier() {
@@ -110,12 +114,6 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 		verifyMutable();
 		this.entityIdentifier = entityIdentifier;
 		return this;
-	}
-
-	public EntityIdentifierBuilder<? extends EntityBuilder<P>> entityIdentifier$begin() {
-		EntityIdentifierBuilder<EntityBuilder<P>> result = new EntityIdentifierBuilder<EntityBuilder<P>>(this);
-		this.entityIdentifier = result;
-		return result;
 	}
 
     public EntityBuilder<P> entityIdentifier$wrap(EntityIdentifier entityIdentifier) {
@@ -149,6 +147,13 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
         return this;
     }
 
+	public EntityIdentifierBuilder<? extends EntityBuilder<P>> entityIdentifier$begin() {
+		verifyMutable();
+		EntityIdentifierBuilder<EntityBuilder<P>> result = new EntityIdentifierBuilder<EntityBuilder<P>>(this);
+		this.entityIdentifier = result;
+		return result;
+	}
+
 	private EntityBuilder<?> rootEntity;
 	
 	public EntityBuilder<?> getRootEntity() {
@@ -164,12 +169,6 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 		verifyMutable();
 		this.rootEntity = rootEntity;
 		return this;
-	}
-
-	public EntityBuilder<? extends EntityBuilder<P>> rootEntity$begin() {
-		EntityBuilder<EntityBuilder<P>> result = new EntityBuilder<EntityBuilder<P>>(this);
-		this.rootEntity = result;
-		return result;
 	}
 
     public EntityBuilder<P> rootEntity$wrap(Entity rootEntity) {
@@ -202,6 +201,13 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
         }
         return this;
     }
+
+	public EntityBuilder<? extends EntityBuilder<P>> rootEntity$begin() {
+		verifyMutable();
+		EntityBuilder<EntityBuilder<P>> result = new EntityBuilder<EntityBuilder<P>>(this);
+		this.rootEntity = result;
+		return result;
+	}
 
 	private InheritanceType inheritanceType;
 	
@@ -237,12 +243,6 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 		return this;
 	}
 
-	public ScalarAttributeBuilder<? extends EntityBuilder<P>> discriminator$begin() {
-		ScalarAttributeBuilder<EntityBuilder<P>> result = new ScalarAttributeBuilder<EntityBuilder<P>>(this);
-		this.discriminator = result;
-		return result;
-	}
-
     public EntityBuilder<P> discriminator$wrap(ScalarAttribute discriminator) {
     	verifyMutable();
     	this.discriminator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(discriminator).to(ScalarAttributeBuilder.class);
@@ -273,6 +273,13 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
         }
         return this;
     }
+
+	public ScalarAttributeBuilder<? extends EntityBuilder<P>> discriminator$begin() {
+		verifyMutable();
+		ScalarAttributeBuilder<EntityBuilder<P>> result = new ScalarAttributeBuilder<EntityBuilder<P>>(this);
+		this.discriminator = result;
+		return result;
+	}
 
 	private String discriminatorValue;
 	
@@ -307,12 +314,37 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 	}
 
 	@Override
+	public AttributeBuilder<? extends EntityBuilder<P>> attributes$addAttribute() {
+		return (AttributeBuilder<? extends EntityBuilder<P>>)super.attributes$addAttribute();
+	}
+	
+	@Override
+	public EntityAttributeBuilder<? extends EntityBuilder<P>> attributes$addEntityAttribute() {
+		return (EntityAttributeBuilder<? extends EntityBuilder<P>>)super.attributes$addEntityAttribute();
+	}
+	
+	@Override
+	public ScalarAttributeBuilder<? extends EntityBuilder<P>> attributes$addScalarAttribute() {
+		return (ScalarAttributeBuilder<? extends EntityBuilder<P>>)super.attributes$addScalarAttribute();
+	}
+	
+	@Override
+	public ValueObjectAttributeBuilder<? extends EntityBuilder<P>> attributes$addValueObjectAttribute() {
+		return (ValueObjectAttributeBuilder<? extends EntityBuilder<P>>)super.attributes$addValueObjectAttribute();
+	}
+	
+
+	public Attributes$$$builder<? extends EntityBuilder<P>> attributes$list() {
+		return (Attributes$$$builder<? extends EntityBuilder<P>>)super.attributes$list();
+	}
+	
+	@Override
     public EntityBuilder<P> attributes$wrap(Attribute ... attributes) {
 		return (EntityBuilder<P>)super.attributes$wrap(attributes);
     }
 
 	@Override
-    public EntityBuilder<P> attributes$wrap(Collection<Attribute> attributes) {
+    public EntityBuilder<P> attributes$wrap(Collection<? extends Attribute> attributes) {
 		return (EntityBuilder<P>)super.attributes$wrap(attributes);
     }
 
@@ -325,4 +357,5 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
     public EntityBuilder<P> attributes$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
 		return (EntityBuilder<P>)super.attributes$restoreFrom(repo, builderIds);
     }
+
 }

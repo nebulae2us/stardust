@@ -50,6 +50,8 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(AttributeHolder.class);
     }
 
+
+
 	private Class<?> declaringClass;
 	
 	public Class<?> getDeclaringClass() {
@@ -90,13 +92,13 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 		}
 		if (attributes != null) {
 			for (AttributeBuilder<?> e : attributes) {
-				this.attributes.add(e);
+				CollectionUtils.addItem(this.attributes, e);
 			}
 		}
 		return this;
 	}
 
-	public AttributeBuilder<AttributeHolderBuilder<P>> attributes$one() {
+	public AttributeBuilder<? extends AttributeHolderBuilder<P>> attributes$addAttribute() {
 		verifyMutable();
 		if (this.attributes == null) {
 			this.attributes = new ArrayList<AttributeBuilder<?>>();
@@ -105,37 +107,105 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 		AttributeBuilder<AttributeHolderBuilder<P>> result =
 				new AttributeBuilder<AttributeHolderBuilder<P>>(this);
 		
-		this.attributes.add(result);
+		CollectionUtils.addItem(this.attributes, result);
 		
 		return result;
 	}
-
-	public class Attributes$$$builder {
-		
-		public AttributeBuilder<Attributes$$$builder> blank$begin() {
-			AttributeBuilder<Attributes$$$builder> result = new AttributeBuilder<Attributes$$$builder>(this);
-			AttributeHolderBuilder.this.attributes.add(result);
-			return result;
-		}
-		
-		public AttributeHolderBuilder<P> end() {
-			return AttributeHolderBuilder.this;
-		}
-	}
 	
-	public Attributes$$$builder attributes$list() {
+	public EntityAttributeBuilder<? extends AttributeHolderBuilder<P>> attributes$addEntityAttribute() {
 		verifyMutable();
 		if (this.attributes == null) {
 			this.attributes = new ArrayList<AttributeBuilder<?>>();
 		}
-		return new Attributes$$$builder();
+		
+		EntityAttributeBuilder<AttributeHolderBuilder<P>> result =
+				new EntityAttributeBuilder<AttributeHolderBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.attributes, result);
+		
+		return result;
+	}
+	
+	public ScalarAttributeBuilder<? extends AttributeHolderBuilder<P>> attributes$addScalarAttribute() {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		
+		ScalarAttributeBuilder<AttributeHolderBuilder<P>> result =
+				new ScalarAttributeBuilder<AttributeHolderBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.attributes, result);
+		
+		return result;
+	}
+	
+	public ValueObjectAttributeBuilder<? extends AttributeHolderBuilder<P>> attributes$addValueObjectAttribute() {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		
+		ValueObjectAttributeBuilder<AttributeHolderBuilder<P>> result =
+				new ValueObjectAttributeBuilder<AttributeHolderBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.attributes, result);
+		
+		return result;
+	}
+	
+
+	public class Attributes$$$builder<P1 extends AttributeHolderBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected Attributes$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public AttributeBuilder<Attributes$$$builder<P1>> attribute$begin() {
+			AttributeBuilder<Attributes$$$builder<P1>> result = new AttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(AttributeHolderBuilder.this.attributes, result);
+			return result;
+		}
+		
+		public EntityAttributeBuilder<Attributes$$$builder<P1>> entityAttribute$begin() {
+			EntityAttributeBuilder<Attributes$$$builder<P1>> result = new EntityAttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(AttributeHolderBuilder.this.attributes, result);
+			return result;
+		}
+		
+		public ScalarAttributeBuilder<Attributes$$$builder<P1>> scalarAttribute$begin() {
+			ScalarAttributeBuilder<Attributes$$$builder<P1>> result = new ScalarAttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(AttributeHolderBuilder.this.attributes, result);
+			return result;
+		}
+		
+		public ValueObjectAttributeBuilder<Attributes$$$builder<P1>> valueObjectAttribute$begin() {
+			ValueObjectAttributeBuilder<Attributes$$$builder<P1>> result = new ValueObjectAttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(AttributeHolderBuilder.this.attributes, result);
+			return result;
+		}
+		
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
+		}
+	}
+	
+	public Attributes$$$builder<? extends AttributeHolderBuilder<P>> attributes$list() {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		return new Attributes$$$builder<AttributeHolderBuilder<P>>(this);
 	}
 
     public AttributeHolderBuilder<P> attributes$wrap(Attribute ... attributes) {
     	return attributes$wrap(new ListBuilder<Attribute>().add(attributes).toList());
     }
 
-    public AttributeHolderBuilder<P> attributes$wrap(Collection<Attribute> attributes) {
+    public AttributeHolderBuilder<P> attributes$wrap(Collection<? extends Attribute> attributes) {
 		verifyMutable();
 
 		if (this.attributes == null) {
@@ -144,7 +214,7 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 		if (attributes != null) {
 			for (Attribute e : attributes) {
 				AttributeBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AttributeBuilder.class);
-				this.attributes.add(wrapped);
+				CollectionUtils.addItem(this.attributes, wrapped);
 			}
 		}
 		return this;
@@ -167,7 +237,7 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						AttributeHolderBuilder.this.attributes.add((AttributeBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(AttributeHolderBuilder.this.attributes, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -179,10 +249,11 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + AttributeBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.attributes.add((AttributeBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.attributes, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 }

@@ -51,6 +51,8 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(SelectQueryParseResult.class);
     }
 
+
+
 	private RelationalEntitiesBuilder<?> relationalEntities;
 	
 	public RelationalEntitiesBuilder<?> getRelationalEntities() {
@@ -66,12 +68,6 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
 		verifyMutable();
 		this.relationalEntities = relationalEntities;
 		return this;
-	}
-
-	public RelationalEntitiesBuilder<? extends SelectQueryParseResultBuilder<P>> relationalEntities$begin() {
-		RelationalEntitiesBuilder<SelectQueryParseResultBuilder<P>> result = new RelationalEntitiesBuilder<SelectQueryParseResultBuilder<P>>(this);
-		this.relationalEntities = result;
-		return result;
 	}
 
     public SelectQueryParseResultBuilder<P> relationalEntities$wrap(RelationalEntities relationalEntities) {
@@ -105,6 +101,13 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
         return this;
     }
 
+	public RelationalEntitiesBuilder<? extends SelectQueryParseResultBuilder<P>> relationalEntities$begin() {
+		verifyMutable();
+		RelationalEntitiesBuilder<SelectQueryParseResultBuilder<P>> result = new RelationalEntitiesBuilder<SelectQueryParseResultBuilder<P>>(this);
+		this.relationalEntities = result;
+		return result;
+	}
+
 	private JoinedTablesBuilder<?> joinedTables;
 	
 	public JoinedTablesBuilder<?> getJoinedTables() {
@@ -120,12 +123,6 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
 		verifyMutable();
 		this.joinedTables = joinedTables;
 		return this;
-	}
-
-	public JoinedTablesBuilder<? extends SelectQueryParseResultBuilder<P>> joinedTables$begin() {
-		JoinedTablesBuilder<SelectQueryParseResultBuilder<P>> result = new JoinedTablesBuilder<SelectQueryParseResultBuilder<P>>(this);
-		this.joinedTables = result;
-		return result;
 	}
 
     public SelectQueryParseResultBuilder<P> joinedTables$wrap(JoinedTables joinedTables) {
@@ -159,6 +156,13 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
         return this;
     }
 
+	public JoinedTablesBuilder<? extends SelectQueryParseResultBuilder<P>> joinedTables$begin() {
+		verifyMutable();
+		JoinedTablesBuilder<SelectQueryParseResultBuilder<P>> result = new JoinedTablesBuilder<SelectQueryParseResultBuilder<P>>(this);
+		this.joinedTables = result;
+		return result;
+	}
+
 	private List<ColumnBuilder<?>> columns;
 	
 	public List<ColumnBuilder<?>> getColumns() {
@@ -182,13 +186,13 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
 		}
 		if (columns != null) {
 			for (ColumnBuilder<?> e : columns) {
-				this.columns.add(e);
+				CollectionUtils.addItem(this.columns, e);
 			}
 		}
 		return this;
 	}
 
-	public ColumnBuilder<SelectQueryParseResultBuilder<P>> columns$one() {
+	public ColumnBuilder<? extends SelectQueryParseResultBuilder<P>> columns$addColumn() {
 		verifyMutable();
 		if (this.columns == null) {
 			this.columns = new ArrayList<ColumnBuilder<?>>();
@@ -197,37 +201,45 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
 		ColumnBuilder<SelectQueryParseResultBuilder<P>> result =
 				new ColumnBuilder<SelectQueryParseResultBuilder<P>>(this);
 		
-		this.columns.add(result);
+		CollectionUtils.addItem(this.columns, result);
 		
 		return result;
 	}
+	
 
-	public class Columns$$$builder {
-		
-		public ColumnBuilder<Columns$$$builder> blank$begin() {
-			ColumnBuilder<Columns$$$builder> result = new ColumnBuilder<Columns$$$builder>(this);
-			SelectQueryParseResultBuilder.this.columns.add(result);
+	public class Columns$$$builder<P1 extends SelectQueryParseResultBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected Columns$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public ColumnBuilder<Columns$$$builder<P1>> column$begin() {
+			ColumnBuilder<Columns$$$builder<P1>> result = new ColumnBuilder<Columns$$$builder<P1>>(this);
+			CollectionUtils.addItem(SelectQueryParseResultBuilder.this.columns, result);
 			return result;
 		}
 		
-		public SelectQueryParseResultBuilder<P> end() {
-			return SelectQueryParseResultBuilder.this;
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
 		}
 	}
 	
-	public Columns$$$builder columns$list() {
+	public Columns$$$builder<? extends SelectQueryParseResultBuilder<P>> columns$list() {
 		verifyMutable();
 		if (this.columns == null) {
 			this.columns = new ArrayList<ColumnBuilder<?>>();
 		}
-		return new Columns$$$builder();
+		return new Columns$$$builder<SelectQueryParseResultBuilder<P>>(this);
 	}
 
     public SelectQueryParseResultBuilder<P> columns$wrap(Column ... columns) {
     	return columns$wrap(new ListBuilder<Column>().add(columns).toList());
     }
 
-    public SelectQueryParseResultBuilder<P> columns$wrap(Collection<Column> columns) {
+    public SelectQueryParseResultBuilder<P> columns$wrap(Collection<? extends Column> columns) {
 		verifyMutable();
 
 		if (this.columns == null) {
@@ -236,7 +248,7 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
 		if (columns != null) {
 			for (Column e : columns) {
 				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ColumnBuilder.class);
-				this.columns.add(wrapped);
+				CollectionUtils.addItem(this.columns, wrapped);
 			}
 		}
 		return this;
@@ -259,7 +271,7 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						SelectQueryParseResultBuilder.this.columns.add((ColumnBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(SelectQueryParseResultBuilder.this.columns, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -271,10 +283,11 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ColumnBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.columns.add((ColumnBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.columns, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 }

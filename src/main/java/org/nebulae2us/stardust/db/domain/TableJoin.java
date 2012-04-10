@@ -27,6 +27,7 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  * @author Trung Phan
  *
  */
+@Deprecated
 public class TableJoin {
 
 	private final Table leftTable;

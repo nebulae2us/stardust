@@ -51,6 +51,8 @@ public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(AliasJoin.class);
     }
 
+
+
 	private String name;
 	
 	public String getName() {

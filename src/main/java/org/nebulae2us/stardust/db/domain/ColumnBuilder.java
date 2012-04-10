@@ -50,6 +50,8 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Column.class);
     }
 
+
+
 	private String name;
 	
 	public String getName() {
@@ -84,12 +86,6 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
 		return this;
 	}
 
-	public TableBuilder<? extends ColumnBuilder<P>> table$begin() {
-		TableBuilder<ColumnBuilder<P>> result = new TableBuilder<ColumnBuilder<P>>(this);
-		this.table = result;
-		return result;
-	}
-
     public ColumnBuilder<P> table$wrap(Table table) {
     	verifyMutable();
     	this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(table).to(TableBuilder.class);
@@ -120,4 +116,11 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
         }
         return this;
     }
+
+	public TableBuilder<? extends ColumnBuilder<P>> table$begin() {
+		verifyMutable();
+		TableBuilder<ColumnBuilder<P>> result = new TableBuilder<ColumnBuilder<P>>(this);
+		this.table = result;
+		return result;
+	}
 }

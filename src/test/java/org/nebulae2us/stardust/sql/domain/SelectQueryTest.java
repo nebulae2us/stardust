@@ -48,9 +48,9 @@ public class SelectQueryTest {
 			.entityClass(Person.class)
 			.toSelectQuery();
 		
-		String sql = selectQuery.toSelectSql(entityRepository);
+		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
 
-		assertThat(sql, equalToIgnoringWhiteSpace(
+		assertThat(parseResult.toString(), equalToIgnoringWhiteSpace(
 				"select ssn, date_born, first_name, last_name, gender, version, updated_date from person"));
 		
 	}
@@ -65,9 +65,9 @@ public class SelectQueryTest {
 				.entityClass(Room.class)
 				.toSelectQuery();
 			
-			String sql = selectQuery.toSelectSql(entityRepository);
+			SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
 
-			assertThat(sql, equalToIgnoringWhiteSpace(
+			assertThat(parseResult.toString(), equalToIgnoringWhiteSpace(
 					"select ssn, date_born, first_name, last_name, gender, version, updated_date from person"));
 
 	}

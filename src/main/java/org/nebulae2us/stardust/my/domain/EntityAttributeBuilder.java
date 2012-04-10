@@ -23,24 +23,27 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	}
 
 	@Override
-	public EntityAttribute getWrappedObject() {
-		return (EntityAttribute)this.$$$wrapped;
-	}
-
-	@Override
     public EntityAttributeBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
-	
+
+	@Override
+	public EntityAttribute getWrappedObject() {
+		return (EntityAttribute)this.$$$wrapped;
+	}
+
     public EntityAttribute toEntityAttribute() {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(EntityAttribute.class);
     }
+    
 
-    @Override
+	@Override
     public EntityAttribute toAttribute() {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(EntityAttribute.class);
     }
+    
+
 
 	private EntityBuilder<?> entity;
 	
@@ -57,12 +60,6 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		verifyMutable();
 		this.entity = entity;
 		return this;
-	}
-
-	public EntityBuilder<? extends EntityAttributeBuilder<P>> entity$begin() {
-		EntityBuilder<EntityAttributeBuilder<P>> result = new EntityBuilder<EntityAttributeBuilder<P>>(this);
-		this.entity = result;
-		return result;
 	}
 
     public EntityAttributeBuilder<P> entity$wrap(Entity entity) {
@@ -95,6 +92,13 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
         }
         return this;
     }
+
+	public EntityBuilder<? extends EntityAttributeBuilder<P>> entity$begin() {
+		verifyMutable();
+		EntityBuilder<EntityAttributeBuilder<P>> result = new EntityBuilder<EntityAttributeBuilder<P>>(this);
+		this.entity = result;
+		return result;
+	}
 
 	private RelationalType relationalType;
 	
@@ -153,13 +157,13 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		}
 		if (leftColumns != null) {
 			for (ColumnBuilder<?> e : leftColumns) {
-				this.leftColumns.add(e);
+				CollectionUtils.addItem(this.leftColumns, e);
 			}
 		}
 		return this;
 	}
 
-	public ColumnBuilder<EntityAttributeBuilder<P>> leftColumns$one() {
+	public ColumnBuilder<? extends EntityAttributeBuilder<P>> leftColumns$addColumn() {
 		verifyMutable();
 		if (this.leftColumns == null) {
 			this.leftColumns = new ArrayList<ColumnBuilder<?>>();
@@ -168,37 +172,45 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		ColumnBuilder<EntityAttributeBuilder<P>> result =
 				new ColumnBuilder<EntityAttributeBuilder<P>>(this);
 		
-		this.leftColumns.add(result);
+		CollectionUtils.addItem(this.leftColumns, result);
 		
 		return result;
 	}
+	
 
-	public class LeftColumns$$$builder {
-		
-		public ColumnBuilder<LeftColumns$$$builder> blank$begin() {
-			ColumnBuilder<LeftColumns$$$builder> result = new ColumnBuilder<LeftColumns$$$builder>(this);
-			EntityAttributeBuilder.this.leftColumns.add(result);
+	public class LeftColumns$$$builder<P1 extends EntityAttributeBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected LeftColumns$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public ColumnBuilder<LeftColumns$$$builder<P1>> column$begin() {
+			ColumnBuilder<LeftColumns$$$builder<P1>> result = new ColumnBuilder<LeftColumns$$$builder<P1>>(this);
+			CollectionUtils.addItem(EntityAttributeBuilder.this.leftColumns, result);
 			return result;
 		}
 		
-		public EntityAttributeBuilder<P> end() {
-			return EntityAttributeBuilder.this;
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
 		}
 	}
 	
-	public LeftColumns$$$builder leftColumns$list() {
+	public LeftColumns$$$builder<? extends EntityAttributeBuilder<P>> leftColumns$list() {
 		verifyMutable();
 		if (this.leftColumns == null) {
 			this.leftColumns = new ArrayList<ColumnBuilder<?>>();
 		}
-		return new LeftColumns$$$builder();
+		return new LeftColumns$$$builder<EntityAttributeBuilder<P>>(this);
 	}
 
     public EntityAttributeBuilder<P> leftColumns$wrap(Column ... leftColumns) {
     	return leftColumns$wrap(new ListBuilder<Column>().add(leftColumns).toList());
     }
 
-    public EntityAttributeBuilder<P> leftColumns$wrap(Collection<Column> leftColumns) {
+    public EntityAttributeBuilder<P> leftColumns$wrap(Collection<? extends Column> leftColumns) {
 		verifyMutable();
 
 		if (this.leftColumns == null) {
@@ -207,7 +219,7 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		if (leftColumns != null) {
 			for (Column e : leftColumns) {
 				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ColumnBuilder.class);
-				this.leftColumns.add(wrapped);
+				CollectionUtils.addItem(this.leftColumns, wrapped);
 			}
 		}
 		return this;
@@ -230,7 +242,7 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						EntityAttributeBuilder.this.leftColumns.add((ColumnBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(EntityAttributeBuilder.this.leftColumns, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -242,12 +254,13 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ColumnBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.leftColumns.add((ColumnBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.leftColumns, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 
 	private List<ColumnBuilder<?>> rightColumns;
 	
@@ -272,13 +285,13 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		}
 		if (rightColumns != null) {
 			for (ColumnBuilder<?> e : rightColumns) {
-				this.rightColumns.add(e);
+				CollectionUtils.addItem(this.rightColumns, e);
 			}
 		}
 		return this;
 	}
 
-	public ColumnBuilder<EntityAttributeBuilder<P>> rightColumns$one() {
+	public ColumnBuilder<? extends EntityAttributeBuilder<P>> rightColumns$addColumn() {
 		verifyMutable();
 		if (this.rightColumns == null) {
 			this.rightColumns = new ArrayList<ColumnBuilder<?>>();
@@ -287,37 +300,45 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		ColumnBuilder<EntityAttributeBuilder<P>> result =
 				new ColumnBuilder<EntityAttributeBuilder<P>>(this);
 		
-		this.rightColumns.add(result);
+		CollectionUtils.addItem(this.rightColumns, result);
 		
 		return result;
 	}
+	
 
-	public class RightColumns$$$builder {
-		
-		public ColumnBuilder<RightColumns$$$builder> blank$begin() {
-			ColumnBuilder<RightColumns$$$builder> result = new ColumnBuilder<RightColumns$$$builder>(this);
-			EntityAttributeBuilder.this.rightColumns.add(result);
+	public class RightColumns$$$builder<P1 extends EntityAttributeBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected RightColumns$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public ColumnBuilder<RightColumns$$$builder<P1>> column$begin() {
+			ColumnBuilder<RightColumns$$$builder<P1>> result = new ColumnBuilder<RightColumns$$$builder<P1>>(this);
+			CollectionUtils.addItem(EntityAttributeBuilder.this.rightColumns, result);
 			return result;
 		}
 		
-		public EntityAttributeBuilder<P> end() {
-			return EntityAttributeBuilder.this;
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
 		}
 	}
 	
-	public RightColumns$$$builder rightColumns$list() {
+	public RightColumns$$$builder<? extends EntityAttributeBuilder<P>> rightColumns$list() {
 		verifyMutable();
 		if (this.rightColumns == null) {
 			this.rightColumns = new ArrayList<ColumnBuilder<?>>();
 		}
-		return new RightColumns$$$builder();
+		return new RightColumns$$$builder<EntityAttributeBuilder<P>>(this);
 	}
 
     public EntityAttributeBuilder<P> rightColumns$wrap(Column ... rightColumns) {
     	return rightColumns$wrap(new ListBuilder<Column>().add(rightColumns).toList());
     }
 
-    public EntityAttributeBuilder<P> rightColumns$wrap(Collection<Column> rightColumns) {
+    public EntityAttributeBuilder<P> rightColumns$wrap(Collection<? extends Column> rightColumns) {
 		verifyMutable();
 
 		if (this.rightColumns == null) {
@@ -326,7 +347,7 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		if (rightColumns != null) {
 			for (Column e : rightColumns) {
 				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ColumnBuilder.class);
-				this.rightColumns.add(wrapped);
+				CollectionUtils.addItem(this.rightColumns, wrapped);
 			}
 		}
 		return this;
@@ -349,7 +370,7 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						EntityAttributeBuilder.this.rightColumns.add((ColumnBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(EntityAttributeBuilder.this.rightColumns, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -361,12 +382,13 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ColumnBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.rightColumns.add((ColumnBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.rightColumns, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 
 	private List<ColumnBuilder<?>> junctionLeftColumns;
 	
@@ -391,13 +413,13 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		}
 		if (junctionLeftColumns != null) {
 			for (ColumnBuilder<?> e : junctionLeftColumns) {
-				this.junctionLeftColumns.add(e);
+				CollectionUtils.addItem(this.junctionLeftColumns, e);
 			}
 		}
 		return this;
 	}
 
-	public ColumnBuilder<EntityAttributeBuilder<P>> junctionLeftColumns$one() {
+	public ColumnBuilder<? extends EntityAttributeBuilder<P>> junctionLeftColumns$addColumn() {
 		verifyMutable();
 		if (this.junctionLeftColumns == null) {
 			this.junctionLeftColumns = new ArrayList<ColumnBuilder<?>>();
@@ -406,37 +428,45 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		ColumnBuilder<EntityAttributeBuilder<P>> result =
 				new ColumnBuilder<EntityAttributeBuilder<P>>(this);
 		
-		this.junctionLeftColumns.add(result);
+		CollectionUtils.addItem(this.junctionLeftColumns, result);
 		
 		return result;
 	}
+	
 
-	public class JunctionLeftColumns$$$builder {
-		
-		public ColumnBuilder<JunctionLeftColumns$$$builder> blank$begin() {
-			ColumnBuilder<JunctionLeftColumns$$$builder> result = new ColumnBuilder<JunctionLeftColumns$$$builder>(this);
-			EntityAttributeBuilder.this.junctionLeftColumns.add(result);
+	public class JunctionLeftColumns$$$builder<P1 extends EntityAttributeBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected JunctionLeftColumns$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public ColumnBuilder<JunctionLeftColumns$$$builder<P1>> column$begin() {
+			ColumnBuilder<JunctionLeftColumns$$$builder<P1>> result = new ColumnBuilder<JunctionLeftColumns$$$builder<P1>>(this);
+			CollectionUtils.addItem(EntityAttributeBuilder.this.junctionLeftColumns, result);
 			return result;
 		}
 		
-		public EntityAttributeBuilder<P> end() {
-			return EntityAttributeBuilder.this;
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
 		}
 	}
 	
-	public JunctionLeftColumns$$$builder junctionLeftColumns$list() {
+	public JunctionLeftColumns$$$builder<? extends EntityAttributeBuilder<P>> junctionLeftColumns$list() {
 		verifyMutable();
 		if (this.junctionLeftColumns == null) {
 			this.junctionLeftColumns = new ArrayList<ColumnBuilder<?>>();
 		}
-		return new JunctionLeftColumns$$$builder();
+		return new JunctionLeftColumns$$$builder<EntityAttributeBuilder<P>>(this);
 	}
 
     public EntityAttributeBuilder<P> junctionLeftColumns$wrap(Column ... junctionLeftColumns) {
     	return junctionLeftColumns$wrap(new ListBuilder<Column>().add(junctionLeftColumns).toList());
     }
 
-    public EntityAttributeBuilder<P> junctionLeftColumns$wrap(Collection<Column> junctionLeftColumns) {
+    public EntityAttributeBuilder<P> junctionLeftColumns$wrap(Collection<? extends Column> junctionLeftColumns) {
 		verifyMutable();
 
 		if (this.junctionLeftColumns == null) {
@@ -445,7 +475,7 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		if (junctionLeftColumns != null) {
 			for (Column e : junctionLeftColumns) {
 				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ColumnBuilder.class);
-				this.junctionLeftColumns.add(wrapped);
+				CollectionUtils.addItem(this.junctionLeftColumns, wrapped);
 			}
 		}
 		return this;
@@ -468,7 +498,7 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						EntityAttributeBuilder.this.junctionLeftColumns.add((ColumnBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(EntityAttributeBuilder.this.junctionLeftColumns, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -480,12 +510,13 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ColumnBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.junctionLeftColumns.add((ColumnBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.junctionLeftColumns, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 
 	private List<ColumnBuilder<?>> junctionRightColumns;
 	
@@ -510,13 +541,13 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		}
 		if (junctionRightColumns != null) {
 			for (ColumnBuilder<?> e : junctionRightColumns) {
-				this.junctionRightColumns.add(e);
+				CollectionUtils.addItem(this.junctionRightColumns, e);
 			}
 		}
 		return this;
 	}
 
-	public ColumnBuilder<EntityAttributeBuilder<P>> junctionRightColumns$one() {
+	public ColumnBuilder<? extends EntityAttributeBuilder<P>> junctionRightColumns$addColumn() {
 		verifyMutable();
 		if (this.junctionRightColumns == null) {
 			this.junctionRightColumns = new ArrayList<ColumnBuilder<?>>();
@@ -525,37 +556,45 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		ColumnBuilder<EntityAttributeBuilder<P>> result =
 				new ColumnBuilder<EntityAttributeBuilder<P>>(this);
 		
-		this.junctionRightColumns.add(result);
+		CollectionUtils.addItem(this.junctionRightColumns, result);
 		
 		return result;
 	}
+	
 
-	public class JunctionRightColumns$$$builder {
-		
-		public ColumnBuilder<JunctionRightColumns$$$builder> blank$begin() {
-			ColumnBuilder<JunctionRightColumns$$$builder> result = new ColumnBuilder<JunctionRightColumns$$$builder>(this);
-			EntityAttributeBuilder.this.junctionRightColumns.add(result);
+	public class JunctionRightColumns$$$builder<P1 extends EntityAttributeBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected JunctionRightColumns$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public ColumnBuilder<JunctionRightColumns$$$builder<P1>> column$begin() {
+			ColumnBuilder<JunctionRightColumns$$$builder<P1>> result = new ColumnBuilder<JunctionRightColumns$$$builder<P1>>(this);
+			CollectionUtils.addItem(EntityAttributeBuilder.this.junctionRightColumns, result);
 			return result;
 		}
 		
-		public EntityAttributeBuilder<P> end() {
-			return EntityAttributeBuilder.this;
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
 		}
 	}
 	
-	public JunctionRightColumns$$$builder junctionRightColumns$list() {
+	public JunctionRightColumns$$$builder<? extends EntityAttributeBuilder<P>> junctionRightColumns$list() {
 		verifyMutable();
 		if (this.junctionRightColumns == null) {
 			this.junctionRightColumns = new ArrayList<ColumnBuilder<?>>();
 		}
-		return new JunctionRightColumns$$$builder();
+		return new JunctionRightColumns$$$builder<EntityAttributeBuilder<P>>(this);
 	}
 
     public EntityAttributeBuilder<P> junctionRightColumns$wrap(Column ... junctionRightColumns) {
     	return junctionRightColumns$wrap(new ListBuilder<Column>().add(junctionRightColumns).toList());
     }
 
-    public EntityAttributeBuilder<P> junctionRightColumns$wrap(Collection<Column> junctionRightColumns) {
+    public EntityAttributeBuilder<P> junctionRightColumns$wrap(Collection<? extends Column> junctionRightColumns) {
 		verifyMutable();
 
 		if (this.junctionRightColumns == null) {
@@ -564,7 +603,7 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		if (junctionRightColumns != null) {
 			for (Column e : junctionRightColumns) {
 				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ColumnBuilder.class);
-				this.junctionRightColumns.add(wrapped);
+				CollectionUtils.addItem(this.junctionRightColumns, wrapped);
 			}
 		}
 		return this;
@@ -587,7 +626,7 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						EntityAttributeBuilder.this.junctionRightColumns.add((ColumnBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(EntityAttributeBuilder.this.junctionRightColumns, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -599,12 +638,13 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ColumnBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.junctionRightColumns.add((ColumnBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.junctionRightColumns, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 
 	@Override
 	public EntityAttributeBuilder<P> field(Field field) {
@@ -616,12 +656,6 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		return (EntityAttributeBuilder<P>)super.owningEntity(owningEntity);
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public EntityBuilder<? extends EntityAttributeBuilder<P>> owningEntity$begin() {
-		return (EntityBuilder<? extends EntityAttributeBuilder<P>>)super.owningEntity$begin();
-	}
-
 	@Override
     public EntityAttributeBuilder<P> owningEntity$wrap(Entity owningEntity) {
 		return (EntityAttributeBuilder<P>)super.owningEntity$wrap(owningEntity);
@@ -631,4 +665,10 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
     public EntityAttributeBuilder<P> owningEntity$restoreFrom(BuilderRepository repo, Object builderId) {
 		return (EntityAttributeBuilder<P>)super.owningEntity$restoreFrom(repo, builderId);
     }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public EntityBuilder<? extends EntityAttributeBuilder<P>> owningEntity$begin() {
+		return (EntityBuilder<? extends EntityAttributeBuilder<P>>)super.owningEntity$begin();
+	}
 }

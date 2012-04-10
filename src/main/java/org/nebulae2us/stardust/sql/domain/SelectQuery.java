@@ -16,12 +16,16 @@
 package org.nebulae2us.stardust.sql.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.nebulae2us.electron.Mirror;
-import org.nebulae2us.electron.util.ImmutableUniqueList;
+import org.nebulae2us.electron.util.ListBuilder;
+import static org.nebulae2us.stardust.Builders.*;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinedTables;
+import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Entity;
@@ -68,7 +72,9 @@ public class SelectQuery {
 		return expressions;
 	}
 	
-	public String toSelectSql(EntityRepository entityRepository) {
+	public SelectQueryParseResult toSelectSql(EntityRepository entityRepository) {
+		
+		Map<Table, String> tableAliases = new HashMap<Table, String>();
 		
 		List<Entity> entities = entityRepository.getEntitiesAndSub(entityClass);
 		Entity entity = entities.get(0);
@@ -88,24 +94,24 @@ public class SelectQuery {
 			}
 		}
 		
-		List<Column> _columns = new ArrayList<Column>();
+		ListBuilder<Column> columnListBuilder = new ListBuilder<Column>();
 		for (ScalarAttribute scalarAttribute : scalarAttributes) {
-			_columns.add(scalarAttribute.getColumn());
+			columnListBuilder.add(scalarAttribute.getColumn());
 		}
-		List<Column> columns = new ImmutableUniqueList<Column>(_columns);
+		List<Column> columns = columnListBuilder.toList();
 		
 		
 		System.out.println(joinedTables.toString());
 
-		for (Column column : columns) {
-			System.out.println(column.getTable().getName() + "." + column.getName());
-		}
-		
-		RelationalEntities re = RelationalEntities.newInstance(entity, initialAlias, aliasJoins);
+		RelationalEntities relationalEntities = RelationalEntities.newInstance(entity, initialAlias, aliasJoins);
 
+		SelectQueryParseResult selectQueryParseResult = selectQueryParseResult()
+				.relationalEntities$wrap(relationalEntities)
+				.joinedTables$wrap(joinedTables)
+				.columns$wrap(columns)
+				.toSelectQueryParseResult();
 
-
-		return "";
+		return selectQueryParseResult;
 
 	}
 	

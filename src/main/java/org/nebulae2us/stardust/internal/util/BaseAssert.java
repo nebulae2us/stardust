@@ -16,6 +16,9 @@
 package org.nebulae2us.stardust.internal.util;
 
 import java.lang.reflect.Constructor;
+import java.util.List;
+
+import org.nebulae2us.stardust.db.domain.Column;
 
 /**
  * @author Trung Phan
@@ -94,4 +97,5 @@ public class BaseAssert<T extends Throwable> {
             throwException(errorFormat, args);
         }
     }
+
 }

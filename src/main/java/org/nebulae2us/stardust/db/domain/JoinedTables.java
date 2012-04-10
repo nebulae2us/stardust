@@ -30,6 +30,7 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  * @author Trung Phan
  *
  */
+@Deprecated
 public class JoinedTables {
 
 	private final Table table;

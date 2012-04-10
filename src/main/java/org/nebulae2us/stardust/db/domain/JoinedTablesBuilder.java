@@ -50,6 +50,8 @@ public class JoinedTablesBuilder<P> implements Wrappable<JoinedTables> {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(JoinedTables.class);
     }
 
+
+
 	private TableBuilder<?> table;
 	
 	public TableBuilder<?> getTable() {
@@ -65,12 +67,6 @@ public class JoinedTablesBuilder<P> implements Wrappable<JoinedTables> {
 		verifyMutable();
 		this.table = table;
 		return this;
-	}
-
-	public TableBuilder<? extends JoinedTablesBuilder<P>> table$begin() {
-		TableBuilder<JoinedTablesBuilder<P>> result = new TableBuilder<JoinedTablesBuilder<P>>(this);
-		this.table = result;
-		return result;
 	}
 
     public JoinedTablesBuilder<P> table$wrap(Table table) {
@@ -104,6 +100,13 @@ public class JoinedTablesBuilder<P> implements Wrappable<JoinedTables> {
         return this;
     }
 
+	public TableBuilder<? extends JoinedTablesBuilder<P>> table$begin() {
+		verifyMutable();
+		TableBuilder<JoinedTablesBuilder<P>> result = new TableBuilder<JoinedTablesBuilder<P>>(this);
+		this.table = result;
+		return result;
+	}
+
 	private List<TableJoinBuilder<?>> tableJoins;
 	
 	public List<TableJoinBuilder<?>> getTableJoins() {
@@ -127,13 +130,13 @@ public class JoinedTablesBuilder<P> implements Wrappable<JoinedTables> {
 		}
 		if (tableJoins != null) {
 			for (TableJoinBuilder<?> e : tableJoins) {
-				this.tableJoins.add(e);
+				CollectionUtils.addItem(this.tableJoins, e);
 			}
 		}
 		return this;
 	}
 
-	public TableJoinBuilder<JoinedTablesBuilder<P>> tableJoins$one() {
+	public TableJoinBuilder<? extends JoinedTablesBuilder<P>> tableJoins$addTableJoin() {
 		verifyMutable();
 		if (this.tableJoins == null) {
 			this.tableJoins = new ArrayList<TableJoinBuilder<?>>();
@@ -142,37 +145,45 @@ public class JoinedTablesBuilder<P> implements Wrappable<JoinedTables> {
 		TableJoinBuilder<JoinedTablesBuilder<P>> result =
 				new TableJoinBuilder<JoinedTablesBuilder<P>>(this);
 		
-		this.tableJoins.add(result);
+		CollectionUtils.addItem(this.tableJoins, result);
 		
 		return result;
 	}
+	
 
-	public class TableJoins$$$builder {
-		
-		public TableJoinBuilder<TableJoins$$$builder> blank$begin() {
-			TableJoinBuilder<TableJoins$$$builder> result = new TableJoinBuilder<TableJoins$$$builder>(this);
-			JoinedTablesBuilder.this.tableJoins.add(result);
+	public class TableJoins$$$builder<P1 extends JoinedTablesBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected TableJoins$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public TableJoinBuilder<TableJoins$$$builder<P1>> tableJoin$begin() {
+			TableJoinBuilder<TableJoins$$$builder<P1>> result = new TableJoinBuilder<TableJoins$$$builder<P1>>(this);
+			CollectionUtils.addItem(JoinedTablesBuilder.this.tableJoins, result);
 			return result;
 		}
 		
-		public JoinedTablesBuilder<P> end() {
-			return JoinedTablesBuilder.this;
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
 		}
 	}
 	
-	public TableJoins$$$builder tableJoins$list() {
+	public TableJoins$$$builder<? extends JoinedTablesBuilder<P>> tableJoins$list() {
 		verifyMutable();
 		if (this.tableJoins == null) {
 			this.tableJoins = new ArrayList<TableJoinBuilder<?>>();
 		}
-		return new TableJoins$$$builder();
+		return new TableJoins$$$builder<JoinedTablesBuilder<P>>(this);
 	}
 
     public JoinedTablesBuilder<P> tableJoins$wrap(TableJoin ... tableJoins) {
     	return tableJoins$wrap(new ListBuilder<TableJoin>().add(tableJoins).toList());
     }
 
-    public JoinedTablesBuilder<P> tableJoins$wrap(Collection<TableJoin> tableJoins) {
+    public JoinedTablesBuilder<P> tableJoins$wrap(Collection<? extends TableJoin> tableJoins) {
 		verifyMutable();
 
 		if (this.tableJoins == null) {
@@ -181,7 +192,7 @@ public class JoinedTablesBuilder<P> implements Wrappable<JoinedTables> {
 		if (tableJoins != null) {
 			for (TableJoin e : tableJoins) {
 				TableJoinBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(TableJoinBuilder.class);
-				this.tableJoins.add(wrapped);
+				CollectionUtils.addItem(this.tableJoins, wrapped);
 			}
 		}
 		return this;
@@ -204,7 +215,7 @@ public class JoinedTablesBuilder<P> implements Wrappable<JoinedTables> {
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						JoinedTablesBuilder.this.tableJoins.add((TableJoinBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(JoinedTablesBuilder.this.tableJoins, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -216,10 +227,11 @@ public class JoinedTablesBuilder<P> implements Wrappable<JoinedTables> {
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + TableJoinBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.tableJoins.add((TableJoinBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.tableJoins, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 }

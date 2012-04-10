@@ -50,6 +50,8 @@ public class ExpressionBuilder<P> implements Wrappable<Expression> {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Expression.class);
     }
 
+
+
 	private boolean negated;
 	
 	public boolean getNegated() {

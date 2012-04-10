@@ -16,42 +16,35 @@
 package org.nebulae2us.stardust.sql.domain;
 
 import java.util.List;
-import java.util.Map;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.db.domain.Column;
-import org.nebulae2us.stardust.db.domain.JoinedTables;
 import org.nebulae2us.stardust.db.domain.Table;
+import org.nebulae2us.stardust.my.domain.Entity;
 
 /**
  * @author Trung Phan
  *
  */
-public class SelectQueryParseResult {
+public class ExpandedJoins {
 
-	private final RelationalEntities relationalEntities;
-	private final JoinedTables joinedTables;
+	private final Table table;
+	
+	private final String alias;
+	
 	private final List<Column> columns;
 	
-	public SelectQueryParseResult(Mirror mirror) {
+	private final Entity entity;
+	
+	private List<ExpandedJoin> joins;
+	
+	public ExpandedJoins(Mirror mirror) {
 		mirror.bind(this);
 		
-		this.relationalEntities = mirror.to(RelationalEntities.class, "relationalEntities");
-		this.joinedTables = mirror.to(JoinedTables.class, "joinedTables");
+		this.table = mirror.to(Table.class, "table");
+		this.alias = mirror.toString("alias");
 		this.columns = mirror.toListOf(Column.class, "columns");
+		this.entity = mirror.to(Entity.class, "entity");
 	}
-
-	public RelationalEntities getRelationalEntities() {
-		return relationalEntities;
-	}
-
-	public JoinedTables getJoinedTables() {
-		return joinedTables;
-	}
-
-	public List<Column> getColumns() {
-		return columns;
-	}
-
 	
 }

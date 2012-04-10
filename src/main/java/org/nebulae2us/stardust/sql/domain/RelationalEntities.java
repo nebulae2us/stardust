@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
@@ -37,6 +38,8 @@ public class RelationalEntities {
 
 	private final Entity entity;
 	
+	private final String initialAlias;
+	
 	private final List<EntityJoin> entityJoins;
 
 	public RelationalEntities(Mirror mirror) {
@@ -44,6 +47,7 @@ public class RelationalEntities {
 		
 		this.entity = mirror.to(Entity.class, "entity");
 		this.entityJoins = mirror.toListOf(EntityJoin.class, "entityJoins");
+		this.initialAlias = ObjectUtils.nvl(mirror.toString("initialAlias"));
 	}
 
 	public Entity getEntity() {
@@ -54,6 +58,10 @@ public class RelationalEntities {
 		return entityJoins;
 	}
 	
+	public String getInitialAlias() {
+		return initialAlias;
+	}
+
 	public EntityJoin getEntityJoin(String alias) {
 		for (EntityJoin entityJoin : entityJoins) {
 			if (entityJoin.getAlias().equals(alias)) {
@@ -72,6 +80,7 @@ public class RelationalEntities {
 		
 		RelationalEntitiesBuilder<?> result = relationalEntities()
 			.entity$wrap(entity)
+			.initialAlias(initialAlias)
 			;
 		
 		Map<String, EntityJoinBuilder<?>> entityJoins = new HashMap<String, EntityJoinBuilder<?>>();

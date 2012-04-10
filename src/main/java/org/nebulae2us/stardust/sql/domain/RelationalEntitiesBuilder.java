@@ -51,6 +51,8 @@ public class RelationalEntitiesBuilder<P> implements Wrappable<RelationalEntitie
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(RelationalEntities.class);
     }
 
+
+
 	private EntityBuilder<?> entity;
 	
 	public EntityBuilder<?> getEntity() {
@@ -66,12 +68,6 @@ public class RelationalEntitiesBuilder<P> implements Wrappable<RelationalEntitie
 		verifyMutable();
 		this.entity = entity;
 		return this;
-	}
-
-	public EntityBuilder<? extends RelationalEntitiesBuilder<P>> entity$begin() {
-		EntityBuilder<RelationalEntitiesBuilder<P>> result = new EntityBuilder<RelationalEntitiesBuilder<P>>(this);
-		this.entity = result;
-		return result;
 	}
 
     public RelationalEntitiesBuilder<P> entity$wrap(Entity entity) {
@@ -105,6 +101,30 @@ public class RelationalEntitiesBuilder<P> implements Wrappable<RelationalEntitie
         return this;
     }
 
+	public EntityBuilder<? extends RelationalEntitiesBuilder<P>> entity$begin() {
+		verifyMutable();
+		EntityBuilder<RelationalEntitiesBuilder<P>> result = new EntityBuilder<RelationalEntitiesBuilder<P>>(this);
+		this.entity = result;
+		return result;
+	}
+
+	private String initialAlias;
+	
+	public String getInitialAlias() {
+		return initialAlias;
+	}
+
+	public void setInitialAlias(String initialAlias) {
+		verifyMutable();
+		this.initialAlias = initialAlias;
+	}
+
+	public RelationalEntitiesBuilder<P> initialAlias(String initialAlias) {
+		verifyMutable();
+		this.initialAlias = initialAlias;
+		return this;
+	}
+
 	private List<EntityJoinBuilder<?>> entityJoins;
 	
 	public List<EntityJoinBuilder<?>> getEntityJoins() {
@@ -128,13 +148,13 @@ public class RelationalEntitiesBuilder<P> implements Wrappable<RelationalEntitie
 		}
 		if (entityJoins != null) {
 			for (EntityJoinBuilder<?> e : entityJoins) {
-				this.entityJoins.add(e);
+				CollectionUtils.addItem(this.entityJoins, e);
 			}
 		}
 		return this;
 	}
 
-	public EntityJoinBuilder<RelationalEntitiesBuilder<P>> entityJoins$one() {
+	public EntityJoinBuilder<? extends RelationalEntitiesBuilder<P>> entityJoins$addEntityJoin() {
 		verifyMutable();
 		if (this.entityJoins == null) {
 			this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
@@ -143,37 +163,45 @@ public class RelationalEntitiesBuilder<P> implements Wrappable<RelationalEntitie
 		EntityJoinBuilder<RelationalEntitiesBuilder<P>> result =
 				new EntityJoinBuilder<RelationalEntitiesBuilder<P>>(this);
 		
-		this.entityJoins.add(result);
+		CollectionUtils.addItem(this.entityJoins, result);
 		
 		return result;
 	}
+	
 
-	public class EntityJoins$$$builder {
-		
-		public EntityJoinBuilder<EntityJoins$$$builder> blank$begin() {
-			EntityJoinBuilder<EntityJoins$$$builder> result = new EntityJoinBuilder<EntityJoins$$$builder>(this);
-			RelationalEntitiesBuilder.this.entityJoins.add(result);
+	public class EntityJoins$$$builder<P1 extends RelationalEntitiesBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected EntityJoins$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public EntityJoinBuilder<EntityJoins$$$builder<P1>> entityJoin$begin() {
+			EntityJoinBuilder<EntityJoins$$$builder<P1>> result = new EntityJoinBuilder<EntityJoins$$$builder<P1>>(this);
+			CollectionUtils.addItem(RelationalEntitiesBuilder.this.entityJoins, result);
 			return result;
 		}
 		
-		public RelationalEntitiesBuilder<P> end() {
-			return RelationalEntitiesBuilder.this;
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
 		}
 	}
 	
-	public EntityJoins$$$builder entityJoins$list() {
+	public EntityJoins$$$builder<? extends RelationalEntitiesBuilder<P>> entityJoins$list() {
 		verifyMutable();
 		if (this.entityJoins == null) {
 			this.entityJoins = new ArrayList<EntityJoinBuilder<?>>();
 		}
-		return new EntityJoins$$$builder();
+		return new EntityJoins$$$builder<RelationalEntitiesBuilder<P>>(this);
 	}
 
     public RelationalEntitiesBuilder<P> entityJoins$wrap(EntityJoin ... entityJoins) {
     	return entityJoins$wrap(new ListBuilder<EntityJoin>().add(entityJoins).toList());
     }
 
-    public RelationalEntitiesBuilder<P> entityJoins$wrap(Collection<EntityJoin> entityJoins) {
+    public RelationalEntitiesBuilder<P> entityJoins$wrap(Collection<? extends EntityJoin> entityJoins) {
 		verifyMutable();
 
 		if (this.entityJoins == null) {
@@ -182,7 +210,7 @@ public class RelationalEntitiesBuilder<P> implements Wrappable<RelationalEntitie
 		if (entityJoins != null) {
 			for (EntityJoin e : entityJoins) {
 				EntityJoinBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(EntityJoinBuilder.class);
-				this.entityJoins.add(wrapped);
+				CollectionUtils.addItem(this.entityJoins, wrapped);
 			}
 		}
 		return this;
@@ -205,7 +233,7 @@ public class RelationalEntitiesBuilder<P> implements Wrappable<RelationalEntitie
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						RelationalEntitiesBuilder.this.entityJoins.add((EntityJoinBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(RelationalEntitiesBuilder.this.entityJoins, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -217,10 +245,11 @@ public class RelationalEntitiesBuilder<P> implements Wrappable<RelationalEntitie
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + EntityJoinBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.entityJoins.add((EntityJoinBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.entityJoins, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 }

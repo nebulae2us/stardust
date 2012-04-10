@@ -50,6 +50,8 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(TableJoin.class);
     }
 
+
+
 	private TableBuilder<?> leftTable;
 	
 	public TableBuilder<?> getLeftTable() {
@@ -65,12 +67,6 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 		verifyMutable();
 		this.leftTable = leftTable;
 		return this;
-	}
-
-	public TableBuilder<? extends TableJoinBuilder<P>> leftTable$begin() {
-		TableBuilder<TableJoinBuilder<P>> result = new TableBuilder<TableJoinBuilder<P>>(this);
-		this.leftTable = result;
-		return result;
 	}
 
     public TableJoinBuilder<P> leftTable$wrap(Table leftTable) {
@@ -104,6 +100,13 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
         return this;
     }
 
+	public TableBuilder<? extends TableJoinBuilder<P>> leftTable$begin() {
+		verifyMutable();
+		TableBuilder<TableJoinBuilder<P>> result = new TableBuilder<TableJoinBuilder<P>>(this);
+		this.leftTable = result;
+		return result;
+	}
+
 	private List<ColumnBuilder<?>> leftColumns;
 	
 	public List<ColumnBuilder<?>> getLeftColumns() {
@@ -127,13 +130,13 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 		}
 		if (leftColumns != null) {
 			for (ColumnBuilder<?> e : leftColumns) {
-				this.leftColumns.add(e);
+				CollectionUtils.addItem(this.leftColumns, e);
 			}
 		}
 		return this;
 	}
 
-	public ColumnBuilder<TableJoinBuilder<P>> leftColumns$one() {
+	public ColumnBuilder<? extends TableJoinBuilder<P>> leftColumns$addColumn() {
 		verifyMutable();
 		if (this.leftColumns == null) {
 			this.leftColumns = new ArrayList<ColumnBuilder<?>>();
@@ -142,37 +145,45 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 		ColumnBuilder<TableJoinBuilder<P>> result =
 				new ColumnBuilder<TableJoinBuilder<P>>(this);
 		
-		this.leftColumns.add(result);
+		CollectionUtils.addItem(this.leftColumns, result);
 		
 		return result;
 	}
+	
 
-	public class LeftColumns$$$builder {
-		
-		public ColumnBuilder<LeftColumns$$$builder> blank$begin() {
-			ColumnBuilder<LeftColumns$$$builder> result = new ColumnBuilder<LeftColumns$$$builder>(this);
-			TableJoinBuilder.this.leftColumns.add(result);
+	public class LeftColumns$$$builder<P1 extends TableJoinBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected LeftColumns$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public ColumnBuilder<LeftColumns$$$builder<P1>> column$begin() {
+			ColumnBuilder<LeftColumns$$$builder<P1>> result = new ColumnBuilder<LeftColumns$$$builder<P1>>(this);
+			CollectionUtils.addItem(TableJoinBuilder.this.leftColumns, result);
 			return result;
 		}
 		
-		public TableJoinBuilder<P> end() {
-			return TableJoinBuilder.this;
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
 		}
 	}
 	
-	public LeftColumns$$$builder leftColumns$list() {
+	public LeftColumns$$$builder<? extends TableJoinBuilder<P>> leftColumns$list() {
 		verifyMutable();
 		if (this.leftColumns == null) {
 			this.leftColumns = new ArrayList<ColumnBuilder<?>>();
 		}
-		return new LeftColumns$$$builder();
+		return new LeftColumns$$$builder<TableJoinBuilder<P>>(this);
 	}
 
     public TableJoinBuilder<P> leftColumns$wrap(Column ... leftColumns) {
     	return leftColumns$wrap(new ListBuilder<Column>().add(leftColumns).toList());
     }
 
-    public TableJoinBuilder<P> leftColumns$wrap(Collection<Column> leftColumns) {
+    public TableJoinBuilder<P> leftColumns$wrap(Collection<? extends Column> leftColumns) {
 		verifyMutable();
 
 		if (this.leftColumns == null) {
@@ -181,7 +192,7 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 		if (leftColumns != null) {
 			for (Column e : leftColumns) {
 				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ColumnBuilder.class);
-				this.leftColumns.add(wrapped);
+				CollectionUtils.addItem(this.leftColumns, wrapped);
 			}
 		}
 		return this;
@@ -204,7 +215,7 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						TableJoinBuilder.this.leftColumns.add((ColumnBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(TableJoinBuilder.this.leftColumns, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -216,12 +227,13 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ColumnBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.leftColumns.add((ColumnBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.leftColumns, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 
 	private TableBuilder<?> rightTable;
 	
@@ -238,12 +250,6 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 		verifyMutable();
 		this.rightTable = rightTable;
 		return this;
-	}
-
-	public TableBuilder<? extends TableJoinBuilder<P>> rightTable$begin() {
-		TableBuilder<TableJoinBuilder<P>> result = new TableBuilder<TableJoinBuilder<P>>(this);
-		this.rightTable = result;
-		return result;
 	}
 
     public TableJoinBuilder<P> rightTable$wrap(Table rightTable) {
@@ -277,6 +283,13 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
         return this;
     }
 
+	public TableBuilder<? extends TableJoinBuilder<P>> rightTable$begin() {
+		verifyMutable();
+		TableBuilder<TableJoinBuilder<P>> result = new TableBuilder<TableJoinBuilder<P>>(this);
+		this.rightTable = result;
+		return result;
+	}
+
 	private List<ColumnBuilder<?>> rightColumns;
 	
 	public List<ColumnBuilder<?>> getRightColumns() {
@@ -300,13 +313,13 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 		}
 		if (rightColumns != null) {
 			for (ColumnBuilder<?> e : rightColumns) {
-				this.rightColumns.add(e);
+				CollectionUtils.addItem(this.rightColumns, e);
 			}
 		}
 		return this;
 	}
 
-	public ColumnBuilder<TableJoinBuilder<P>> rightColumns$one() {
+	public ColumnBuilder<? extends TableJoinBuilder<P>> rightColumns$addColumn() {
 		verifyMutable();
 		if (this.rightColumns == null) {
 			this.rightColumns = new ArrayList<ColumnBuilder<?>>();
@@ -315,37 +328,45 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 		ColumnBuilder<TableJoinBuilder<P>> result =
 				new ColumnBuilder<TableJoinBuilder<P>>(this);
 		
-		this.rightColumns.add(result);
+		CollectionUtils.addItem(this.rightColumns, result);
 		
 		return result;
 	}
+	
 
-	public class RightColumns$$$builder {
-		
-		public ColumnBuilder<RightColumns$$$builder> blank$begin() {
-			ColumnBuilder<RightColumns$$$builder> result = new ColumnBuilder<RightColumns$$$builder>(this);
-			TableJoinBuilder.this.rightColumns.add(result);
+	public class RightColumns$$$builder<P1 extends TableJoinBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected RightColumns$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public ColumnBuilder<RightColumns$$$builder<P1>> column$begin() {
+			ColumnBuilder<RightColumns$$$builder<P1>> result = new ColumnBuilder<RightColumns$$$builder<P1>>(this);
+			CollectionUtils.addItem(TableJoinBuilder.this.rightColumns, result);
 			return result;
 		}
 		
-		public TableJoinBuilder<P> end() {
-			return TableJoinBuilder.this;
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
 		}
 	}
 	
-	public RightColumns$$$builder rightColumns$list() {
+	public RightColumns$$$builder<? extends TableJoinBuilder<P>> rightColumns$list() {
 		verifyMutable();
 		if (this.rightColumns == null) {
 			this.rightColumns = new ArrayList<ColumnBuilder<?>>();
 		}
-		return new RightColumns$$$builder();
+		return new RightColumns$$$builder<TableJoinBuilder<P>>(this);
 	}
 
     public TableJoinBuilder<P> rightColumns$wrap(Column ... rightColumns) {
     	return rightColumns$wrap(new ListBuilder<Column>().add(rightColumns).toList());
     }
 
-    public TableJoinBuilder<P> rightColumns$wrap(Collection<Column> rightColumns) {
+    public TableJoinBuilder<P> rightColumns$wrap(Collection<? extends Column> rightColumns) {
 		verifyMutable();
 
 		if (this.rightColumns == null) {
@@ -354,7 +375,7 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 		if (rightColumns != null) {
 			for (Column e : rightColumns) {
 				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ColumnBuilder.class);
-				this.rightColumns.add(wrapped);
+				CollectionUtils.addItem(this.rightColumns, wrapped);
 			}
 		}
 		return this;
@@ -377,7 +398,7 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						TableJoinBuilder.this.rightColumns.add((ColumnBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(TableJoinBuilder.this.rightColumns, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -389,12 +410,13 @@ public class TableJoinBuilder<P> implements Wrappable<TableJoin> {
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ColumnBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.rightColumns.add((ColumnBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.rightColumns, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 
 	private JoinType joinType;
 	

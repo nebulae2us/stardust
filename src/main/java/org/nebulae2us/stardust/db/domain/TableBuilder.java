@@ -50,6 +50,8 @@ public class TableBuilder<P> implements Wrappable<Table> {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Table.class);
     }
 
+
+
 	private String name;
 	
 	public String getName() {

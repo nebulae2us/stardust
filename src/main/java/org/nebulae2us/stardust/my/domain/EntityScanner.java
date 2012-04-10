@@ -147,7 +147,7 @@ public class EntityScanner {
 						
 						
 						entityAttribute
-							.rightColumns$one()
+							.rightColumns$addColumn()
 								.name(annotJoinColumn.name())
 								.table$begin()
 									.name(annotJoinColumn.table())
@@ -187,7 +187,7 @@ public class EntityScanner {
 				if (ObjectUtils.isEmpty(tableJoin.getLeftColumns())) {
 					for (ScalarAttributeBuilder<?> idAttribute : idAttributes) {
 						tableJoin
-							.leftColumns$one()
+							.leftColumns$addColumn()
 								.name(idAttribute.getColumn().getName())
 								.table$begin()
 									.name(idAttribute.getColumn().getTable().getName())
@@ -198,7 +198,7 @@ public class EntityScanner {
 				if (ObjectUtils.isEmpty(tableJoin.getRightColumns())) {
 					for (ScalarAttributeBuilder<?> idAttribute : idAttributes) {
 						tableJoin
-							.rightColumns$one()
+							.rightColumns$addColumn()
 								.name(idAttribute.getColumn().getName())
 								.table$begin()
 									.name(idAttribute.getColumn().getTable().getName())

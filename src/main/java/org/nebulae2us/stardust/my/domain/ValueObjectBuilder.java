@@ -21,24 +21,27 @@ public class ValueObjectBuilder<P> extends AttributeHolderBuilder<P> {
 	}
 
 	@Override
-	public ValueObject getWrappedObject() {
-		return (ValueObject)this.$$$wrapped;
-	}
-
-	@Override
     public ValueObjectBuilder<P> storeTo(BuilderRepository repo, Object builderId) {
     	repo.put(builderId, this);
     	return this;
     }
-	
+
+	@Override
+	public ValueObject getWrappedObject() {
+		return (ValueObject)this.$$$wrapped;
+	}
+
     public ValueObject toValueObject() {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ValueObject.class);
     }
+    
 
-    @Override
+	@Override
     public ValueObject toAttributeHolder() {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ValueObject.class);
     }
+    
+
 
 	private ValueObjectBuilder<?> superValueObject;
 	
@@ -55,12 +58,6 @@ public class ValueObjectBuilder<P> extends AttributeHolderBuilder<P> {
 		verifyMutable();
 		this.superValueObject = superValueObject;
 		return this;
-	}
-
-	public ValueObjectBuilder<? extends ValueObjectBuilder<P>> superValueObject$begin() {
-		ValueObjectBuilder<ValueObjectBuilder<P>> result = new ValueObjectBuilder<ValueObjectBuilder<P>>(this);
-		this.superValueObject = result;
-		return result;
 	}
 
     public ValueObjectBuilder<P> superValueObject$wrap(ValueObject superValueObject) {
@@ -94,6 +91,13 @@ public class ValueObjectBuilder<P> extends AttributeHolderBuilder<P> {
         return this;
     }
 
+	public ValueObjectBuilder<? extends ValueObjectBuilder<P>> superValueObject$begin() {
+		verifyMutable();
+		ValueObjectBuilder<ValueObjectBuilder<P>> result = new ValueObjectBuilder<ValueObjectBuilder<P>>(this);
+		this.superValueObject = result;
+		return result;
+	}
+
 	@Override
 	public ValueObjectBuilder<P> declaringClass(Class<?> declaringClass) {
 		return (ValueObjectBuilder<P>)super.declaringClass(declaringClass);
@@ -110,12 +114,37 @@ public class ValueObjectBuilder<P> extends AttributeHolderBuilder<P> {
 	}
 
 	@Override
+	public AttributeBuilder<? extends ValueObjectBuilder<P>> attributes$addAttribute() {
+		return (AttributeBuilder<? extends ValueObjectBuilder<P>>)super.attributes$addAttribute();
+	}
+	
+	@Override
+	public EntityAttributeBuilder<? extends ValueObjectBuilder<P>> attributes$addEntityAttribute() {
+		return (EntityAttributeBuilder<? extends ValueObjectBuilder<P>>)super.attributes$addEntityAttribute();
+	}
+	
+	@Override
+	public ScalarAttributeBuilder<? extends ValueObjectBuilder<P>> attributes$addScalarAttribute() {
+		return (ScalarAttributeBuilder<? extends ValueObjectBuilder<P>>)super.attributes$addScalarAttribute();
+	}
+	
+	@Override
+	public ValueObjectAttributeBuilder<? extends ValueObjectBuilder<P>> attributes$addValueObjectAttribute() {
+		return (ValueObjectAttributeBuilder<? extends ValueObjectBuilder<P>>)super.attributes$addValueObjectAttribute();
+	}
+	
+
+	public Attributes$$$builder<? extends ValueObjectBuilder<P>> attributes$list() {
+		return (Attributes$$$builder<? extends ValueObjectBuilder<P>>)super.attributes$list();
+	}
+	
+	@Override
     public ValueObjectBuilder<P> attributes$wrap(Attribute ... attributes) {
 		return (ValueObjectBuilder<P>)super.attributes$wrap(attributes);
     }
 
 	@Override
-    public ValueObjectBuilder<P> attributes$wrap(Collection<Attribute> attributes) {
+    public ValueObjectBuilder<P> attributes$wrap(Collection<? extends Attribute> attributes) {
 		return (ValueObjectBuilder<P>)super.attributes$wrap(attributes);
     }
 
@@ -128,4 +157,5 @@ public class ValueObjectBuilder<P> extends AttributeHolderBuilder<P> {
     public ValueObjectBuilder<P> attributes$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
 		return (ValueObjectBuilder<P>)super.attributes$restoreFrom(repo, builderIds);
     }
+
 }

@@ -50,6 +50,8 @@ public class EntityIdentifierBuilder<P> implements Wrappable<EntityIdentifier> {
     	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(EntityIdentifier.class);
     }
 
+
+
 	private List<AttributeBuilder<?>> attributes;
 	
 	public List<AttributeBuilder<?>> getAttributes() {
@@ -73,13 +75,13 @@ public class EntityIdentifierBuilder<P> implements Wrappable<EntityIdentifier> {
 		}
 		if (attributes != null) {
 			for (AttributeBuilder<?> e : attributes) {
-				this.attributes.add(e);
+				CollectionUtils.addItem(this.attributes, e);
 			}
 		}
 		return this;
 	}
 
-	public AttributeBuilder<EntityIdentifierBuilder<P>> attributes$one() {
+	public AttributeBuilder<? extends EntityIdentifierBuilder<P>> attributes$addAttribute() {
 		verifyMutable();
 		if (this.attributes == null) {
 			this.attributes = new ArrayList<AttributeBuilder<?>>();
@@ -88,37 +90,105 @@ public class EntityIdentifierBuilder<P> implements Wrappable<EntityIdentifier> {
 		AttributeBuilder<EntityIdentifierBuilder<P>> result =
 				new AttributeBuilder<EntityIdentifierBuilder<P>>(this);
 		
-		this.attributes.add(result);
+		CollectionUtils.addItem(this.attributes, result);
 		
 		return result;
 	}
-
-	public class Attributes$$$builder {
-		
-		public AttributeBuilder<Attributes$$$builder> blank$begin() {
-			AttributeBuilder<Attributes$$$builder> result = new AttributeBuilder<Attributes$$$builder>(this);
-			EntityIdentifierBuilder.this.attributes.add(result);
-			return result;
-		}
-		
-		public EntityIdentifierBuilder<P> end() {
-			return EntityIdentifierBuilder.this;
-		}
-	}
 	
-	public Attributes$$$builder attributes$list() {
+	public EntityAttributeBuilder<? extends EntityIdentifierBuilder<P>> attributes$addEntityAttribute() {
 		verifyMutable();
 		if (this.attributes == null) {
 			this.attributes = new ArrayList<AttributeBuilder<?>>();
 		}
-		return new Attributes$$$builder();
+		
+		EntityAttributeBuilder<EntityIdentifierBuilder<P>> result =
+				new EntityAttributeBuilder<EntityIdentifierBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.attributes, result);
+		
+		return result;
+	}
+	
+	public ScalarAttributeBuilder<? extends EntityIdentifierBuilder<P>> attributes$addScalarAttribute() {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		
+		ScalarAttributeBuilder<EntityIdentifierBuilder<P>> result =
+				new ScalarAttributeBuilder<EntityIdentifierBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.attributes, result);
+		
+		return result;
+	}
+	
+	public ValueObjectAttributeBuilder<? extends EntityIdentifierBuilder<P>> attributes$addValueObjectAttribute() {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		
+		ValueObjectAttributeBuilder<EntityIdentifierBuilder<P>> result =
+				new ValueObjectAttributeBuilder<EntityIdentifierBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.attributes, result);
+		
+		return result;
+	}
+	
+
+	public class Attributes$$$builder<P1 extends EntityIdentifierBuilder<P>> {
+	
+		private final P1 $$$parentBuilder1;
+	
+		protected Attributes$$$builder(P1 parentBuilder) {
+			this.$$$parentBuilder1 = parentBuilder;
+		}
+
+		public AttributeBuilder<Attributes$$$builder<P1>> attribute$begin() {
+			AttributeBuilder<Attributes$$$builder<P1>> result = new AttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(EntityIdentifierBuilder.this.attributes, result);
+			return result;
+		}
+		
+		public EntityAttributeBuilder<Attributes$$$builder<P1>> entityAttribute$begin() {
+			EntityAttributeBuilder<Attributes$$$builder<P1>> result = new EntityAttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(EntityIdentifierBuilder.this.attributes, result);
+			return result;
+		}
+		
+		public ScalarAttributeBuilder<Attributes$$$builder<P1>> scalarAttribute$begin() {
+			ScalarAttributeBuilder<Attributes$$$builder<P1>> result = new ScalarAttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(EntityIdentifierBuilder.this.attributes, result);
+			return result;
+		}
+		
+		public ValueObjectAttributeBuilder<Attributes$$$builder<P1>> valueObjectAttribute$begin() {
+			ValueObjectAttributeBuilder<Attributes$$$builder<P1>> result = new ValueObjectAttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(EntityIdentifierBuilder.this.attributes, result);
+			return result;
+		}
+		
+
+		public P1 end() {
+			return this.$$$parentBuilder1;
+		}
+	}
+	
+	public Attributes$$$builder<? extends EntityIdentifierBuilder<P>> attributes$list() {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		return new Attributes$$$builder<EntityIdentifierBuilder<P>>(this);
 	}
 
     public EntityIdentifierBuilder<P> attributes$wrap(Attribute ... attributes) {
     	return attributes$wrap(new ListBuilder<Attribute>().add(attributes).toList());
     }
 
-    public EntityIdentifierBuilder<P> attributes$wrap(Collection<Attribute> attributes) {
+    public EntityIdentifierBuilder<P> attributes$wrap(Collection<? extends Attribute> attributes) {
 		verifyMutable();
 
 		if (this.attributes == null) {
@@ -127,7 +197,7 @@ public class EntityIdentifierBuilder<P> implements Wrappable<EntityIdentifier> {
 		if (attributes != null) {
 			for (Attribute e : attributes) {
 				AttributeBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AttributeBuilder.class);
-				this.attributes.add(wrapped);
+				CollectionUtils.addItem(this.attributes, wrapped);
 			}
 		}
 		return this;
@@ -150,7 +220,7 @@ public class EntityIdentifierBuilder<P> implements Wrappable<EntityIdentifier> {
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						EntityIdentifierBuilder.this.attributes.add((AttributeBuilder<?>)arguments[0]);
+	    						CollectionUtils.addItem(EntityIdentifierBuilder.this.attributes, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -162,10 +232,11 @@ public class EntityIdentifierBuilder<P> implements Wrappable<EntityIdentifier> {
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + AttributeBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                this.attributes.add((AttributeBuilder<?>)restoredObject);
+	                CollectionUtils.addItem(this.attributes, restoredObject);
 	            }
 	    	}
 		}
         return this;
     }
+
 }
