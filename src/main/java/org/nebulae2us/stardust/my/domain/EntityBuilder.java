@@ -44,30 +44,30 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
     
 
 
-	private JoinedTablesBuilder<?> joinedTables;
+	private LinkedTableBundleBuilder<?> linkedTableBundle;
 	
-	public JoinedTablesBuilder<?> getJoinedTables() {
-		return joinedTables;
+	public LinkedTableBundleBuilder<?> getLinkedTableBundle() {
+		return linkedTableBundle;
 	}
 
-	public void setJoinedTables(JoinedTablesBuilder<?> joinedTables) {
+	public void setLinkedTableBundle(LinkedTableBundleBuilder<?> linkedTableBundle) {
 		verifyMutable();
-		this.joinedTables = joinedTables;
+		this.linkedTableBundle = linkedTableBundle;
 	}
 
-	public EntityBuilder<P> joinedTables(JoinedTablesBuilder<?> joinedTables) {
+	public EntityBuilder<P> linkedTableBundle(LinkedTableBundleBuilder<?> linkedTableBundle) {
 		verifyMutable();
-		this.joinedTables = joinedTables;
+		this.linkedTableBundle = linkedTableBundle;
 		return this;
 	}
 
-    public EntityBuilder<P> joinedTables$wrap(JoinedTables joinedTables) {
+    public EntityBuilder<P> linkedTableBundle$wrap(LinkedTableBundle linkedTableBundle) {
     	verifyMutable();
-    	this.joinedTables = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(joinedTables).to(JoinedTablesBuilder.class);
+    	this.linkedTableBundle = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(linkedTableBundle).to(LinkedTableBundleBuilder.class);
         return this;
     }
     
-    public EntityBuilder<P> joinedTables$restoreFrom(BuilderRepository repo, Object builderId) {
+    public EntityBuilder<P> linkedTableBundle$restoreFrom(BuilderRepository repo, Object builderId) {
     	verifyMutable();
     	
         Object restoredObject = repo.get(builderId);
@@ -75,7 +75,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
-						EntityBuilder.this.joinedTables = (JoinedTablesBuilder<?>)arguments[0];
+						EntityBuilder.this.linkedTableBundle = (LinkedTableBundleBuilder<?>)arguments[0];
 					}
 				});
         	}
@@ -83,19 +83,19 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
-        else if (!(restoredObject instanceof JoinedTablesBuilder)) {
-        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + JoinedTablesBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        else if (!(restoredObject instanceof LinkedTableBundleBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + LinkedTableBundleBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
         }
         else {
-            this.joinedTables = (JoinedTablesBuilder<?>)restoredObject;
+            this.linkedTableBundle = (LinkedTableBundleBuilder<?>)restoredObject;
         }
         return this;
     }
 
-	public JoinedTablesBuilder<? extends EntityBuilder<P>> joinedTables$begin() {
+	public LinkedTableBundleBuilder<? extends EntityBuilder<P>> linkedTableBundle$begin() {
 		verifyMutable();
-		JoinedTablesBuilder<EntityBuilder<P>> result = new JoinedTablesBuilder<EntityBuilder<P>>(this);
-		this.joinedTables = result;
+		LinkedTableBundleBuilder<EntityBuilder<P>> result = new LinkedTableBundleBuilder<EntityBuilder<P>>(this);
+		this.linkedTableBundle = result;
 		return result;
 	}
 
@@ -358,4 +358,13 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 		return (EntityBuilder<P>)super.attributes$restoreFrom(repo, builderIds);
     }
 
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

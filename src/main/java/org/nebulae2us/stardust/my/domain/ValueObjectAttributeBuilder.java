@@ -124,4 +124,13 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
 	public EntityBuilder<? extends ValueObjectAttributeBuilder<P>> owningEntity$begin() {
 		return (EntityBuilder<? extends ValueObjectAttributeBuilder<P>>)super.owningEntity$begin();
 	}
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

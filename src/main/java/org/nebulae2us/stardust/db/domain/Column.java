@@ -70,4 +70,9 @@ public class Column {
 	public int hashCode() {
 		return name.hashCode() ^ table.hashCode();
 	}
+	
+	@Override
+	public String toString() {
+		return table.getName() + "." + name;
+	}
 }

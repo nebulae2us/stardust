@@ -85,6 +85,11 @@ public class Table {
 	public int hashCode() {
 		return name.hashCode() ^ schemaName.hashCode() ^ catalogName.hashCode();
 	}
+	
+	@Override
+	public String toString() {
+		return name;
+	}
 
 	
 }

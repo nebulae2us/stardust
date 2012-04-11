@@ -142,4 +142,13 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	public EntityBuilder<? extends ScalarAttributeBuilder<P>> owningEntity$begin() {
 		return (EntityBuilder<? extends ScalarAttributeBuilder<P>>)super.owningEntity$begin();
 	}
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

@@ -102,4 +102,13 @@ public class TableBuilder<P> implements Wrappable<Table> {
 		this.catalogName = catalogName;
 		return this;
 	}
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

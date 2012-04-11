@@ -17,6 +17,9 @@ package org.nebulae2us.stardust.sql.domain;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.db.domain.JoinType;
+import org.nebulae2us.stardust.internal.util.ObjectUtils;
+
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan
@@ -36,6 +39,14 @@ public class AliasJoin {
 		this.name = mirror.toString("name");
 		this.alias = mirror.toString("alias");
 		this.joinType = mirror.to(JoinType.class, "joinType");
+		
+		assertInvariant();
+	}
+	
+	private void assertInvariant() {
+		Assert.notEmpty(this.name, "name cannot be emtpty");
+		Assert.notEmpty(this.alias, "alias cannot be empty");
+		Assert.notNull(this.joinType, "joinType cannot be null");
 	}
 
 	public String getName() {

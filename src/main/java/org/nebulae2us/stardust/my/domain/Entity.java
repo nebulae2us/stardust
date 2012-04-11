@@ -16,9 +16,7 @@
 package org.nebulae2us.stardust.my.domain;
 
 import org.nebulae2us.electron.Mirror;
-import org.nebulae2us.stardust.common.domain.Links;
-import org.nebulae2us.stardust.db.domain.JoinedTables;
-import org.nebulae2us.stardust.db.domain.LinkedTable;
+import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
 
 /**
  * @author Trung Phan
@@ -26,11 +24,8 @@ import org.nebulae2us.stardust.db.domain.LinkedTable;
  */
 public class Entity extends AttributeHolder {
 
+	private final LinkedTableBundle linkedTableBundle;
 	
-	private final JoinedTables joinedTables;
-	
-	private final Links<LinkedTable> linkedTables;
-
 	private final EntityIdentifier entityIdentifier;
 
 	private final Entity rootEntity;
@@ -45,14 +40,12 @@ public class Entity extends AttributeHolder {
 		super(mirror);
 		mirror.bind(this);
 
-		this.joinedTables = mirror.to(JoinedTables.class, "joinedTables");
+		this.linkedTableBundle = mirror.to(LinkedTableBundle.class, "linkedTableBundle");
 		this.entityIdentifier = mirror.to(EntityIdentifier.class, "entityIdentifier");
 		this.rootEntity = mirror.to(Entity.class, "rootEntity");
 		this.inheritanceType = mirror.to(InheritanceType.class, "inheritanceType");
 		this.discriminator = mirror.to(ScalarAttribute.class, "discriminator");
 		this.discriminatorValue = mirror.toString("discriminatorValue");
-		
-		this.linkedTables = mirror.to(Links.class, "linkedTables");
 	}
 
 	public EntityIdentifier getEntityIdentifier() {
@@ -69,10 +62,6 @@ public class Entity extends AttributeHolder {
 
 	public String getDiscriminatorValue() {
 		return discriminatorValue;
-	}
-
-	public JoinedTables getJoinedTables() {
-		return joinedTables;
 	}
 
 	public InheritanceType getInheritanceType() {
@@ -100,9 +89,10 @@ public class Entity extends AttributeHolder {
 		return entity.getDeclaringClass().isAssignableFrom(declaringClass);
 	}
 
-	public Links<LinkedTable> getLinkedTables() {
-		return linkedTables;
+	public LinkedTableBundle getLinkedTableBundle() {
+		return linkedTableBundle;
 	}
 
+	
 	
 }

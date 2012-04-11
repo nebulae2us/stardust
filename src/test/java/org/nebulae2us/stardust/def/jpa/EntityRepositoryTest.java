@@ -89,28 +89,28 @@ public class EntityRepositoryTest {
 	public void table_for_person_entity() {
 		Entity person = entityRepository.getEntity(Person.class);
 		
-		assertEquals("PERSON", person.getJoinedTables().getTable().getName());
-		assertEquals("", person.getJoinedTables().getTable().getSchemaName());
+		assertEquals("PERSON", person.getLinkedTableBundle().getRoot().getTable().getName());
+		assertEquals("", person.getLinkedTableBundle().getRoot().getTable().getSchemaName());
 	}
 
 	@Test
 	public void table_for_room() {
 		Entity room = entityRepository.getEntity(Room.class);
 
-		List<TableJoin> tableJoins = room.getJoinedTables().getTableJoins();
+		List<LinkedTable> linkedTables = room.getLinkedTableBundle().getLinkedTables();
 		
-		assertEquals("ROOM", room.getJoinedTables().getTable().getName());
-		assertEquals(1, tableJoins.size());
-		assertTrue(room.getJoinedTables().getTable() == tableJoins.get(0).getLeftTable());
-		assertEquals("ROOM_DETAIL", tableJoins.get(0).getRightTable().getName());
+		assertEquals("ROOM", room.getLinkedTableBundle().getRoot().getTable().getName());
+		assertEquals(2, linkedTables.size());
+		assertTrue(room.getLinkedTableBundle().getRoot().getTable() == linkedTables.get(1).getParent().getTable());
+		assertEquals("ROOM_DETAIL", linkedTables.get(1).getTable().getName());
 
-		assertEquals(3, tableJoins.get(0).getLeftColumns().size());
-		assertEquals("HOUSE_ID", tableJoins.get(0).getLeftColumns().get(0).getName());
-		assertEquals("HOUSE_LETTER", tableJoins.get(0).getLeftColumns().get(1).getName());
-		assertEquals("SEQUENCE_NUMBER", tableJoins.get(0).getLeftColumns().get(2).getName());
-		assertEquals("HOUSE_ID", tableJoins.get(0).getRightColumns().get(0).getName());
-		assertEquals("HOUSE_LETTER", tableJoins.get(0).getRightColumns().get(1).getName());
-		assertEquals("SEQUENCE_NUMBER", tableJoins.get(0).getRightColumns().get(2).getName());
+		assertEquals(3, linkedTables.get(1).getParentColumns().size());
+		assertEquals("HOUSE_ID", linkedTables.get(1).getParentColumns().get(0).getName());
+		assertEquals("HOUSE_LETTER", linkedTables.get(1).getParentColumns().get(1).getName());
+		assertEquals("SEQUENCE_NUMBER", linkedTables.get(1).getParentColumns().get(2).getName());
+		assertEquals("HOUSE_ID", linkedTables.get(1).getColumns().get(0).getName());
+		assertEquals("HOUSE_LETTER", linkedTables.get(1).getColumns().get(1).getName());
+		assertEquals("SEQUENCE_NUMBER", linkedTables.get(1).getColumns().get(2).getName());
 		
 	}
 	
@@ -120,7 +120,7 @@ public class EntityRepositoryTest {
 		Entity bedRoom = entityRepository.getEntity(BedRoom.class);
 		Entity room = entityRepository.getEntity(Room.class);
 		
-		assertEquals(room.getJoinedTables(), bedRoom.getJoinedTables());
+		assertEquals(room.getLinkedTableBundle(), bedRoom.getLinkedTableBundle());
 		
 	}
 	
@@ -128,24 +128,24 @@ public class EntityRepositoryTest {
 	public void table_for_house() {
 		Entity house = entityRepository.getEntity(House.class);
 		
-		assertEquals("HOUSE", house.getJoinedTables().getTable().getName());
-		assertEquals(2, house.getJoinedTables().getTableJoins().size());
+		assertEquals("HOUSE", house.getLinkedTableBundle().getRoot().getTable().getName());
+		assertEquals(3, house.getLinkedTableBundle().getLinkedTables().size());
 
-		TableJoin tableJoin0 = house.getJoinedTables().getTableJoins().get(0);
+		LinkedTable tableJoin1 = house.getLinkedTableBundle().getLinkedTables().get(1);
 		
-		assertEquals("HOUSE_ID", tableJoin0.getLeftColumns().get(0).getName());
-		assertEquals("HOUSE_LETTER", tableJoin0.getLeftColumns().get(1).getName());
+		assertEquals("HOUSE_ID", tableJoin1.getParentColumns().get(0).getName());
+		assertEquals("HOUSE_LETTER", tableJoin1.getParentColumns().get(1).getName());
 		
-		assertEquals("HOUSE_ID", tableJoin0.getRightColumns().get(0).getName());
-		assertEquals("HOUSE_LETTER", tableJoin0.getRightColumns().get(1).getName());
+		assertEquals("HOUSE_ID", tableJoin1.getColumns().get(0).getName());
+		assertEquals("HOUSE_LETTER", tableJoin1.getColumns().get(1).getName());
 
-		TableJoin tableJoin1 = house.getJoinedTables().getTableJoins().get(1);
+		LinkedTable tableJoin2 = house.getLinkedTableBundle().getLinkedTables().get(2);
 		
-		assertEquals("HOUSE_ID", tableJoin1.getLeftColumns().get(0).getName());
-		assertEquals("HOUSE_LETTER", tableJoin1.getLeftColumns().get(1).getName());
+		assertEquals("HOUSE_ID", tableJoin2.getParentColumns().get(0).getName());
+		assertEquals("HOUSE_LETTER", tableJoin2.getParentColumns().get(1).getName());
 		
-		assertEquals("HOUSE_ID", tableJoin1.getRightColumns().get(0).getName());
-		assertEquals("HOUSE_LETTER", tableJoin1.getRightColumns().get(1).getName());
+		assertEquals("HOUSE_ID", tableJoin2.getColumns().get(0).getName());
+		assertEquals("HOUSE_LETTER", tableJoin2.getColumns().get(1).getName());
 		
 	}
 	
@@ -153,21 +153,21 @@ public class EntityRepositoryTest {
 	public void table_for_bungalow() {
 		
 		Entity bungalow = entityRepository.getEntity(Bungalow.class);
-		JoinedTables joinedTables = bungalow.getJoinedTables();
-		List<TableJoin> tableJoins = joinedTables.getTableJoins();
+		LinkedTableBundle linkedTableBundle = bungalow.getLinkedTableBundle();
+		List<LinkedTable> linkedTable = linkedTableBundle.getLinkedTables();
 		
-		assertEquals("HOUSE", joinedTables.getTable().getName());
-		assertEquals(3, tableJoins.size());
+		assertEquals("HOUSE", linkedTableBundle.getRoot().getTable().getName());
+		assertEquals(4, linkedTable.size());
 		
-		for (int i = 0; i < tableJoins.size(); i++) {
-			assertEquals("HOUSE_ID", tableJoins.get(0).getLeftColumns().get(0).getName());
-			assertEquals("HOUSE_LETTER", tableJoins.get(0).getLeftColumns().get(1).getName());
+		for (int i = 1; i < linkedTable.size(); i++) {
+			assertEquals("HOUSE_ID", linkedTable.get(i).getParentColumns().get(0).getName());
+			assertEquals("HOUSE_LETTER", linkedTable.get(i).getParentColumns().get(1).getName());
 		}
 
-		assertEquals("BUNGALOW_HOUSE_ID", tableJoins.get(2).getRightColumns().get(0).getName());
-		assertEquals("BUNGALOW_HOUSE_LETTER", tableJoins.get(2).getRightColumns().get(1).getName());
+		assertEquals("BUNGALOW_HOUSE_ID", linkedTable.get(3).getColumns().get(0).getName());
+		assertEquals("BUNGALOW_HOUSE_LETTER", linkedTable.get(3).getColumns().get(1).getName());
 		
-		assertEquals("BUNGALOW", tableJoins.get(2).getRightTable().getName());
+		assertEquals("BUNGALOW", linkedTable.get(3).getTable().getName());
 		
 	}
 	

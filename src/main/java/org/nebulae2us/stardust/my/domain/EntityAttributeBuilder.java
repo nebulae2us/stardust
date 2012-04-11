@@ -671,4 +671,13 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	public EntityBuilder<? extends EntityAttributeBuilder<P>> owningEntity$begin() {
 		return (EntityBuilder<? extends EntityAttributeBuilder<P>>)super.owningEntity$begin();
 	}
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

@@ -25,7 +25,7 @@ import java.util.Map;
  */
 public class ObjectUtils {
 	
-    public static String nvl(String str1, String str2) {
+    public static <T> T nvl(T str1, T str2) {
         return str1 != null ? str1 : str2;
     }
     

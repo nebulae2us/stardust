@@ -18,9 +18,8 @@ package org.nebulae2us.stardust;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
-import org.nebulae2us.stardust.db.domain.JoinedTablesTest;
 import org.nebulae2us.stardust.def.jpa.EntityRepositoryTest;
-import org.nebulae2us.stardust.sql.domain.RelationalEntitiesTest;
+import org.nebulae2us.stardust.sql.domain.LinkedEntityBundleTest;
 import org.nebulae2us.stardust.sql.domain.SelectQueryTest;
 
 /**
@@ -29,9 +28,8 @@ import org.nebulae2us.stardust.sql.domain.SelectQueryTest;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-	JoinedTablesTest.class, 
 	EntityRepositoryTest.class, 
-	RelationalEntitiesTest.class, 
+	LinkedEntityBundleTest.class, 
 	SelectQueryTest.class})
 public class AllTests {
 	

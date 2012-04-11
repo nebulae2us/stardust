@@ -35,7 +35,7 @@ import static org.junit.Assert.*;
  * @author Trung Phan
  *
  */
-public class RelationalEntitiesTest {
+public class LinkedEntityBundleTest {
 
 	private EntityRepository entityRepository;
 	
@@ -50,17 +50,17 @@ public class RelationalEntitiesTest {
 
 		Entity house = this.entityRepository.getEntity(House.class);
 		List<AliasJoinBuilder<?>> aliasJoinBuilders = Arrays.asList(new AliasJoinBuilder<?>[] {
-				aliasJoin().name("rooms").alias("r"),
-				aliasJoin().name("owners").alias("o")
+				aliasJoin().name("rooms").alias("r").joinType(JoinType.INNER_JOIN),
+				aliasJoin().name("owners").alias("o").joinType(JoinType.INNER_JOIN)
 				});
 
 		List<AliasJoin> aliasJoins = new Converter(Builders.DESTINATION_CLASS_RESOLVER, true).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
 		
-		RelationalEntities relationalEntities = RelationalEntities.newInstance(house, "", aliasJoins);
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(house, "", aliasJoins);
 		
-		assertTrue(relationalEntities.getEntity() == house);
-		assertNotNull(relationalEntities.getEntityJoin("r"));
-		assertNotNull(relationalEntities.getEntityJoin("o"));
+		assertTrue(linkedEntityBundle.getRoot().getEntity() == house);
+		assertNotNull(linkedEntityBundle.getLinkedEntity("r"));
+		assertNotNull(linkedEntityBundle.getLinkedEntity("o"));
 		
 		
 	}
@@ -78,14 +78,14 @@ public class RelationalEntitiesTest {
 		
 		List<AliasJoin> aliasJoins = new Converter(Builders.DESTINATION_CLASS_RESOLVER, true).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
 		
-		RelationalEntities relationalEntities = RelationalEntities.newInstance(person, "", aliasJoins);
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(person, "", aliasJoins);
 		
-		assertNotNull(relationalEntities.getEntityJoin("h"));
-		assertEquals(JoinType.LEFT_JOIN, relationalEntities.getEntityJoin("h").getJoinType());
-		assertNotNull(relationalEntities.getEntityJoin("r"));
-		assertEquals(JoinType.LEFT_JOIN, relationalEntities.getEntityJoin("r").getJoinType());
-		assertNotNull(relationalEntities.getEntityJoin("o"));
-		assertEquals(JoinType.LEFT_JOIN, relationalEntities.getEntityJoin("o").getJoinType());
+		assertNotNull(linkedEntityBundle.getLinkedEntity("h"));
+		assertEquals(JoinType.LEFT_JOIN, linkedEntityBundle.getLinkedEntity("h").getJoinType());
+		assertNotNull(linkedEntityBundle.getLinkedEntity("r"));
+		assertEquals(JoinType.LEFT_JOIN, linkedEntityBundle.getLinkedEntity("r").getJoinType());
+		assertNotNull(linkedEntityBundle.getLinkedEntity("o"));
+		assertEquals(JoinType.LEFT_JOIN, linkedEntityBundle.getLinkedEntity("o").getJoinType());
 	}
 	
 	

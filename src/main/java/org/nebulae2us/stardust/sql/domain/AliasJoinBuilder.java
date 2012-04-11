@@ -103,4 +103,13 @@ public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
 		this.joinType = joinType;
 		return this;
 	}
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

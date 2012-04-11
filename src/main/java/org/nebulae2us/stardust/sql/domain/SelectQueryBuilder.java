@@ -362,4 +362,13 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
         return this;
     }
 
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

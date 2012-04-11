@@ -123,4 +123,13 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
 		this.table = result;
 		return result;
 	}
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

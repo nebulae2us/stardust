@@ -3,20 +3,14 @@ package org.nebulae2us.stardust;
 
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.common.domain.LinkedNode;
-import org.nebulae2us.stardust.common.domain.LinkedNodeBuilder;
-import org.nebulae2us.stardust.common.domain.Links;
-import org.nebulae2us.stardust.common.domain.LinksBuilder;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.ColumnBuilder;
-import org.nebulae2us.stardust.db.domain.JoinedTables;
-import org.nebulae2us.stardust.db.domain.JoinedTablesBuilder;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
+import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
+import org.nebulae2us.stardust.db.domain.LinkedTableBundleBuilder;
 import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.db.domain.TableBuilder;
-import org.nebulae2us.stardust.db.domain.TableJoin;
-import org.nebulae2us.stardust.db.domain.TableJoinBuilder;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.ExpressionBuilder;
 import org.nebulae2us.stardust.my.domain.Attribute;
@@ -27,10 +21,10 @@ import org.nebulae2us.stardust.my.domain.EntityIdentifier;
 import org.nebulae2us.stardust.my.domain.EntityIdentifierBuilder;
 import org.nebulae2us.stardust.sql.domain.AliasJoin;
 import org.nebulae2us.stardust.sql.domain.AliasJoinBuilder;
-import org.nebulae2us.stardust.sql.domain.EntityJoin;
-import org.nebulae2us.stardust.sql.domain.EntityJoinBuilder;
-import org.nebulae2us.stardust.sql.domain.RelationalEntities;
-import org.nebulae2us.stardust.sql.domain.RelationalEntitiesBuilder;
+import org.nebulae2us.stardust.sql.domain.LinkedEntity;
+import org.nebulae2us.stardust.sql.domain.LinkedEntityBuilder;
+import org.nebulae2us.stardust.sql.domain.LinkedEntityBundle;
+import org.nebulae2us.stardust.sql.domain.LinkedEntityBundleBuilder;
 import org.nebulae2us.stardust.sql.domain.SelectQuery;
 import org.nebulae2us.stardust.sql.domain.SelectQueryBuilder;
 import org.nebulae2us.stardust.sql.domain.SelectQueryParseResult;
@@ -52,20 +46,17 @@ public class Builders {
 
 	public static final DestinationClassResolver DESTINATION_CLASS_RESOLVER = new DestinationClassResolverByMap(
 			new MapBuilder<Class<?>, Class<?>> ()
-				.put(LinkedNode.class, LinkedNodeBuilder.class)
-				.put(Links.class, LinksBuilder.class)
 				.put(Column.class, ColumnBuilder.class)
-				.put(JoinedTables.class, JoinedTablesBuilder.class)
 				.put(LinkedTable.class, LinkedTableBuilder.class)
+				.put(LinkedTableBundle.class, LinkedTableBundleBuilder.class)
 				.put(Table.class, TableBuilder.class)
-				.put(TableJoin.class, TableJoinBuilder.class)
 				.put(Expression.class, ExpressionBuilder.class)
 				.put(Attribute.class, AttributeBuilder.class)
 				.put(AttributeHolder.class, AttributeHolderBuilder.class)
 				.put(EntityIdentifier.class, EntityIdentifierBuilder.class)
 				.put(AliasJoin.class, AliasJoinBuilder.class)
-				.put(EntityJoin.class, EntityJoinBuilder.class)
-				.put(RelationalEntities.class, RelationalEntitiesBuilder.class)
+				.put(LinkedEntity.class, LinkedEntityBuilder.class)
+				.put(LinkedEntityBundle.class, LinkedEntityBundleBuilder.class)
 				.put(SelectQuery.class, SelectQueryBuilder.class)
 				.put(SelectQueryParseResult.class, SelectQueryParseResultBuilder.class)
 				.put(LogicalExpression.class, LogicalExpressionBuilder.class)
@@ -77,23 +68,6 @@ public class Builders {
 			.toMap()
 			);
 
-
-    public static LinksBuilder<?> links() {
-        return new LinksBuilder<Object>();
-    }
-
-    public static LinksBuilder<?> links$restoreFrom(BuilderRepository repo, int builderId) {
-        return (LinksBuilder<?>)repo.get(builderId);
-    }
-
-    public static LinksBuilder<?> links$copyFrom(Links links) {
-    	LinksBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(links).to(LinksBuilder.class);
-    	return result;
-    }
-    
-    public static LinksBuilder<?> wrap(Links links) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(links).to(LinksBuilder.class);
-    }
 
     public static ColumnBuilder<?> column() {
         return new ColumnBuilder<Object>();
@@ -110,23 +84,6 @@ public class Builders {
     
     public static ColumnBuilder<?> wrap(Column column) {
     	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(column).to(ColumnBuilder.class);
-    }
-
-    public static JoinedTablesBuilder<?> joinedTables() {
-        return new JoinedTablesBuilder<Object>();
-    }
-
-    public static JoinedTablesBuilder<?> joinedTables$restoreFrom(BuilderRepository repo, int builderId) {
-        return (JoinedTablesBuilder<?>)repo.get(builderId);
-    }
-
-    public static JoinedTablesBuilder<?> joinedTables$copyFrom(JoinedTables joinedTables) {
-    	JoinedTablesBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(joinedTables).to(JoinedTablesBuilder.class);
-    	return result;
-    }
-    
-    public static JoinedTablesBuilder<?> wrap(JoinedTables joinedTables) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(joinedTables).to(JoinedTablesBuilder.class);
     }
 
     public static LinkedTableBuilder<?> linkedTable() {
@@ -146,6 +103,23 @@ public class Builders {
     	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(linkedTable).to(LinkedTableBuilder.class);
     }
 
+    public static LinkedTableBundleBuilder<?> linkedTableBundle() {
+        return new LinkedTableBundleBuilder<Object>();
+    }
+
+    public static LinkedTableBundleBuilder<?> linkedTableBundle$restoreFrom(BuilderRepository repo, int builderId) {
+        return (LinkedTableBundleBuilder<?>)repo.get(builderId);
+    }
+
+    public static LinkedTableBundleBuilder<?> linkedTableBundle$copyFrom(LinkedTableBundle linkedTableBundle) {
+    	LinkedTableBundleBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(linkedTableBundle).to(LinkedTableBundleBuilder.class);
+    	return result;
+    }
+    
+    public static LinkedTableBundleBuilder<?> wrap(LinkedTableBundle linkedTableBundle) {
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(linkedTableBundle).to(LinkedTableBundleBuilder.class);
+    }
+
     public static TableBuilder<?> table() {
         return new TableBuilder<Object>();
     }
@@ -161,23 +135,6 @@ public class Builders {
     
     public static TableBuilder<?> wrap(Table table) {
     	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(table).to(TableBuilder.class);
-    }
-
-    public static TableJoinBuilder<?> tableJoin() {
-        return new TableJoinBuilder<Object>();
-    }
-
-    public static TableJoinBuilder<?> tableJoin$restoreFrom(BuilderRepository repo, int builderId) {
-        return (TableJoinBuilder<?>)repo.get(builderId);
-    }
-
-    public static TableJoinBuilder<?> tableJoin$copyFrom(TableJoin tableJoin) {
-    	TableJoinBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(tableJoin).to(TableJoinBuilder.class);
-    	return result;
-    }
-    
-    public static TableJoinBuilder<?> wrap(TableJoin tableJoin) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(tableJoin).to(TableJoinBuilder.class);
     }
 
     public static ExpressionBuilder<?> expression() {
@@ -265,38 +222,38 @@ public class Builders {
     	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(aliasJoin).to(AliasJoinBuilder.class);
     }
 
-    public static EntityJoinBuilder<?> entityJoin() {
-        return new EntityJoinBuilder<Object>();
+    public static LinkedEntityBuilder<?> linkedEntity() {
+        return new LinkedEntityBuilder<Object>();
     }
 
-    public static EntityJoinBuilder<?> entityJoin$restoreFrom(BuilderRepository repo, int builderId) {
-        return (EntityJoinBuilder<?>)repo.get(builderId);
+    public static LinkedEntityBuilder<?> linkedEntity$restoreFrom(BuilderRepository repo, int builderId) {
+        return (LinkedEntityBuilder<?>)repo.get(builderId);
     }
 
-    public static EntityJoinBuilder<?> entityJoin$copyFrom(EntityJoin entityJoin) {
-    	EntityJoinBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityJoin).to(EntityJoinBuilder.class);
+    public static LinkedEntityBuilder<?> linkedEntity$copyFrom(LinkedEntity linkedEntity) {
+    	LinkedEntityBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(linkedEntity).to(LinkedEntityBuilder.class);
     	return result;
     }
     
-    public static EntityJoinBuilder<?> wrap(EntityJoin entityJoin) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(entityJoin).to(EntityJoinBuilder.class);
+    public static LinkedEntityBuilder<?> wrap(LinkedEntity linkedEntity) {
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(linkedEntity).to(LinkedEntityBuilder.class);
     }
 
-    public static RelationalEntitiesBuilder<?> relationalEntities() {
-        return new RelationalEntitiesBuilder<Object>();
+    public static LinkedEntityBundleBuilder<?> linkedEntityBundle() {
+        return new LinkedEntityBundleBuilder<Object>();
     }
 
-    public static RelationalEntitiesBuilder<?> relationalEntities$restoreFrom(BuilderRepository repo, int builderId) {
-        return (RelationalEntitiesBuilder<?>)repo.get(builderId);
+    public static LinkedEntityBundleBuilder<?> linkedEntityBundle$restoreFrom(BuilderRepository repo, int builderId) {
+        return (LinkedEntityBundleBuilder<?>)repo.get(builderId);
     }
 
-    public static RelationalEntitiesBuilder<?> relationalEntities$copyFrom(RelationalEntities relationalEntities) {
-    	RelationalEntitiesBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(relationalEntities).to(RelationalEntitiesBuilder.class);
+    public static LinkedEntityBundleBuilder<?> linkedEntityBundle$copyFrom(LinkedEntityBundle linkedEntityBundle) {
+    	LinkedEntityBundleBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(linkedEntityBundle).to(LinkedEntityBundleBuilder.class);
     	return result;
     }
     
-    public static RelationalEntitiesBuilder<?> wrap(RelationalEntities relationalEntities) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(relationalEntities).to(RelationalEntitiesBuilder.class);
+    public static LinkedEntityBundleBuilder<?> wrap(LinkedEntityBundle linkedEntityBundle) {
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(linkedEntityBundle).to(LinkedEntityBundleBuilder.class);
     }
 
     public static SelectQueryBuilder<?> selectQuery() {
@@ -434,4 +391,13 @@ public class Builders {
     public static ValueObjectAttributeBuilder<?> wrap(ValueObjectAttribute valueObjectAttribute) {
     	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(valueObjectAttribute).to(ValueObjectAttributeBuilder.class);
     }
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

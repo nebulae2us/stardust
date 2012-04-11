@@ -20,25 +20,60 @@ import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
 
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+
 /**
  * @author Trung Phan
  *
  */
-public class EntityJoin {
+public class LinkedEntity {
+
+	private final LinkedEntity parent;
+	
+	private final Entity entity;
+	
+	private final String alias;
 
 	private final EntityAttribute attribute;
 	
-	private final String alias;
-	
 	private final JoinType joinType;
 	
-	public EntityJoin(Mirror mirror) {
+	public LinkedEntity(Mirror mirror) {
 		mirror.bind(this);
 
+		this.parent = mirror.to(LinkedEntity.class, "parent");
+		this.entity = mirror.to(Entity.class, "entity");
 		this.attribute = mirror.to(EntityAttribute.class, "attribute");
 		this.alias = mirror.toString("alias");
 		this.joinType = mirror.to(JoinType.class, "joinType");
 		
+		assertInvariant();
+	}
+	
+	private void assertInvariant() {
+		Assert.notNull(this.entity, "entity cannot be null");
+		Assert.notNull(this.alias, "alias cannot be null");
+
+		if (parent == null) {
+			Assert.isNull(this.joinType, "joinType cannot be set for the root node");
+			Assert.isNull(this.attribute, "attribute cannot be set for root node");
+		}
+		else {
+			Assert.notNull(this.joinType, "joinType cannot be null");
+			Assert.notNull(this.attribute, "attribute cannot be null");
+			
+			Assert.isTrue(this.attribute.getEntity() == this.entity, "asdfa");
+			Assert.isTrue(this.attribute.getOwningEntity() == this.parent.entity, "asdfsaf");
+		}
+		
+	}
+	
+	public LinkedEntity getParent() {
+		return parent;
+	}
+
+	public Entity getEntity() {
+		return entity;
 	}
 
 	public String getAlias() {
@@ -60,4 +95,5 @@ public class EntityJoin {
 	public Entity getRightEntity() {
 		return attribute.getEntity();
 	}
+	
 }

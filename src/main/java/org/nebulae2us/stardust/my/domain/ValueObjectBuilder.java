@@ -158,4 +158,13 @@ public class ValueObjectBuilder<P> extends AttributeHolderBuilder<P> {
 		return (ValueObjectBuilder<P>)super.attributes$restoreFrom(repo, builderIds);
     }
 
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

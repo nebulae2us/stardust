@@ -18,8 +18,6 @@ package org.nebulae2us.stardust;
 import java.io.File;
 
 import org.nebulae2us.electron.BuilderGenerator;
-import org.nebulae2us.stardust.common.domain.LinkedNode;
-import org.nebulae2us.stardust.common.domain.Links;
 import org.nebulae2us.stardust.db.domain.*;
 import org.nebulae2us.stardust.expr.domain.*;
 import org.nebulae2us.stardust.my.domain.*;
@@ -40,13 +38,10 @@ public class GenerateBuilders {
 			.buildersClassName("org.nebulae2us.stardust.Builders")
 			.builderSuffix("Builder")
 			.generate(
-					LinkedNode.class,
-					Links.class,
 					Table.class,
 					Column.class,
 					LinkedTable.class,
-					TableJoin.class,
-					JoinedTables.class,
+					LinkedTableBundle.class,
 					Attribute.class,
 					AttributeHolder.class,
 					Entity.class,
@@ -56,8 +51,8 @@ public class GenerateBuilders {
 					ValueObject.class,
 					ValueObjectAttribute.class,
 					AliasJoin.class,
-					EntityJoin.class,
-					RelationalEntities.class,
+					LinkedEntity.class,
+					LinkedEntityBundle.class,
 					SelectQuery.class,
 					Expression.class,
 					LogicalExpression.class,

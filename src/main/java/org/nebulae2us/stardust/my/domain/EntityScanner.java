@@ -43,7 +43,7 @@ import org.nebulae2us.electron.internal.util.ClassUtils;
 import org.nebulae2us.stardust.Builders;
 import org.nebulae2us.stardust.db.domain.ColumnBuilder;
 import org.nebulae2us.stardust.db.domain.JoinType;
-import org.nebulae2us.stardust.db.domain.TableJoinBuilder;
+import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 
 import static org.nebulae2us.stardust.Builders.*;
@@ -87,22 +87,22 @@ public class EntityScanner {
 		EntityBuilder<?> result = produceRaw();
 
 		for (EntityBuilder<?> entityBuilder : scannedEntityBuilders.values()) {
-			fixJoinedTables(entityBuilder);
-			fixEntityAttributes(entityBuilder);
+			fillDefaultValuesForJoinedTables(entityBuilder);
+			fillDefaultValuesForEntityAttributes(entityBuilder);
 		}
 		
-//		for (EntityBuilder entityBuilder : scannedEntityBuilders.values()) {
+//		for (EntityBuilder<?> entityBuilder : scannedEntityBuilders.values()) {
 //			System.out.println("**** " + entityBuilder.getDeclaringClass());
 //			
-//			for (AttributeBuilder attribute : entityBuilder.getAttributes()) {
+//			for (AttributeBuilder<?> attribute : entityBuilder.getAttributes()) {
 //				System.out.println(" ----" + attribute.getField().getName());
 //				if (attribute instanceof ScalarAttributeBuilder) {
-//					ScalarAttributeBuilder scalarAttribute = (ScalarAttributeBuilder)attribute;
+//					ScalarAttributeBuilder<?> scalarAttribute = (ScalarAttributeBuilder<?>)attribute;
 //					System.out.println("column: " + scalarAttribute.getColumn().getName());
 //					System.out.println("table: " + scalarAttribute.getColumn().getTable().getName());
 //				}
 //				else if (attribute instanceof EntityAttributeBuilder) {
-//					EntityAttributeBuilder entityAttribute = (EntityAttributeBuilder)attribute;
+//					EntityAttributeBuilder<?> entityAttribute = (EntityAttributeBuilder<?>)attribute;
 //					System.out.println("left columns: " + entityAttribute.getLeftColumns());
 //					System.out.println("right columns: " + entityAttribute.getLeftColumns());
 //				}
@@ -114,7 +114,7 @@ public class EntityScanner {
 	/**
 	 * @param result
 	 */
-	private void fixEntityAttributes(EntityBuilder<?> entity) {
+	private void fillDefaultValuesForEntityAttributes(EntityBuilder<?> entity) {
 		for (EntityAttributeBuilder<?>entityAttribute : ScannerUtils.extractEntityAttributes(entity.getAttributes())) {
 			Field field = entityAttribute.getField();
 
@@ -159,7 +159,7 @@ public class EntityScanner {
 					
 					for (ColumnBuilder<?> column : entityAttribute.getRightColumns()) {
 						if (ObjectUtils.isEmpty(column.getTable().getName())) {
-							column.table(entity.getJoinedTables().getTable());
+							column.table(entity.getLinkedTableBundle().getRoot().getTable());
 						}
 					}
 					
@@ -177,17 +177,17 @@ public class EntityScanner {
 		}
 	}
 
-	private void fixJoinedTables(EntityBuilder<?> result) {
-		if (ObjectUtils.notEmpty(result.getJoinedTables().getTableJoins())) {
+	private void fillDefaultValuesForJoinedTables(EntityBuilder<?> result) {
+		if (ObjectUtils.notEmpty(result.getLinkedTableBundle().getNonRoots())) {
 			List<ScalarAttributeBuilder<?>> idAttributes = ScannerUtils.extractScalarAttributes(
 					result.getEntityIdentifier().getAttributes()
 			);
 			
-			for (TableJoinBuilder<?> tableJoin : result.getJoinedTables().getTableJoins()) {
-				if (ObjectUtils.isEmpty(tableJoin.getLeftColumns())) {
+			for (LinkedTableBuilder<?> linkedTable : result.getLinkedTableBundle().getNonRoots()) {
+				if (ObjectUtils.isEmpty(linkedTable.getParentColumns())) {
 					for (ScalarAttributeBuilder<?> idAttribute : idAttributes) {
-						tableJoin
-							.leftColumns$addColumn()
+						linkedTable
+							.parentColumns$addColumn()
 								.name(idAttribute.getColumn().getName())
 								.table$begin()
 									.name(idAttribute.getColumn().getTable().getName())
@@ -195,14 +195,12 @@ public class EntityScanner {
 							.end();
 					}
 				}
-				if (ObjectUtils.isEmpty(tableJoin.getRightColumns())) {
+				if (ObjectUtils.isEmpty(linkedTable.getColumns())) {
 					for (ScalarAttributeBuilder<?> idAttribute : idAttributes) {
-						tableJoin
-							.rightColumns$addColumn()
+						linkedTable
+							.columns$addColumn()
 								.name(idAttribute.getColumn().getName())
-								.table$begin()
-									.name(idAttribute.getColumn().getTable().getName())
-								.end()
+								.table(linkedTable.getTable())
 							.end();
 					}
 				}
@@ -235,7 +233,7 @@ public class EntityScanner {
 		
 		EntityBuilder<?> result = entity()
 				.declaringClass(entityClass)
-				.joinedTables(ScannerUtils.extractTableInfo(entityClass, rootEntityClass, inheritanceType))
+				.linkedTableBundle(ScannerUtils.extractTableInfo(entityClass, rootEntityClass, inheritanceType))
 				.inheritanceType(inheritanceType)
 				.rootEntity(rootEntity)
 				;
@@ -264,7 +262,7 @@ public class EntityScanner {
 							.field(field)
 							.scalarType(fieldClass)
 							.owningEntity(result)
-							.column(ScannerUtils.extractColumnInfo(field, result.getJoinedTables()))
+							.column(ScannerUtils.extractColumnInfo(field, result.getLinkedTableBundle()))
 							;
 					
 					result.attributes(attributeBuilder);

@@ -124,4 +124,13 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 		this.owningEntity = result;
 		return result;
 	}
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

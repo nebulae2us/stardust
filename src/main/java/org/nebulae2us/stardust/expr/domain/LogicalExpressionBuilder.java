@@ -212,4 +212,13 @@ public class LogicalExpressionBuilder<P> extends ExpressionBuilder<P> {
 	public LogicalExpressionBuilder<P> negated(boolean negated) {
 		return (LogicalExpressionBuilder<P>)super.negated(negated);
 	}
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

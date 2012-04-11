@@ -4,10 +4,9 @@ import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
 import org.nebulae2us.stardust.*;
-import org.nebulae2us.stardust.common.domain.*;
 
 @Builder(destination=LinkedTable.class)
-public class LinkedTableBuilder<P> implements Wrappable<LinkedTable>, LinkedNodeBuilder {
+public class LinkedTableBuilder<P> implements Wrappable<LinkedTable> {
 
 	protected final LinkedTable $$$wrapped;
 
@@ -105,61 +104,6 @@ public class LinkedTableBuilder<P> implements Wrappable<LinkedTable>, LinkedNode
 		verifyMutable();
 		LinkedTableBuilder<LinkedTableBuilder<P>> result = new LinkedTableBuilder<LinkedTableBuilder<P>>(this);
 		this.parent = result;
-		return result;
-	}
-
-	private TableBuilder<?> table;
-	
-	public TableBuilder<?> getTable() {
-		return table;
-	}
-
-	public void setTable(TableBuilder<?> table) {
-		verifyMutable();
-		this.table = table;
-	}
-
-	public LinkedTableBuilder<P> table(TableBuilder<?> table) {
-		verifyMutable();
-		this.table = table;
-		return this;
-	}
-
-    public LinkedTableBuilder<P> table$wrap(Table table) {
-    	verifyMutable();
-    	this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(table).to(TableBuilder.class);
-        return this;
-    }
-    
-    public LinkedTableBuilder<P> table$restoreFrom(BuilderRepository repo, Object builderId) {
-    	verifyMutable();
-    	
-        Object restoredObject = repo.get(builderId);
-        if (restoredObject == null) {
-        	if (repo.isSupportLazy()) {
-        		repo.addObjectStoredListener(builderId, new Procedure() {
-					public void execute(Object... arguments) {
-						LinkedTableBuilder.this.table = (TableBuilder<?>)arguments[0];
-					}
-				});
-        	}
-        	else {
-                throw new IllegalStateException("Object does not exist with id " + builderId);
-        	}
-        }
-        else if (!(restoredObject instanceof TableBuilder)) {
-        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + TableBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
-        }
-        else {
-            this.table = (TableBuilder<?>)restoredObject;
-        }
-        return this;
-    }
-
-	public TableBuilder<? extends LinkedTableBuilder<P>> table$begin() {
-		verifyMutable();
-		TableBuilder<LinkedTableBuilder<P>> result = new TableBuilder<LinkedTableBuilder<P>>(this);
-		this.table = result;
 		return result;
 	}
 
@@ -290,6 +234,61 @@ public class LinkedTableBuilder<P> implements Wrappable<LinkedTable>, LinkedNode
         return this;
     }
 
+
+	private TableBuilder<?> table;
+	
+	public TableBuilder<?> getTable() {
+		return table;
+	}
+
+	public void setTable(TableBuilder<?> table) {
+		verifyMutable();
+		this.table = table;
+	}
+
+	public LinkedTableBuilder<P> table(TableBuilder<?> table) {
+		verifyMutable();
+		this.table = table;
+		return this;
+	}
+
+    public LinkedTableBuilder<P> table$wrap(Table table) {
+    	verifyMutable();
+    	this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(table).to(TableBuilder.class);
+        return this;
+    }
+    
+    public LinkedTableBuilder<P> table$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
+        	if (repo.isSupportLazy()) {
+        		repo.addObjectStoredListener(builderId, new Procedure() {
+					public void execute(Object... arguments) {
+						LinkedTableBuilder.this.table = (TableBuilder<?>)arguments[0];
+					}
+				});
+        	}
+        	else {
+                throw new IllegalStateException("Object does not exist with id " + builderId);
+        	}
+        }
+        else if (!(restoredObject instanceof TableBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + TableBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
+        else {
+            this.table = (TableBuilder<?>)restoredObject;
+        }
+        return this;
+    }
+
+	public TableBuilder<? extends LinkedTableBuilder<P>> table$begin() {
+		verifyMutable();
+		TableBuilder<LinkedTableBuilder<P>> result = new TableBuilder<LinkedTableBuilder<P>>(this);
+		this.table = result;
+		return result;
+	}
 
 	private List<ColumnBuilder<?>> columns;
 	
@@ -435,4 +434,13 @@ public class LinkedTableBuilder<P> implements Wrappable<LinkedTable>, LinkedNode
 		this.joinType = joinType;
 		return this;
 	}
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

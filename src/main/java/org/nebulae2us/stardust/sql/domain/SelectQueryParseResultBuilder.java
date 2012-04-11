@@ -53,26 +53,26 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
 
 
 
-	private RelationalEntitiesBuilder<?> relationalEntities;
+	private LinkedEntityBundleBuilder<?> relationalEntities;
 	
-	public RelationalEntitiesBuilder<?> getRelationalEntities() {
+	public LinkedEntityBundleBuilder<?> getRelationalEntities() {
 		return relationalEntities;
 	}
 
-	public void setRelationalEntities(RelationalEntitiesBuilder<?> relationalEntities) {
+	public void setRelationalEntities(LinkedEntityBundleBuilder<?> relationalEntities) {
 		verifyMutable();
 		this.relationalEntities = relationalEntities;
 	}
 
-	public SelectQueryParseResultBuilder<P> relationalEntities(RelationalEntitiesBuilder<?> relationalEntities) {
+	public SelectQueryParseResultBuilder<P> relationalEntities(LinkedEntityBundleBuilder<?> relationalEntities) {
 		verifyMutable();
 		this.relationalEntities = relationalEntities;
 		return this;
 	}
 
-    public SelectQueryParseResultBuilder<P> relationalEntities$wrap(RelationalEntities relationalEntities) {
+    public SelectQueryParseResultBuilder<P> relationalEntities$wrap(LinkedEntityBundle relationalEntities) {
     	verifyMutable();
-    	this.relationalEntities = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(relationalEntities).to(RelationalEntitiesBuilder.class);
+    	this.relationalEntities = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(relationalEntities).to(LinkedEntityBundleBuilder.class);
         return this;
     }
     
@@ -84,7 +84,7 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
-						SelectQueryParseResultBuilder.this.relationalEntities = (RelationalEntitiesBuilder<?>)arguments[0];
+						SelectQueryParseResultBuilder.this.relationalEntities = (LinkedEntityBundleBuilder<?>)arguments[0];
 					}
 				});
         	}
@@ -92,42 +92,42 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
-        else if (!(restoredObject instanceof RelationalEntitiesBuilder)) {
-        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + RelationalEntitiesBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        else if (!(restoredObject instanceof LinkedEntityBundleBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + LinkedEntityBundleBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
         }
         else {
-            this.relationalEntities = (RelationalEntitiesBuilder<?>)restoredObject;
+            this.relationalEntities = (LinkedEntityBundleBuilder<?>)restoredObject;
         }
         return this;
     }
 
-	public RelationalEntitiesBuilder<? extends SelectQueryParseResultBuilder<P>> relationalEntities$begin() {
+	public LinkedEntityBundleBuilder<? extends SelectQueryParseResultBuilder<P>> relationalEntities$begin() {
 		verifyMutable();
-		RelationalEntitiesBuilder<SelectQueryParseResultBuilder<P>> result = new RelationalEntitiesBuilder<SelectQueryParseResultBuilder<P>>(this);
+		LinkedEntityBundleBuilder<SelectQueryParseResultBuilder<P>> result = new LinkedEntityBundleBuilder<SelectQueryParseResultBuilder<P>>(this);
 		this.relationalEntities = result;
 		return result;
 	}
 
-	private JoinedTablesBuilder<?> joinedTables;
+	private LinkedTableBundleBuilder<?> joinedTables;
 	
-	public JoinedTablesBuilder<?> getJoinedTables() {
+	public LinkedTableBundleBuilder<?> getJoinedTables() {
 		return joinedTables;
 	}
 
-	public void setJoinedTables(JoinedTablesBuilder<?> joinedTables) {
+	public void setJoinedTables(LinkedTableBundleBuilder<?> joinedTables) {
 		verifyMutable();
 		this.joinedTables = joinedTables;
 	}
 
-	public SelectQueryParseResultBuilder<P> joinedTables(JoinedTablesBuilder<?> joinedTables) {
+	public SelectQueryParseResultBuilder<P> joinedTables(LinkedTableBundleBuilder<?> joinedTables) {
 		verifyMutable();
 		this.joinedTables = joinedTables;
 		return this;
 	}
 
-    public SelectQueryParseResultBuilder<P> joinedTables$wrap(JoinedTables joinedTables) {
+    public SelectQueryParseResultBuilder<P> joinedTables$wrap(LinkedTableBundle joinedTables) {
     	verifyMutable();
-    	this.joinedTables = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(joinedTables).to(JoinedTablesBuilder.class);
+    	this.joinedTables = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(joinedTables).to(LinkedTableBundleBuilder.class);
         return this;
     }
     
@@ -139,7 +139,7 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
-						SelectQueryParseResultBuilder.this.joinedTables = (JoinedTablesBuilder<?>)arguments[0];
+						SelectQueryParseResultBuilder.this.joinedTables = (LinkedTableBundleBuilder<?>)arguments[0];
 					}
 				});
         	}
@@ -147,18 +147,18 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
                 throw new IllegalStateException("Object does not exist with id " + builderId);
         	}
         }
-        else if (!(restoredObject instanceof JoinedTablesBuilder)) {
-        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + JoinedTablesBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        else if (!(restoredObject instanceof LinkedTableBundleBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + LinkedTableBundleBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
         }
         else {
-            this.joinedTables = (JoinedTablesBuilder<?>)restoredObject;
+            this.joinedTables = (LinkedTableBundleBuilder<?>)restoredObject;
         }
         return this;
     }
 
-	public JoinedTablesBuilder<? extends SelectQueryParseResultBuilder<P>> joinedTables$begin() {
+	public LinkedTableBundleBuilder<? extends SelectQueryParseResultBuilder<P>> joinedTables$begin() {
 		verifyMutable();
-		JoinedTablesBuilder<SelectQueryParseResultBuilder<P>> result = new JoinedTablesBuilder<SelectQueryParseResultBuilder<P>>(this);
+		LinkedTableBundleBuilder<SelectQueryParseResultBuilder<P>> result = new LinkedTableBundleBuilder<SelectQueryParseResultBuilder<P>>(this);
 		this.joinedTables = result;
 		return result;
 	}
@@ -290,4 +290,13 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
         return this;
     }
 
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

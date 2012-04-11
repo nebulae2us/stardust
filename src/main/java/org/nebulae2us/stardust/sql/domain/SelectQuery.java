@@ -24,7 +24,7 @@ import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.electron.util.ListBuilder;
 import static org.nebulae2us.stardust.Builders.*;
 import org.nebulae2us.stardust.db.domain.Column;
-import org.nebulae2us.stardust.db.domain.JoinedTables;
+import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
 import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
@@ -80,7 +80,7 @@ public class SelectQuery {
 		Entity entity = entities.get(0);
 		Entity rootEntity = entity.getRootEntity();
 
-		JoinedTables joinedTables = entity.getJoinedTables();
+		LinkedTableBundle linkedTableBundle = entity.getLinkedTableBundle();
 		List<ScalarAttribute> scalarAttributes = new ArrayList<ScalarAttribute>();
 		for (Entity e : entities) {
 			scalarAttributes.addAll(e.getScalarAttributes());
@@ -89,7 +89,7 @@ public class SelectQuery {
 		if (rootEntity.getInheritanceType() == InheritanceType.JOINED) {
 			for (Entity e : entities) {
 				if (e != entity) {
-					joinedTables = joinedTables.join(e.getJoinedTables().getTableJoins());
+					linkedTableBundle = linkedTableBundle.join(e.getLinkedTableBundle());
 				}
 			}
 		}
@@ -101,13 +101,13 @@ public class SelectQuery {
 		List<Column> columns = columnListBuilder.toList();
 		
 		
-		System.out.println(joinedTables.toString());
+		System.out.println(linkedTableBundle.toString());
 
-		RelationalEntities relationalEntities = RelationalEntities.newInstance(entity, initialAlias, aliasJoins);
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, initialAlias, aliasJoins);
 
 		SelectQueryParseResult selectQueryParseResult = selectQueryParseResult()
-				.relationalEntities$wrap(relationalEntities)
-				.joinedTables$wrap(joinedTables)
+				.relationalEntities$wrap(linkedEntityBundle)
+				.joinedTables$wrap(linkedTableBundle)
 				.columns$wrap(columns)
 				.toSelectQueryParseResult();
 

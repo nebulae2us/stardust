@@ -77,7 +77,7 @@ public class ValueObjectScanner {
 							.field(field)
 							.scalarType(fieldClass)
 							.owningEntity(owningEntity)
-							.column(ScannerUtils.extractColumnInfo(field, owningEntity.getJoinedTables()))
+							.column(ScannerUtils.extractColumnInfo(field, owningEntity.getLinkedTableBundle()))
 							;
 					
 					result.attributes(attributeBuilder);

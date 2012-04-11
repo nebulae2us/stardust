@@ -239,4 +239,13 @@ public class EntityIdentifierBuilder<P> implements Wrappable<EntityIdentifier> {
         return this;
     }
 
+
+    /* CUSTOM CODE *********************************
+     * 
+     * Put your own custom code below. These codes won't be discarded during generation.
+     * 
+     */
+     
+     
+     
 }

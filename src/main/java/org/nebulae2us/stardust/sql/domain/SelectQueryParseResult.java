@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.db.domain.Column;
-import org.nebulae2us.stardust.db.domain.JoinedTables;
+import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
 import org.nebulae2us.stardust.db.domain.Table;
 
 /**
@@ -29,23 +29,23 @@ import org.nebulae2us.stardust.db.domain.Table;
  */
 public class SelectQueryParseResult {
 
-	private final RelationalEntities relationalEntities;
-	private final JoinedTables joinedTables;
+	private final LinkedEntityBundle relationalEntities;
+	private final LinkedTableBundle joinedTables;
 	private final List<Column> columns;
 	
 	public SelectQueryParseResult(Mirror mirror) {
 		mirror.bind(this);
 		
-		this.relationalEntities = mirror.to(RelationalEntities.class, "relationalEntities");
-		this.joinedTables = mirror.to(JoinedTables.class, "joinedTables");
+		this.relationalEntities = mirror.to(LinkedEntityBundle.class, "relationalEntities");
+		this.joinedTables = mirror.to(LinkedTableBundle.class, "joinedTables");
 		this.columns = mirror.toListOf(Column.class, "columns");
 	}
 
-	public RelationalEntities getRelationalEntities() {
+	public LinkedEntityBundle getRelationalEntities() {
 		return relationalEntities;
 	}
 
-	public JoinedTables getJoinedTables() {
+	public LinkedTableBundle getJoinedTables() {
 		return joinedTables;
 	}
 

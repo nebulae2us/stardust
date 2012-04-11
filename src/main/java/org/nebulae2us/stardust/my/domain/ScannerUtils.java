@@ -32,8 +32,8 @@ import javax.persistence.SecondaryTables;
 
 import org.nebulae2us.stardust.db.domain.ColumnBuilder;
 import org.nebulae2us.stardust.db.domain.JoinType;
-import org.nebulae2us.stardust.db.domain.JoinedTablesBuilder;
-import org.nebulae2us.stardust.db.domain.TableJoinBuilder;
+import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
+import org.nebulae2us.stardust.db.domain.LinkedTableBundleBuilder;
 import org.nebulae2us.stardust.internal.util.NameUtils;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 
@@ -45,7 +45,7 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  */
 public class ScannerUtils {
 	
-	public static ColumnBuilder<?> extractColumnInfo(Field field, JoinedTablesBuilder<?> joinedTables) {
+	public static ColumnBuilder<?> extractColumnInfo(Field field, LinkedTableBundleBuilder<?> linkedTableBundle) {
 		
 		ColumnBuilder<?> result = column();
 		
@@ -69,8 +69,8 @@ public class ScannerUtils {
 		}
 		
 		if (result.getTable() == null || ObjectUtils.isEmpty(result.getTable().getName())) {
-			Assert.notNull(joinedTables.getTable(), "table cannot be null.");
-			result.table(joinedTables.getTable());
+			Assert.notNull(linkedTableBundle.getRoot().getTable(), "table cannot be null.");
+			result.table(linkedTableBundle.getRoot().getTable());
 		}
 		
 		return result;
@@ -106,26 +106,30 @@ public class ScannerUtils {
 	}
 	
 	
-	private static JoinedTablesBuilder<?> _extractTableInfo(Class<?> entityClass) {
+	private static LinkedTableBundleBuilder<?> _extractTableInfo(Class<?> entityClass) {
 		
 
-		JoinedTablesBuilder<?> result = joinedTables();
+		LinkedTableBundleBuilder<?> result = linkedTableBundle();
 		
 		javax.persistence.Table table = entityClass.getAnnotation(javax.persistence.Table.class);
 		
 		if (table != null) {
-			result.table$begin()
-					.name(table.name())
-					.schemaName(table.schema())
-					.catalogName(table.catalog())
-				.end()
-				;
+			result
+				.linkedTables$addLinkedTable()
+					.table$begin()
+						.name(table.name())
+						.schemaName(table.schema())
+						.catalogName(table.catalog())
+					.end()
+				.end();
 		}
 		else {
-			result.table$begin()
+			result
+			.linkedTables$addLinkedTable()
+				.table$begin()
 					.name(NameUtils.camelCaseToUpperCase(entityClass.getSimpleName()))
 				.end()
-				;
+			.end();
 		}
 
 		ArrayList<SecondaryTable> secondaryTables = new ArrayList<SecondaryTable>();
@@ -139,10 +143,10 @@ public class ScannerUtils {
 		}
 		
 		for (SecondaryTable secondaryTable : secondaryTables) {
-			TableJoinBuilder<?> tableJoin = result.tableJoins$addTableJoin()
+			LinkedTableBuilder<?> linkedTable = result.linkedTables$addLinkedTable()
 				.joinType(JoinType.LEFT_JOIN)
-				.leftTable(result.getTable())
-				.rightTable$begin()
+				.parent(result.getRoot())
+				.table$begin()
 					.name(secondaryTable.name())
 					.schemaName(secondaryTable.schema())
 					.catalogName(secondaryTable.catalog())
@@ -151,16 +155,17 @@ public class ScannerUtils {
 			
 			if (secondaryTable.pkJoinColumns() != null || secondaryTable.pkJoinColumns().length > 0) {
 				for (PrimaryKeyJoinColumn pk : secondaryTable.pkJoinColumns()) {
-					tableJoin
-						.rightColumns$addColumn()
-							.table(tableJoin.getRightTable())
+					
+					linkedTable
+						.columns$addColumn()
+							.table(linkedTable.getTable())
 							.name(pk.name())
 						.end()
 						;
 					
-					tableJoin
-						.leftColumns$addColumn()
-							.table(tableJoin.getLeftTable())
+					linkedTable
+						.parentColumns$addColumn()
+							.table(linkedTable.getParent().getTable())
 							.name(pk.referencedColumnName())
 						.end()
 						;
@@ -174,51 +179,50 @@ public class ScannerUtils {
 	
 	
 	
-	public static JoinedTablesBuilder<?> extractTableInfo(Class<?> entityClass, Class<?> rootEntityClass, InheritanceType inheritanceType) {
+	public static LinkedTableBundleBuilder<?> extractTableInfo(Class<?> entityClass, Class<?> rootEntityClass, InheritanceType inheritanceType) {
 		
-		JoinedTablesBuilder<?> result = _extractTableInfo(rootEntityClass);
+		LinkedTableBundleBuilder<?> result = _extractTableInfo(rootEntityClass);
 		
 		if (entityClass == rootEntityClass || inheritanceType == InheritanceType.SINGLE_TABLE) {
 			return result;
 		}
 		
-		List<Class<?>> relatedClasses = new ArrayList<Class<?>>();
+		List<Class<?>> subEntityClasses = new ArrayList<Class<?>>();
 		Class<?> c = entityClass;
 		while (c != null && c != rootEntityClass) {
 			if (c.getAnnotation(Entity.class) != null) {
-				relatedClasses.add(c);
+				subEntityClasses.add(c);
 			}
 			c = c.getSuperclass();
 		}
 		
-		Collections.reverse(relatedClasses);
+		Collections.reverse(subEntityClasses);
 		
-		for (Class<?> relatedClass : relatedClasses) {
-			JoinedTablesBuilder<?> joinedTables = _extractTableInfo(relatedClass);
+		for (Class<?> subEntityClass : subEntityClasses) {
+			LinkedTableBundleBuilder<?> linkedTableBundle = _extractTableInfo(subEntityClass);
 			
-			TableJoinBuilder<?> tableJoin = tableJoin()
-					.leftTable(result.getTable())
-					.rightTable(joinedTables.getTable())
-					;
-
+			LinkedTableBuilder<?> subEntityRootLinkedTable = linkedTableBundle.getRoot();
+			subEntityRootLinkedTable.parent(result.getRoot())
+				.joinType(JoinType.LEFT_JOIN);
+			
+			
 			List<PrimaryKeyJoinColumn> pkColumns = new ArrayList<PrimaryKeyJoinColumn>();
-			if (relatedClass.getAnnotation(PrimaryKeyJoinColumn.class) != null) {
-				pkColumns.add(relatedClass.getAnnotation(PrimaryKeyJoinColumn.class));
+			if (subEntityClass.getAnnotation(PrimaryKeyJoinColumn.class) != null) {
+				pkColumns.add(subEntityClass.getAnnotation(PrimaryKeyJoinColumn.class));
 			}
-			else if (relatedClass.getAnnotation(PrimaryKeyJoinColumns.class) != null) {
-				pkColumns.addAll(Arrays.asList(relatedClass.getAnnotation(PrimaryKeyJoinColumns.class).value()));
+			else if (subEntityClass.getAnnotation(PrimaryKeyJoinColumns.class) != null) {
+				pkColumns.addAll(Arrays.asList(subEntityClass.getAnnotation(PrimaryKeyJoinColumns.class).value()));
 			}
 			
 			for (PrimaryKeyJoinColumn pkColumn : pkColumns) {
-				tableJoin
-					.rightColumns$addColumn()
+				subEntityRootLinkedTable
+					.columns$addColumn()
 						.name(pkColumn.name())
-						.table(tableJoin.getRightTable())
+						.table(subEntityRootLinkedTable.getTable())
 					.end();
 			}
 			
-			result.tableJoins(tableJoin);
-			result.tableJoins(joinedTables.getTableJoins());
+			result.linkedTables(linkedTableBundle.getLinkedTables());
 		}
 		
 		
