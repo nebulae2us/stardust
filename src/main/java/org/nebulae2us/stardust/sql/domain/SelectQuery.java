@@ -17,6 +17,7 @@ package org.nebulae2us.stardust.sql.domain;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,11 +25,14 @@ import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.electron.util.ListBuilder;
 import static org.nebulae2us.stardust.Builders.*;
 import org.nebulae2us.stardust.db.domain.Column;
+import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
 import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.expr.domain.Expression;
+import org.nebulae2us.stardust.internal.util.BaseAssert;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Entity;
+import org.nebulae2us.stardust.my.domain.EntityAttribute;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
@@ -74,44 +78,102 @@ public class SelectQuery {
 	
 	public SelectQueryParseResult toSelectSql(EntityRepository entityRepository) {
 		
-		Map<Table, String> tableAliases = new HashMap<Table, String>();
 		
-		List<Entity> entities = entityRepository.getEntitiesAndSub(entityClass);
-		Entity entity = entities.get(0);
-		Entity rootEntity = entity.getRootEntity();
+//		List<Entity> entitiesAndSub = entityRepository.getEntitiesAndSub(entityClass);
+//		List<Entity> subEntities = entitiesAndSub.subList(1, entitiesAndSub.size());
+//		Entity entity = entitiesAndSub.get(0);
+//		Entity rootEntity = entity.getRootEntity();
+//
+//		LinkedTableBundle linkedTableBundle = entity.getLinkedTableBundle();
+//		List<ScalarAttribute> scalarAttributes = new ArrayList<ScalarAttribute>();
+//		for (Entity e : entitiesAndSub) {
+//			scalarAttributes.addAll(e.getScalarAttributes());
+//		}
+//		
+//		if (rootEntity.getInheritanceType() == InheritanceType.JOINED) {
+//			for (Entity e : subEntities) {
+//				linkedTableBundle = linkedTableBundle.join(e.getLinkedTableBundle());
+//			}
+//		}
 
-		LinkedTableBundle linkedTableBundle = entity.getLinkedTableBundle();
-		List<ScalarAttribute> scalarAttributes = new ArrayList<ScalarAttribute>();
-		for (Entity e : entities) {
-			scalarAttributes.addAll(e.getScalarAttributes());
-		}
+		// THINK SIMPLE FIRST, no Inheritance type of JOINED
 		
-		if (rootEntity.getInheritanceType() == InheritanceType.JOINED) {
-			for (Entity e : entities) {
-				if (e != entity) {
-					linkedTableBundle = linkedTableBundle.join(e.getLinkedTableBundle());
-				}
+		
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(this.entityClass), this.initialAlias, this.aliasJoins);
+
+		SelectQueryParseResultBuilder<?> result = selectQueryParseResult();
+		LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle = result.linkedTableEntityBundle$begin();
+		
+		IdentityHashMap<LinkedEntity, LinkedTableEntityBuilder<?>> linkedEntity2LinkedTableEntity = new IdentityHashMap<LinkedEntity, LinkedTableEntityBuilder<?>>();
+		
+		for (LinkedEntity linkedEntity : linkedEntityBundle.getLinkedEntities()) {
+			
+			Entity entity = linkedEntity.getEntity();
+			List<ScalarAttribute> scalarAttributes = entity.getScalarAttributes();
+			LinkedTableBundle linkedTableBundle = entity.getLinkedTableBundle();
+			
+			String alias = linkedEntity.getAlias();
+
+			String tableAlias = alias;
+			if (tableAlias.length() == 0) {
+				tableAlias = linkedEntityBundle.getRecommendedDefaultAlias();
 			}
+
+			IdentityHashMap<LinkedTable, LinkedTableEntityBuilder<?>> linkedTable2LinkedTableEntity = new IdentityHashMap<LinkedTable, LinkedTableEntityBuilder<?>>();
+			
+			int i = 0;
+			for (LinkedTable linkedTable : linkedTableBundle.getLinkedTables()) {
+				LinkedTableEntityBuilder<?> linkedTableEntity = linkedTableEntityBundle.linkedTableEntities$addLinkedTableEntity()
+					.entity$wrap(entity)
+					.table$wrap(linkedTable.getTable())
+					.alias(alias)
+					.tableAlias(i == 0 ? tableAlias : tableAlias + i)
+					;
+				
+				linkedTable2LinkedTableEntity.put(linkedTable, linkedTableEntity);
+				
+				for (ScalarAttribute scalarAttribute : scalarAttributes) {
+					if (scalarAttribute.getColumn().getTable().equals(linkedTable.getTable())) {
+						linkedTableEntity.scalarAttributes$wrap(scalarAttribute);
+					}
+				}
+				
+				if (i == 0) {
+					linkedEntity2LinkedTableEntity.put(linkedEntity, linkedTableEntity);
+					
+					if (linkedEntity.getParent() != null) {
+						EntityAttribute entityAttribute = linkedEntity.getAttribute();
+						
+						// TODO consider junction tables later
+						linkedTableEntity
+							.parentColumns$wrap(entityAttribute.getLeftColumns())
+							.columns$wrap(entityAttribute.getRightColumns())
+						;
+						
+						LinkedTableEntityBuilder<?> linkedTableEntityParent = linkedEntity2LinkedTableEntity.get(linkedEntity.getParent());
+						BaseAssert.AssertState.notNull(linkedTableEntityParent, " check");
+						linkedTableEntity.parent(linkedTableEntityParent);
+					}
+					
+				}
+				else {
+					linkedTableEntity
+						.parentColumns$wrap(linkedTable.getParentColumns())
+						.columns$wrap(linkedTable.getColumns())
+						.parent(linkedTable2LinkedTableEntity.get(linkedTable.getParent()))
+						.joinType(linkedTable.getJoinType())
+						;
+					
+					
+				}
+				
+				i++;
+				
+			}
+			
 		}
-		
-		ListBuilder<Column> columnListBuilder = new ListBuilder<Column>();
-		for (ScalarAttribute scalarAttribute : scalarAttributes) {
-			columnListBuilder.add(scalarAttribute.getColumn());
-		}
-		List<Column> columns = columnListBuilder.toList();
-		
-		
-		System.out.println(linkedTableBundle.toString());
 
-		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, initialAlias, aliasJoins);
-
-		SelectQueryParseResult selectQueryParseResult = selectQueryParseResult()
-				.relationalEntities$wrap(linkedEntityBundle)
-				.joinedTables$wrap(linkedTableBundle)
-				.columns$wrap(columns)
-				.toSelectQueryParseResult();
-
-		return selectQueryParseResult;
+		return result.toSelectQueryParseResult();
 
 	}
 	

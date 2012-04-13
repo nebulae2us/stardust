@@ -62,8 +62,8 @@ public class LinkedEntity {
 			Assert.notNull(this.joinType, "joinType cannot be null");
 			Assert.notNull(this.attribute, "attribute cannot be null");
 			
-			Assert.isTrue(this.attribute.getEntity() == this.entity, "asdfa");
-			Assert.isTrue(this.attribute.getOwningEntity() == this.parent.entity, "asdfsaf");
+			Assert.isTrue(this.attribute.getEntity() == this.entity, "invalid");
+			Assert.isTrue(this.attribute.getOwningEntity() == this.parent.entity, "invalid");
 		}
 		
 	}

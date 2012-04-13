@@ -42,8 +42,8 @@ import javax.persistence.Table;
 @Table(name="HOUSE")
 @SecondaryTables({
 	@SecondaryTable(name="HOUSE_INTERIOR_DETAIL", pkJoinColumns={
-			@PrimaryKeyJoinColumn(name="HOUSE_ID", referencedColumnName="HOUSE_ID"),
-			@PrimaryKeyJoinColumn(name="HOUSE_LETTER", referencedColumnName="HOUSE_LETTER")}),
+			@PrimaryKeyJoinColumn(name="IN_HOUSE_ID", referencedColumnName="HOUSE_ID"),
+			@PrimaryKeyJoinColumn(name="IN_HOUSE_LETTER", referencedColumnName="HOUSE_LETTER")}),
 	@SecondaryTable(name="HOUSE_EXTERIOR_DETAIL")
 })
 @Inheritance(strategy=InheritanceType.JOINED)
@@ -71,7 +71,7 @@ public class House extends AbstractEntity {
 	@AttributeOverrides({
 		@AttributeOverride(name="red", column=@Column(name="HOUSE_COLOR_RED", table="HOUSE_EXTERIOR_DETAIL")),
 		@AttributeOverride(name="green", column=@Column(name="HOUSE_COLOR_GREEN", table="HOUSE_EXTERIOR_DETAIL")),
-		@AttributeOverride(name="blue", column=@Column(name="HOUSE_COLOR_BLUE", table="HOUSE_EXTERIOR_DETAIL"))		
+		@AttributeOverride(name="blue", column=@Column(name="HOUSE_COLOR_BLUE", table="HOUSE_EXTERIOR_DETAIL"))
 	})
 	private Color color;
 

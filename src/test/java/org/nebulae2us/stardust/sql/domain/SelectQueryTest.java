@@ -15,9 +15,16 @@
  */
 package org.nebulae2us.stardust.sql.domain;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.regex.Pattern;
+
+import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
+import org.nebulae2us.electron.util.ImmutableList;
 import org.nebulae2us.stardust.jpa.group1.BedRoom;
+import org.nebulae2us.stardust.jpa.group1.House;
 import org.nebulae2us.stardust.jpa.group1.Kitchen;
 import org.nebulae2us.stardust.jpa.group1.Person;
 import org.nebulae2us.stardust.jpa.group1.Room;
@@ -26,6 +33,7 @@ import org.nebulae2us.stardust.my.domain.EntityRepository;
 import static org.nebulae2us.stardust.Builders.*;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
+import static org.nebulae2us.electron.util.Immutables.*;
 
 /**
  * @author Trung Phan
@@ -40,18 +48,34 @@ public class SelectQueryTest {
 		entityRepository = new EntityRepository();
 	}
 
+	private ImmutableList<String> extractSelectColumns(String simpleSql) {
+		String sql = simpleSql.trim().toLowerCase();
+
+		int index = sql.indexOf("from");
+		
+		assertTrue(index > -1);
+		
+		String selectClause = sql.substring("select".length(), index).trim();
+		
+		return $(selectClause.split(","))
+				.trimElement()
+				.extractMatchFromElement(Pattern.compile("(.+\\.)?([^ ]+) .*"), 2);
+
+	}
 	
 	@Test
 	public void select_person() {
 		
 		SelectQuery selectQuery = selectQuery()
 			.entityClass(Person.class)
+			.initialAlias("b")
 			.toSelectQuery();
 		
 		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
 
-		assertThat(parseResult.toString(), equalToIgnoringWhiteSpace(
-				"select ssn, date_born, first_name, last_name, gender, version, updated_date from person"));
+		List<String> columns = extractSelectColumns(parseResult.toString());
+		
+		assertThat(columns, hasItems("ssn", "date_born", "gender", "first_name", "last_name", "version", "updated_date"));
 		
 	}
 	
@@ -65,12 +89,28 @@ public class SelectQueryTest {
 				.entityClass(Room.class)
 				.toSelectQuery();
 			
-			SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
+		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
 
-			assertThat(parseResult.toString(), equalToIgnoringWhiteSpace(
-					"select ssn, date_born, first_name, last_name, gender, version, updated_date from person"));
+		List<String> columns = extractSelectColumns(parseResult.toString());
 
+		assertThat(columns, hasItems("house_id", "house_letter", "sequence_number", "room_type", "red", "green", "blue", "door_count"));
 	}
+
+	@Test
+	public void selectHouse() {
+		SelectQuery selectQuery = selectQuery()
+				.entityClass(House.class)
+				.toSelectQuery();
+			
+		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
+		
+		System.out.println(parseResult.toString());
+
+		List<String> columns = extractSelectColumns(parseResult.toString());
+		System.out.println(columns);
+		
+	}
+	
 	
 	
 	

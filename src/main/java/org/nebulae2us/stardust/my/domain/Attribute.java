@@ -25,10 +25,6 @@ import org.nebulae2us.electron.Mirror;
  */
 public abstract class Attribute {
 
-//	private final boolean collection;
-//	
-//	private final Class<?> collectionType;
-	
 	private final Field field;
 	
 	private final Entity owningEntity;
@@ -36,19 +32,9 @@ public abstract class Attribute {
 	public Attribute(Mirror mirror) {
 		mirror.bind(this);
 		
-//		this.collection = mirror.toBooleanValue("collection");
-//		this.collectionType = mirror.to(Class.class, "collectionType");
 		this.field = mirror.to(Field.class, "field");
 		this.owningEntity = mirror.to(Entity.class, "owningEntity");
 	}
-
-//	public boolean isCollection() {
-//		return collection;
-//	}
-//
-//	public Class<?> getCollectionType() {
-//		return collectionType;
-//	}
 
 	public String getName() {
 		return field.getName();

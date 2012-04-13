@@ -131,21 +131,21 @@ public class EntityRepositoryTest {
 		assertEquals("HOUSE", house.getLinkedTableBundle().getRoot().getTable().getName());
 		assertEquals(3, house.getLinkedTableBundle().getLinkedTables().size());
 
-		LinkedTable tableJoin1 = house.getLinkedTableBundle().getLinkedTables().get(1);
+		LinkedTable linkedTable1 = house.getLinkedTableBundle().getLinkedTables().get(1);
 		
-		assertEquals("HOUSE_ID", tableJoin1.getParentColumns().get(0).getName());
-		assertEquals("HOUSE_LETTER", tableJoin1.getParentColumns().get(1).getName());
+		assertEquals("HOUSE_ID", linkedTable1.getParentColumns().get(0).getName());
+		assertEquals("HOUSE_LETTER", linkedTable1.getParentColumns().get(1).getName());
 		
-		assertEquals("HOUSE_ID", tableJoin1.getColumns().get(0).getName());
-		assertEquals("HOUSE_LETTER", tableJoin1.getColumns().get(1).getName());
+		assertEquals("HOUSE_ID", linkedTable1.getColumns().get(0).getName());
+		assertEquals("HOUSE_LETTER", linkedTable1.getColumns().get(1).getName());
 
-		LinkedTable tableJoin2 = house.getLinkedTableBundle().getLinkedTables().get(2);
+		LinkedTable linkedTable2 = house.getLinkedTableBundle().getLinkedTables().get(2);
 		
-		assertEquals("HOUSE_ID", tableJoin2.getParentColumns().get(0).getName());
-		assertEquals("HOUSE_LETTER", tableJoin2.getParentColumns().get(1).getName());
+		assertEquals("HOUSE_ID", linkedTable2.getParentColumns().get(0).getName());
+		assertEquals("HOUSE_LETTER", linkedTable2.getParentColumns().get(1).getName());
 		
-		assertEquals("HOUSE_ID", tableJoin2.getColumns().get(0).getName());
-		assertEquals("HOUSE_LETTER", tableJoin2.getColumns().get(1).getName());
+		assertEquals("HOUSE_ID", linkedTable2.getColumns().get(0).getName());
+		assertEquals("HOUSE_LETTER", linkedTable2.getColumns().get(1).getName());
 		
 	}
 	

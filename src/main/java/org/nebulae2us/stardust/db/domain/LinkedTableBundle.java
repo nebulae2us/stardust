@@ -99,12 +99,8 @@ public class LinkedTableBundle {
 		return -1;
 	}
 	
-//	public JoinedTables join(LinkedTable linkedTable) {
-//		return join(Collections.singletonList(linkedTable));
-//	}
-
 	public LinkedTableBundle join(LinkedTableBundle linkedTableBundle) {
-		Assert.notNull(linkedTables, "tableJoins cannot be null");
+		Assert.notNull(linkedTableBundle, "linkedTableBundle cannot be null");
 		
 		if (linkedTableBundle.linkedTables.size() <= 1) {
 			return this;
@@ -143,24 +139,24 @@ public class LinkedTableBundle {
 		result.append(this.linkedTables.get(0).getTable().getName());
 		
 		for (int j = 1; j < this.linkedTables.size(); j++) {
-			LinkedTable tableJoin = this.linkedTables.get(j);
+			LinkedTable linkedTable = this.linkedTables.get(j);
 
-			result.append("\n    ").append(tableJoin.getJoinType() == JoinType.INNER_JOIN ? "inner join " : "left outer join ")
-			.append(tableJoin.getTable().getExtName()).append("\n        on (");
+			result.append("\n    ").append(linkedTable.getJoinType() == JoinType.INNER_JOIN ? "inner join " : "left outer join ")
+			.append(linkedTable.getTable().getExtName()).append("\n        on (");
 			
-			for (int i = 0; i < tableJoin.getParentColumns().size(); i++) {
-				Column parentColumn = tableJoin.getParentColumns().get(i);
-				Column column = tableJoin.getColumns().get(i);
+			for (int i = 0; i < linkedTable.getParentColumns().size(); i++) {
+				Column parentColumn = linkedTable.getParentColumns().get(i);
+				Column column = linkedTable.getColumns().get(i);
 
 				if (i > 0) {
 					result.append("\n        and ");
 				}
 				
-				result.append(tableJoin.getParent().getTable().getName())
+				result.append(linkedTable.getParent().getTable().getName())
 					.append(".")
 					.append(parentColumn.getName())
 					.append(" = ")
-					.append(tableJoin.getTable().getName())
+					.append(linkedTable.getTable().getName())
 					.append(".")
 					.append(column.getName());
 			}

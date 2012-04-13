@@ -56,6 +56,8 @@ public class GenerateBuilders {
 					SelectQuery.class,
 					Expression.class,
 					LogicalExpression.class,
+					LinkedTableEntity.class,
+					LinkedTableEntityBundle.class,
 					SelectQueryParseResult.class
 					);
 		

@@ -30,8 +30,12 @@ import javax.persistence.Transient;
 import org.nebulae2us.electron.Constants;
 import org.nebulae2us.electron.internal.util.ClassUtils;
 import org.nebulae2us.stardust.Builders;
+import org.nebulae2us.stardust.my.domain.scanner.*;
 
 /**
+ * 
+ * This class will scan the Embedded field to return ValueObject class
+ * 
  * @author Trung Phan
  *
  */
@@ -41,9 +45,12 @@ public class ValueObjectScanner {
 	
 	private final Class<?> valueObjectClass;
 	
-	public ValueObjectScanner(EntityBuilder<?> owningEntity, Class<?> valueObjectClass) {
+	private final AttributeOverrideScanner attributeOverrideScanner;
+	
+	public ValueObjectScanner(EntityBuilder<?> owningEntity, Class<?> valueObjectClass, AttributeOverrideScanner attributeOverrideScanner) {
 		this.owningEntity = owningEntity;
 		this.valueObjectClass = valueObjectClass;
+		this.attributeOverrideScanner = attributeOverrideScanner;
 	}
 	
 	public ValueObjectBuilder<?> produce() {
@@ -76,19 +83,23 @@ public class ValueObjectScanner {
 					ScalarAttributeBuilder<?> attributeBuilder = scalarAttribute()
 							.field(field)
 							.scalarType(fieldClass)
-							.owningEntity(owningEntity)
-							.column(ScannerUtils.extractColumnInfo(field, owningEntity.getLinkedTableBundle()))
+							.owningEntity(this.owningEntity)
+							.column(ScannerUtils.extractColumnInfo(field, this.owningEntity.getLinkedTableBundle()))
 							;
+					
+					if (this.attributeOverrideScanner.getColumns().containsKey(field.getName())) {
+						attributeBuilder.column(this.attributeOverrideScanner .getColumns().get(field.getName()));
+					}
 					
 					result.attributes(attributeBuilder);
 				}
 				else if (field.getAnnotation(Embedded.class) != null || field.getAnnotation(EmbeddedId.class) != null || fieldClass.getAnnotation(Embeddable.class) != null) {
-					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(owningEntity, fieldClass).produce();
+					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(this.owningEntity, fieldClass, this.attributeOverrideScanner.sub(field.getName())).produce();
 					
 					ValueObjectAttributeBuilder<?> attributeBuilder = valueObjectAttribute()
 							.field(field)
 							.valueObject(valueObjectBuilder)
-							.owningEntity(owningEntity)
+							.owningEntity(this.owningEntity)
 							;
 					
 					result.attributes(attributeBuilder);

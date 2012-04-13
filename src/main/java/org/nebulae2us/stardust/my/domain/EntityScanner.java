@@ -25,6 +25,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
@@ -45,6 +47,7 @@ import org.nebulae2us.stardust.db.domain.ColumnBuilder;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
+import org.nebulae2us.stardust.my.domain.scanner.AttributeOverrideScanner;
 
 import static org.nebulae2us.stardust.Builders.*;
 
@@ -87,7 +90,7 @@ public class EntityScanner {
 		EntityBuilder<?> result = produceRaw();
 
 		for (EntityBuilder<?> entityBuilder : scannedEntityBuilders.values()) {
-			fillDefaultValuesForJoinedTables(entityBuilder);
+			fillDefaultValuesForLinkedTableBundle(entityBuilder);
 			fillDefaultValuesForEntityAttributes(entityBuilder);
 		}
 		
@@ -177,7 +180,7 @@ public class EntityScanner {
 		}
 	}
 
-	private void fillDefaultValuesForJoinedTables(EntityBuilder<?> result) {
+	private void fillDefaultValuesForLinkedTableBundle(EntityBuilder<?> result) {
 		if (ObjectUtils.notEmpty(result.getLinkedTableBundle().getNonRoots())) {
 			List<ScalarAttributeBuilder<?>> idAttributes = ScannerUtils.extractScalarAttributes(
 					result.getEntityIdentifier().getAttributes()
@@ -278,7 +281,10 @@ public class EntityScanner {
 					
 				}
 				else if (field.getAnnotation(Embedded.class) != null || field.getAnnotation(EmbeddedId.class) != null || fieldClass.getAnnotation(Embeddable.class) != null) {
-					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass).produce();
+					
+					AttributeOverrideScanner attributeOverrideAnnots = new AttributeOverrideScanner(result, field.getAnnotation(AttributeOverride.class), field.getAnnotation(AttributeOverrides.class));
+
+					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass, attributeOverrideAnnots).produce();
 					
 					ValueObjectAttributeBuilder<?> attributeBuilder = valueObjectAttribute()
 							.field(field)

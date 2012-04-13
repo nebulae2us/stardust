@@ -15,13 +15,8 @@
  */
 package org.nebulae2us.stardust.sql.domain;
 
-import java.util.List;
-import java.util.Map;
-
 import org.nebulae2us.electron.Mirror;
-import org.nebulae2us.stardust.db.domain.Column;
-import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
-import org.nebulae2us.stardust.db.domain.Table;
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan
@@ -29,29 +24,28 @@ import org.nebulae2us.stardust.db.domain.Table;
  */
 public class SelectQueryParseResult {
 
-	private final LinkedEntityBundle relationalEntities;
-	private final LinkedTableBundle joinedTables;
-	private final List<Column> columns;
+	private final LinkedTableEntityBundle linkedTableEntityBundle;
 	
 	public SelectQueryParseResult(Mirror mirror) {
 		mirror.bind(this);
 		
-		this.relationalEntities = mirror.to(LinkedEntityBundle.class, "relationalEntities");
-		this.joinedTables = mirror.to(LinkedTableBundle.class, "joinedTables");
-		this.columns = mirror.toListOf(Column.class, "columns");
+		this.linkedTableEntityBundle = mirror.to(LinkedTableEntityBundle.class, "linkedTableEntityBundle");
+		
+		assertInvariant();
 	}
 
-	public LinkedEntityBundle getRelationalEntities() {
-		return relationalEntities;
+	private void assertInvariant() {
+		Assert.notNull(this.linkedTableEntityBundle, "linkedTableEntityBundle cannot be null");
 	}
 
-	public LinkedTableBundle getJoinedTables() {
-		return joinedTables;
+	public LinkedTableEntityBundle getLinkedTableEntityBundle() {
+		return linkedTableEntityBundle;
 	}
 
-	public List<Column> getColumns() {
-		return columns;
+	@Override
+	public String toString() {
+		return linkedTableEntityBundle.toString();
 	}
-
+	
 	
 }

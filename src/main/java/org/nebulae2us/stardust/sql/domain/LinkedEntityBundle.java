@@ -22,11 +22,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.electron.util.ImmutableList;
+import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
 
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
@@ -41,6 +44,19 @@ public class LinkedEntityBundle {
 		mirror.bind(this);
 		
 		this.linkedEntities = mirror.toListOf(LinkedEntity.class, "linkedEntities");
+		
+		assertInvariant();
+	}
+
+	private void assertInvariant() {
+		Assert.notEmpty(this.linkedEntities, "linkedEntities cannot be empty");
+		Assert.isNull(getRoot().getParent(), "root node cannot have parent");
+		
+		for (LinkedEntity linkedEntity : getNonRoots()) {
+			Assert.notEmpty(linkedEntity.getAlias(), "non root node's alias cannot be empty.");
+		}
+		
+		Assert.isTrue(getAliases().isUnique(), "Duplicated alias is found");
 	}
 
 	public List<LinkedEntity> getLinkedEntities() {
@@ -51,6 +67,10 @@ public class LinkedEntityBundle {
 		return this.linkedEntities.get(0);
 	}
 	
+	public List<LinkedEntity> getNonRoots() {
+		return this.linkedEntities.subList(1, this.linkedEntities.size());
+	}
+	
 	public LinkedEntity getLinkedEntity(String alias) {
 		for (LinkedEntity linkedEntity : linkedEntities) {
 			if (linkedEntity.getAlias().equals(alias)) {
@@ -58,6 +78,41 @@ public class LinkedEntityBundle {
 			}
 		}
 		return null;
+	}
+	
+	public ImmutableList<String> getAliases() {
+		ListBuilder<String> result = new ListBuilder<String>();
+		
+		for (LinkedEntity linkedEntity : this.linkedEntities) {
+			result.add(linkedEntity.getAlias());
+		}
+		
+		return result.toList();
+	}
+	
+	public String getRecommendedDefaultAlias() {
+		if (getRoot().getAlias().length() > 0) {
+			return getRoot().getAlias();
+		}
+		
+		List<String> aliases = getAliases();
+		
+		for (char c = 'a'; c  <= 'z'; c++) {
+			if (!aliases.contains(c)) {
+				return String.valueOf(c);
+			}
+		}
+		
+		for (char c = 'a'; c  <= 'z'; c++) {
+			for (char c2 = 'a'; c2 <= 'z'; c2++) {
+				String newAlias = "" + c + c2;
+				if (!aliases.contains(newAlias)) {
+					return newAlias;
+				}
+			}
+		}		
+		
+		return "base";
 	}
 
 	public static LinkedEntityBundle newInstance(final Entity entity, final String initialAlias, final List<AliasJoin> aliasJoins) {
