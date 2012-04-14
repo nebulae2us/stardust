@@ -40,7 +40,7 @@ public class ValueObjectAttribute extends Attribute {
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();
-		result.append(this.getName())
+		result.append(this.getFullName())
 		.append(": VO ")
 		.append(valueObject.getDeclaringClass().getSimpleName())
 		.append(valueObject.getAttributes());

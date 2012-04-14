@@ -24,12 +24,10 @@ import java.util.Map;
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.electron.util.ImmutableList;
 import org.nebulae2us.electron.util.ListBuilder;
-import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
 
-import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**

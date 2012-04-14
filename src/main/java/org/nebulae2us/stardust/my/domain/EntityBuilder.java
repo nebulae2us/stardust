@@ -365,6 +365,23 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
      * 
      */
      
+    public List<ScalarAttributeBuilder<?>> getScalarAttributesForIdentifier() {
+		List<ScalarAttributeBuilder<?>> result = new ArrayList<ScalarAttributeBuilder<?>>();
+		
+		for (AttributeBuilder<?> attribute : this.entityIdentifier.getAttributes()) {
+			if (attribute instanceof ScalarAttributeBuilder) {
+				result.add((ScalarAttributeBuilder<?>)attribute);
+			}
+			else if (attribute instanceof ValueObjectAttributeBuilder) {
+				ValueObjectAttributeBuilder<?> valueObjectAttribute = (ValueObjectAttributeBuilder<?>)attribute;
+				ValueObjectBuilder<?> valueObject = valueObjectAttribute.getValueObject();
+				result.addAll(valueObject.getScalarAttributes());
+			}
+		}
+		
+		return result;
+   	 
+    }
      
      
 }

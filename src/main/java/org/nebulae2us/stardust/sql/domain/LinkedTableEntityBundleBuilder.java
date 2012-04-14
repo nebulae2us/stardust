@@ -186,6 +186,9 @@ public class LinkedTableEntityBundleBuilder<P> implements Wrappable<LinkedTableE
      * 
      */
      
+	public LinkedTableEntityBuilder<?> getRoot() {
+		return this.linkedTableEntities.get(0);
+	}
      
      
 }

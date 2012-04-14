@@ -118,6 +118,11 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	}
 
 	@Override
+	public ScalarAttributeBuilder<P> fullName(String fullName) {
+		return (ScalarAttributeBuilder<P>)super.fullName(fullName);
+	}
+
+	@Override
 	public ScalarAttributeBuilder<P> field(Field field) {
 		return (ScalarAttributeBuilder<P>)super.field(field);
 	}

@@ -90,6 +90,8 @@ public class SelectQueryTest {
 				.toSelectQuery();
 			
 		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
+		
+		System.out.println(parseResult.toString());
 
 		List<String> columns = extractSelectColumns(parseResult.toString());
 
@@ -104,10 +106,10 @@ public class SelectQueryTest {
 			
 		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
 		
-		System.out.println(parseResult.toString());
+//		System.out.println(parseResult.toString());
 
 		List<String> columns = extractSelectColumns(parseResult.toString());
-		System.out.println(columns);
+//		System.out.println(columns);
 		
 	}
 	

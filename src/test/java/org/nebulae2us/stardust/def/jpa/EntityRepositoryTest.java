@@ -136,8 +136,8 @@ public class EntityRepositoryTest {
 		assertEquals("HOUSE_ID", linkedTable1.getParentColumns().get(0).getName());
 		assertEquals("HOUSE_LETTER", linkedTable1.getParentColumns().get(1).getName());
 		
-		assertEquals("HOUSE_ID", linkedTable1.getColumns().get(0).getName());
-		assertEquals("HOUSE_LETTER", linkedTable1.getColumns().get(1).getName());
+		assertEquals("IN_HOUSE_ID", linkedTable1.getColumns().get(0).getName());
+		assertEquals("IN_HOUSE_LETTER", linkedTable1.getColumns().get(1).getName());
 
 		LinkedTable linkedTable2 = house.getLinkedTableBundle().getLinkedTables().get(2);
 		

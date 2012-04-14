@@ -21,7 +21,10 @@ import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.db.domain.Table;
+import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
+import org.nebulae2us.stardust.my.domain.EntityAttribute;
+import org.nebulae2us.stardust.my.domain.RelationalType;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
@@ -42,7 +45,7 @@ public class LinkedTableEntity {
 	
 	private final String tableAlias; // in most case, alias == tableAlias, only when there is joined inheritance or secondary table, then they are different
 	
-	private final List<ScalarAttribute> scalarAttributes;
+	private final List<Attribute> attributes;
 	
 	private final List<Column> parentColumns;
 	
@@ -58,7 +61,7 @@ public class LinkedTableEntity {
 		this.entity = mirror.to(Entity.class, "entity");
 		this.tableAlias = mirror.toString("tableAlias");
 		this.alias = mirror.toString("alias");
-		this.scalarAttributes = mirror.toListOf(ScalarAttribute.class, "scalarAttributes");
+		this.attributes = mirror.toListOf(Attribute.class, "attributes");
 		
 		this.parentColumns = mirror.toListOf(Column.class, "parentColumns");
 		this.columns = mirror.toListOf(Column.class, "columns");
@@ -96,8 +99,14 @@ public class LinkedTableEntity {
 
 		}
 		
-		for (ScalarAttribute scalarAttribute : this.scalarAttributes) {
-			Assert.isTrue(this.table.equals(scalarAttribute.getColumn().getTable()), "Invalid scalarAttributes.");
+		for (Attribute attribute : this.attributes) {
+			if (attribute instanceof ScalarAttribute) {
+				Assert.isTrue(this.table.equals(((ScalarAttribute)attribute).getColumn().getTable()), "Invalid scalarAttributes.");
+			}
+			else if (attribute instanceof EntityAttribute) {
+				EntityAttribute entityAttribute = (EntityAttribute)attribute;
+				Assert.isTrue(entityAttribute.isOwningSide(), "invalide entity Attribute");
+			}
 		}
 		
 	}
@@ -122,8 +131,8 @@ public class LinkedTableEntity {
 		return tableAlias;
 	}
 
-	public List<ScalarAttribute> getScalarAttributes() {
-		return scalarAttributes;
+	public List<Attribute> getAttributes() {
+		return attributes;
 	}
 
 	public List<Column> getParentColumns() {

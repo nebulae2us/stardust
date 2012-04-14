@@ -4,6 +4,7 @@ import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
 import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.db.domain.ColumnBuilder;
 
 @Builder(destination=AttributeHolder.class)
 public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
@@ -263,6 +264,56 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
      * 
      */
      
-     
+    public List<EntityAttributeBuilder<?>> getEntityAttributes() {
+		List<EntityAttributeBuilder<?>> result = new ArrayList<EntityAttributeBuilder<?>>();
+		
+		for (AttributeBuilder<?> attribute : attributes) {
+			if (attribute instanceof EntityAttributeBuilder) {
+				result.add((EntityAttributeBuilder<?>)attribute);
+			}
+		}
+		
+		return result;
+    }
+    
+    public List<ScalarAttributeBuilder<?>> getScalarAttributes() {
+		List<ScalarAttributeBuilder<?>> result = new ArrayList<ScalarAttributeBuilder<?>>();
+		
+		for (AttributeBuilder<?> attribute : attributes) {
+			if (attribute instanceof ScalarAttributeBuilder) {
+				result.add((ScalarAttributeBuilder<?>)attribute);
+			}
+			else if (attribute instanceof ValueObjectAttributeBuilder) {
+				ValueObjectAttributeBuilder<?> valueObjectAttribute = (ValueObjectAttributeBuilder<?>)attribute;
+				ValueObjectBuilder<?> valueObject = valueObjectAttribute.getValueObject();
+				result.addAll(valueObject.getScalarAttributes());
+			}
+		}
+		
+		return result;
+    	
+    }
+    
+    public List<ColumnBuilder<?>> getColumns() {
+		List<ColumnBuilder<?>> result = new ArrayList<ColumnBuilder<?>>();
+		
+		for (AttributeBuilder<?> attribute : attributes) {
+			if (attribute instanceof ScalarAttributeBuilder) {
+				result.add(((ScalarAttributeBuilder<?>)attribute).getColumn());
+			}
+			else if (attribute instanceof ValueObjectAttributeBuilder) {
+				ValueObjectAttributeBuilder<?> valueObjectAttribute = (ValueObjectAttributeBuilder<?>)attribute;
+				ValueObjectBuilder<?> valueObject = valueObjectAttribute.getValueObject();
+				for (ScalarAttributeBuilder<?> scalarAttribute : valueObject.getScalarAttributes()) {
+					result.add(scalarAttribute.getColumn());
+					
+				}
+			}
+		}
+		
+		return result;
+    	
+    }
+    
      
 }

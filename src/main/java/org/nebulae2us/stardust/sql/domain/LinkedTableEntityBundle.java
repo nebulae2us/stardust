@@ -15,11 +15,15 @@
  */
 package org.nebulae2us.stardust.sql.domain;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
+import org.nebulae2us.stardust.my.domain.Attribute;
+import org.nebulae2us.stardust.my.domain.EntityAttribute;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
@@ -64,16 +68,29 @@ public class LinkedTableEntityBundle {
 		result.append("select ");
 		
 		for (LinkedTableEntity linkedTableEntity : this.linkedTableEntities) {
-			for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
+			Set<Column> columns = new LinkedHashSet<Column>();
+			
+			for (Attribute attribute : linkedTableEntity.getAttributes()) {
+				if (attribute instanceof ScalarAttribute) {
+					ScalarAttribute scalarAttribute = (ScalarAttribute)attribute;
+					columns.add(scalarAttribute.getColumn());
+				}
+				else if (attribute instanceof EntityAttribute) {
+					columns.addAll(((EntityAttribute)attribute).getLeftColumns());
+				}
+			}
+			
+			for (Column column : columns) {
 				result
 					.append(linkedTableEntity.getTableAlias())
 					.append('.')
-					.append(scalarAttribute.getColumn().getName())
+					.append(column.getName())
 					.append(' ')
 					.append(linkedTableEntity.getAlias().length() == 0 ? "" : linkedTableEntity.getAlias() + '_')
-					.append(scalarAttribute.getColumn().getName())
+					.append(column.getName())
 					.append(",\n       ");
 			}
+			
 		}
 		
 		result.delete(result.length() - 9, result.length());

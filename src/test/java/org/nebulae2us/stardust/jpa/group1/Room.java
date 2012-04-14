@@ -58,8 +58,8 @@ public class Room extends AbstractEntity {
 	
 	@ManyToOne
 	@JoinColumns({
-		@JoinColumn(name="HOUSE_ID"),
-		@JoinColumn(name="HOUSE_LETTER")
+		@JoinColumn(name="HOUSE_ID", nullable = false),
+		@JoinColumn(name="HOUSE_LETTER", nullable = false)
 	})
 	private House house;
 

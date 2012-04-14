@@ -134,6 +134,23 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		return this;
 	}
 
+	private boolean owningSide;
+	
+	public boolean getOwningSide() {
+		return owningSide;
+	}
+
+	public void setOwningSide(boolean owningSide) {
+		verifyMutable();
+		this.owningSide = owningSide;
+	}
+
+	public EntityAttributeBuilder<P> owningSide(boolean owningSide) {
+		verifyMutable();
+		this.owningSide = owningSide;
+		return this;
+	}
+
 	private List<ColumnBuilder<?>> leftColumns;
 	
 	public List<ColumnBuilder<?>> getLeftColumns() {
@@ -647,6 +664,11 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 
 
 	@Override
+	public EntityAttributeBuilder<P> fullName(String fullName) {
+		return (EntityAttributeBuilder<P>)super.fullName(fullName);
+	}
+
+	@Override
 	public EntityAttributeBuilder<P> field(Field field) {
 		return (EntityAttributeBuilder<P>)super.field(field);
 	}
@@ -677,7 +699,6 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
      * Put your own custom code below. These codes won't be discarded during generation.
      * 
      */
-     
      
      
 }

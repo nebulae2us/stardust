@@ -19,13 +19,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.electron.util.ImmutableList;
+import org.nebulae2us.stardust.db.domain.Table;
 
 /**
  * @author Trung Phan
  *
  */
 public class AttributeHolder {
-
+	
 	protected final Class<?> declaringClass;
 	
 	protected final List<Attribute> attributes;
@@ -46,18 +48,18 @@ public class AttributeHolder {
 	}
 
 	public Attribute getAttribute(String attributeName) {
-		for (Attribute attribute : attributes) {
+		for (Attribute attribute : this.attributes) {
 			if (attribute.getName().equals(attributeName)) {
 				return attribute;
 			}
 		}
 		return null;
 	}
-
+	
 	public List<ScalarAttribute> getScalarAttributes() {
 		List<ScalarAttribute> result = new ArrayList<ScalarAttribute>();
 		
-		for (Attribute attribute : attributes) {
+		for (Attribute attribute : this.attributes) {
 			if (attribute instanceof ScalarAttribute) {
 				result.add((ScalarAttribute)attribute);
 			}
@@ -71,5 +73,78 @@ public class AttributeHolder {
 		return result;
 
 	}
+
+	/**
+	 * 
+	 * Get ScalarAttributes for a particular Table
+	 * 
+	 * @param table
+	 * @return
+	 */
+	public ImmutableList<ScalarAttribute> getScalarAttributes(Table table) {
+		List<ScalarAttribute> result = new ArrayList<ScalarAttribute>();
+		
+		for (Attribute attribute : this.attributes) {
+			if (attribute instanceof ScalarAttribute) {
+				ScalarAttribute scalarAttribute = (ScalarAttribute)attribute;
+				if (scalarAttribute.getColumn().getTable().equals(table)) {
+					result.add(scalarAttribute);
+				}
+			}
+			else if (attribute instanceof ValueObjectAttribute) {
+				ValueObjectAttribute valueObjectAttribute = (ValueObjectAttribute)attribute;
+				ValueObject valueObject = valueObjectAttribute.getValueObject();
+				List<ScalarAttribute> scalarAttributes = valueObject.getScalarAttributes();
+				for (ScalarAttribute scalarAttribute : scalarAttributes) {
+					if (scalarAttribute.getColumn().getTable().equals(table)) {
+						result.add(scalarAttribute);
+					}
+				}
+			}
+		}
+		
+		return new ImmutableList<ScalarAttribute>(result);
+
+	}
 	
+	/**
+	 * Return ManyToOne EntityAttribute or OneToOne EntityAttribute what is owned by this entity
+	 * @param table
+	 * @return
+	 */
+	public ImmutableList<EntityAttribute> getOwningSideEntityAttributes() {
+		List<EntityAttribute> result = new ArrayList<EntityAttribute>();
+		
+		for (Attribute attribute : this.attributes) {
+			if (attribute instanceof EntityAttribute) {
+				EntityAttribute entityAttribute = (EntityAttribute)attribute;
+				if (entityAttribute.isOwningSide()) {
+					result.add(entityAttribute);
+				}
+			}
+		}
+		
+		return new ImmutableList<EntityAttribute>(result);
+
+	}
+
+	public ImmutableList<EntityAttribute> getOwningSideEntityAttributes(Table table) {
+		List<EntityAttribute> result = new ArrayList<EntityAttribute>();
+		
+		for (Attribute attribute : this.attributes) {
+			if (attribute instanceof EntityAttribute) {
+				EntityAttribute entityAttribute = (EntityAttribute)attribute;
+				if (entityAttribute.isOwningSide()) {
+					if (entityAttribute.getLeftColumns().get(0).getTable().equals(table)) {
+						result.add(entityAttribute);
+					}
+				}
+			}
+		}
+		
+		return new ImmutableList<EntityAttribute>(result);
+
+	}
+
+
 }

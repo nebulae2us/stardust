@@ -13,23 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.my.domain;
+package org.nebulae2us.stardust.my.domain.scanner;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-import org.nebulae2us.electron.Mirror;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinColumns;
 
 /**
  * @author Trung Phan
  *
  */
-public class EntityIdentifier extends AttributeHolder {
+public class JoinColumnAnnotScanner {
 
-	public EntityIdentifier(Mirror mirror) {
-		super(mirror);
-		mirror.bind(this);
-		
+	private final List<JoinColumn> joinColumns;
+	
+	public JoinColumnAnnotScanner(JoinColumn joinColumn, JoinColumns joinColumns) {
+		this.joinColumns = new ArrayList<JoinColumn>();
+		if (joinColumn != null) {
+			this.joinColumns.add(joinColumn);
+		}
+		if (joinColumns != null) {
+			this.joinColumns.addAll(Arrays.asList(joinColumns.value()));
+		}
 	}
 
+	
 	
 }

@@ -46,7 +46,7 @@ public class ScalarAttribute extends Attribute {
 
 	@Override
 	public String toString() {
-		return this.getName() + ": " + this.getScalarType().getSimpleName();
+		return this.getFullName() + ": " + this.getScalarType().getSimpleName();
 	}
 	
 }

@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.nebulae2us.electron.Converter;
 import org.nebulae2us.stardust.Builders;
+import org.nebulae2us.stardust.my.domain.scanner.EntityScanner;
 
 
 /**

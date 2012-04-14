@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.my.domain;
+package org.nebulae2us.stardust.my.domain.scanner;
 
 import static org.nebulae2us.stardust.Builders.*;
 
@@ -30,6 +30,10 @@ import javax.persistence.Transient;
 import org.nebulae2us.electron.Constants;
 import org.nebulae2us.electron.internal.util.ClassUtils;
 import org.nebulae2us.stardust.Builders;
+import org.nebulae2us.stardust.my.domain.EntityBuilder;
+import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
+import org.nebulae2us.stardust.my.domain.ValueObjectAttributeBuilder;
+import org.nebulae2us.stardust.my.domain.ValueObjectBuilder;
 import org.nebulae2us.stardust.my.domain.scanner.*;
 
 /**
@@ -47,10 +51,13 @@ public class ValueObjectScanner {
 	
 	private final AttributeOverrideScanner attributeOverrideScanner;
 	
-	public ValueObjectScanner(EntityBuilder<?> owningEntity, Class<?> valueObjectClass, AttributeOverrideScanner attributeOverrideScanner) {
+	private final String owningFieldFullName;
+	
+	public ValueObjectScanner(EntityBuilder<?> owningEntity, Class<?> valueObjectClass, String owningFieldFullName, AttributeOverrideScanner attributeOverrideScanner) {
 		this.owningEntity = owningEntity;
 		this.valueObjectClass = valueObjectClass;
 		this.attributeOverrideScanner = attributeOverrideScanner;
+		this.owningFieldFullName = owningFieldFullName;
 	}
 	
 	public ValueObjectBuilder<?> produce() {
@@ -73,19 +80,15 @@ public class ValueObjectScanner {
 			
 			for (Field field : relatedClass.getDeclaredFields()) {
 				
-				Class<?> fieldClass = ClassUtils.getClass(field.getType());
+				Class<?> fieldClass = field.getType();
 				
 				if ((field.getModifiers() & Modifier.TRANSIENT) != 0 || field.getAnnotation(Transient.class) != null) {
 					continue;
 				}
 				
 				if (Constants.SCALAR_TYPES.contains(fieldClass) || fieldClass.isEnum()) {
-					ScalarAttributeBuilder<?> attributeBuilder = scalarAttribute()
-							.field(field)
-							.scalarType(fieldClass)
-							.owningEntity(this.owningEntity)
-							.column(ScannerUtils.extractColumnInfo(field, this.owningEntity.getLinkedTableBundle()))
-							;
+					
+					ScalarAttributeBuilder<?> attributeBuilder = new ScalarAttributeScanner(this.owningEntity, field, this.owningFieldFullName).produce() ;
 					
 					if (this.attributeOverrideScanner.getColumns().containsKey(field.getName())) {
 						attributeBuilder.column(this.attributeOverrideScanner .getColumns().get(field.getName()));
@@ -94,9 +97,11 @@ public class ValueObjectScanner {
 					result.attributes(attributeBuilder);
 				}
 				else if (field.getAnnotation(Embedded.class) != null || field.getAnnotation(EmbeddedId.class) != null || fieldClass.getAnnotation(Embeddable.class) != null) {
-					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(this.owningEntity, fieldClass, this.attributeOverrideScanner.sub(field.getName())).produce();
+					String fullName = this.owningFieldFullName + "." + field.getName();
+					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(this.owningEntity, fieldClass, fullName, this.attributeOverrideScanner.sub(field.getName())).produce();
 					
 					ValueObjectAttributeBuilder<?> attributeBuilder = valueObjectAttribute()
+							.fullName(fullName)
 							.field(field)
 							.valueObject(valueObjectBuilder)
 							.owningEntity(this.owningEntity)

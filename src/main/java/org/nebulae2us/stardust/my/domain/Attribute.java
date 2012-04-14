@@ -18,13 +18,27 @@ package org.nebulae2us.stardust.my.domain;
 import java.lang.reflect.Field;
 
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.electron.util.EqualityComparator;
+
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan
  *
  */
 public abstract class Attribute {
+	
+	public static final EqualityComparator<Attribute> COMPARATOR_BY_NAME = new EqualityComparator<Attribute>() {
+		public int hashCode(Attribute a) {
+			return a.hashCode();
+		}
+		public boolean compare(Attribute a1, Attribute a2) {
+			return a1.getFullName().equals(a2.getFullName());
+		}
+	};
 
+	private final String fullName;
+	
 	private final Field field;
 	
 	private final Entity owningEntity;
@@ -34,6 +48,15 @@ public abstract class Attribute {
 		
 		this.field = mirror.to(Field.class, "field");
 		this.owningEntity = mirror.to(Entity.class, "owningEntity");
+		this.fullName = mirror.toString("fullName");
+		
+		assertInvariant();
+	}
+
+	private void assertInvariant() {
+		Assert.notNull(this.field, "field cannot be null");
+		Assert.notNull(this.owningEntity, "owningEntity cannot be null");
+		Assert.notEmpty(this.fullName, "fullName cannot be empty");
 	}
 
 	public String getName() {
@@ -47,5 +70,13 @@ public abstract class Attribute {
 	public Entity getOwningEntity() {
 		return owningEntity;
 	}
+
+	public String getFullName() {
+		return fullName;
+	}
 	
+	@Override
+	public String toString() {
+		return fullName;
+	}
 }

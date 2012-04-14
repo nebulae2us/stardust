@@ -100,6 +100,11 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
 	}
 
 	@Override
+	public ValueObjectAttributeBuilder<P> fullName(String fullName) {
+		return (ValueObjectAttributeBuilder<P>)super.fullName(fullName);
+	}
+
+	@Override
 	public ValueObjectAttributeBuilder<P> field(Field field) {
 		return (ValueObjectAttributeBuilder<P>)super.field(field);
 	}

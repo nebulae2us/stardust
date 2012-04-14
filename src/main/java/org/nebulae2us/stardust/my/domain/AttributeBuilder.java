@@ -53,6 +53,23 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 
 
 
+	private String fullName;
+	
+	public String getFullName() {
+		return fullName;
+	}
+
+	public void setFullName(String fullName) {
+		verifyMutable();
+		this.fullName = fullName;
+	}
+
+	public AttributeBuilder<P> fullName(String fullName) {
+		verifyMutable();
+		this.fullName = fullName;
+		return this;
+	}
+
 	private Field field;
 	
 	public Field getField() {

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.my.domain;
+package org.nebulae2us.stardust.my.domain.scanner;
 
 import static org.nebulae2us.stardust.Builders.*;
 
@@ -36,6 +36,12 @@ import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
 import org.nebulae2us.stardust.db.domain.LinkedTableBundleBuilder;
 import org.nebulae2us.stardust.internal.util.NameUtils;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
+import org.nebulae2us.stardust.my.domain.AttributeBuilder;
+import org.nebulae2us.stardust.my.domain.EntityAttributeBuilder;
+import org.nebulae2us.stardust.my.domain.InheritanceType;
+import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
+import org.nebulae2us.stardust.my.domain.ValueObjectAttributeBuilder;
+import org.nebulae2us.stardust.my.domain.ValueObjectBuilder;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -44,67 +50,6 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  *
  */
 public class ScannerUtils {
-	
-	public static ColumnBuilder<?> extractColumnInfo(Field field, LinkedTableBundleBuilder<?> linkedTableBundle) {
-		
-		ColumnBuilder<?> result = column();
-		
-		if (field.getAnnotation(javax.persistence.Column.class) != null) {
-			javax.persistence.Column column = field.getAnnotation(javax.persistence.Column.class);
-			result.name(column.name())
-				.table$begin()
-					.name(column.table())
-				.end();
-			
-		}
-		else if (field.getAnnotation(JoinColumn.class) != null) {
-			JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
-			result.name(joinColumn.name())
-				.table$begin()
-					.name(joinColumn.table())
-				.end();
-		}
-		else {
-			result.name(NameUtils.camelCaseToUpperCase(field.getName()));
-		}
-		
-		if (result.getTable() == null || ObjectUtils.isEmpty(result.getTable().getName())) {
-			Assert.notNull(linkedTableBundle.getRoot().getTable(), "table cannot be null.");
-			result.table(linkedTableBundle.getRoot().getTable());
-		}
-		
-		return result;
-	}
-	
-	public static List<EntityAttributeBuilder<?>> extractEntityAttributes(List<AttributeBuilder<?>> attributes) {
-		List<EntityAttributeBuilder<?>> result = new ArrayList<EntityAttributeBuilder<?>>();
-		
-		for (AttributeBuilder<?> attribute : attributes) {
-			if (attribute instanceof EntityAttributeBuilder) {
-				result.add((EntityAttributeBuilder<?>)attribute);
-			}
-		}
-		
-		return result;
-	}
-
-	public static List<ScalarAttributeBuilder<?>> extractScalarAttributes(List<AttributeBuilder<?>> attributes) {
-		List<ScalarAttributeBuilder<?>> result = new ArrayList<ScalarAttributeBuilder<?>>();
-		
-		for (AttributeBuilder<?> attribute : attributes) {
-			if (attribute instanceof ScalarAttributeBuilder) {
-				result.add((ScalarAttributeBuilder<?>)attribute);
-			}
-			else if (attribute instanceof ValueObjectAttributeBuilder) {
-				ValueObjectAttributeBuilder<?> valueObjectAttribute = (ValueObjectAttributeBuilder<?>)attribute;
-				ValueObjectBuilder<?> valueObject = valueObjectAttribute.getValueObject();
-				result.addAll(extractScalarAttributes(valueObject.getAttributes()));
-			}
-		}
-		
-		return result;
-	}
-	
 	
 	private static LinkedTableBundleBuilder<?> _extractTableInfo(Class<?> entityClass) {
 		

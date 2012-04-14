@@ -253,61 +253,121 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 		return this;
 	}
 
-	private List<ScalarAttributeBuilder<?>> scalarAttributes;
+	private List<AttributeBuilder<?>> attributes;
 	
-	public List<ScalarAttributeBuilder<?>> getScalarAttributes() {
-		return scalarAttributes;
+	public List<AttributeBuilder<?>> getAttributes() {
+		return attributes;
 	}
 
-	public void setScalarAttributes(List<ScalarAttributeBuilder<?>> scalarAttributes) {
+	public void setAttributes(List<AttributeBuilder<?>> attributes) {
 		verifyMutable();
-		this.scalarAttributes = scalarAttributes;
+		this.attributes = attributes;
 	}
 
-	public LinkedTableEntityBuilder<P> scalarAttributes(ScalarAttributeBuilder<?> ... scalarAttributes) {
+	public LinkedTableEntityBuilder<P> attributes(AttributeBuilder<?> ... attributes) {
 		verifyMutable();
-		return scalarAttributes(new ListBuilder<ScalarAttributeBuilder<?>>().add(scalarAttributes).toList());
+		return attributes(new ListBuilder<AttributeBuilder<?>>().add(attributes).toList());
 	}
 	
-	public LinkedTableEntityBuilder<P> scalarAttributes(Collection<ScalarAttributeBuilder<?>> scalarAttributes) {
+	public LinkedTableEntityBuilder<P> attributes(Collection<AttributeBuilder<?>> attributes) {
 		verifyMutable();
-		if (this.scalarAttributes == null) {
-			this.scalarAttributes = new ArrayList<ScalarAttributeBuilder<?>>();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
 		}
-		if (scalarAttributes != null) {
-			for (ScalarAttributeBuilder<?> e : scalarAttributes) {
-				CollectionUtils.addItem(this.scalarAttributes, e);
+		if (attributes != null) {
+			for (AttributeBuilder<?> e : attributes) {
+				CollectionUtils.addItem(this.attributes, e);
 			}
 		}
 		return this;
 	}
 
-	public ScalarAttributeBuilder<? extends LinkedTableEntityBuilder<P>> scalarAttributes$addScalarAttribute() {
+	public AttributeBuilder<? extends LinkedTableEntityBuilder<P>> attributes$addAttribute() {
 		verifyMutable();
-		if (this.scalarAttributes == null) {
-			this.scalarAttributes = new ArrayList<ScalarAttributeBuilder<?>>();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		
+		AttributeBuilder<LinkedTableEntityBuilder<P>> result =
+				new AttributeBuilder<LinkedTableEntityBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.attributes, result);
+		
+		return result;
+	}
+	
+	public EntityAttributeBuilder<? extends LinkedTableEntityBuilder<P>> attributes$addEntityAttribute() {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		
+		EntityAttributeBuilder<LinkedTableEntityBuilder<P>> result =
+				new EntityAttributeBuilder<LinkedTableEntityBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.attributes, result);
+		
+		return result;
+	}
+	
+	public ScalarAttributeBuilder<? extends LinkedTableEntityBuilder<P>> attributes$addScalarAttribute() {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
 		}
 		
 		ScalarAttributeBuilder<LinkedTableEntityBuilder<P>> result =
 				new ScalarAttributeBuilder<LinkedTableEntityBuilder<P>>(this);
 		
-		CollectionUtils.addItem(this.scalarAttributes, result);
+		CollectionUtils.addItem(this.attributes, result);
+		
+		return result;
+	}
+	
+	public ValueObjectAttributeBuilder<? extends LinkedTableEntityBuilder<P>> attributes$addValueObjectAttribute() {
+		verifyMutable();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		}
+		
+		ValueObjectAttributeBuilder<LinkedTableEntityBuilder<P>> result =
+				new ValueObjectAttributeBuilder<LinkedTableEntityBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.attributes, result);
 		
 		return result;
 	}
 	
 
-	public class ScalarAttributes$$$builder<P1 extends LinkedTableEntityBuilder<P>> {
+	public class Attributes$$$builder<P1 extends LinkedTableEntityBuilder<P>> {
 	
 		private final P1 $$$parentBuilder1;
 	
-		protected ScalarAttributes$$$builder(P1 parentBuilder) {
+		protected Attributes$$$builder(P1 parentBuilder) {
 			this.$$$parentBuilder1 = parentBuilder;
 		}
 
-		public ScalarAttributeBuilder<ScalarAttributes$$$builder<P1>> scalarAttribute$begin() {
-			ScalarAttributeBuilder<ScalarAttributes$$$builder<P1>> result = new ScalarAttributeBuilder<ScalarAttributes$$$builder<P1>>(this);
-			CollectionUtils.addItem(LinkedTableEntityBuilder.this.scalarAttributes, result);
+		public AttributeBuilder<Attributes$$$builder<P1>> attribute$begin() {
+			AttributeBuilder<Attributes$$$builder<P1>> result = new AttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(LinkedTableEntityBuilder.this.attributes, result);
+			return result;
+		}
+		
+		public EntityAttributeBuilder<Attributes$$$builder<P1>> entityAttribute$begin() {
+			EntityAttributeBuilder<Attributes$$$builder<P1>> result = new EntityAttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(LinkedTableEntityBuilder.this.attributes, result);
+			return result;
+		}
+		
+		public ScalarAttributeBuilder<Attributes$$$builder<P1>> scalarAttribute$begin() {
+			ScalarAttributeBuilder<Attributes$$$builder<P1>> result = new ScalarAttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(LinkedTableEntityBuilder.this.attributes, result);
+			return result;
+		}
+		
+		public ValueObjectAttributeBuilder<Attributes$$$builder<P1>> valueObjectAttribute$begin() {
+			ValueObjectAttributeBuilder<Attributes$$$builder<P1>> result = new ValueObjectAttributeBuilder<Attributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(LinkedTableEntityBuilder.this.attributes, result);
 			return result;
 		}
 		
@@ -317,42 +377,42 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 		}
 	}
 	
-	public ScalarAttributes$$$builder<? extends LinkedTableEntityBuilder<P>> scalarAttributes$list() {
+	public Attributes$$$builder<? extends LinkedTableEntityBuilder<P>> attributes$list() {
 		verifyMutable();
-		if (this.scalarAttributes == null) {
-			this.scalarAttributes = new ArrayList<ScalarAttributeBuilder<?>>();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
 		}
-		return new ScalarAttributes$$$builder<LinkedTableEntityBuilder<P>>(this);
+		return new Attributes$$$builder<LinkedTableEntityBuilder<P>>(this);
 	}
 
-    public LinkedTableEntityBuilder<P> scalarAttributes$wrap(ScalarAttribute ... scalarAttributes) {
-    	return scalarAttributes$wrap(new ListBuilder<ScalarAttribute>().add(scalarAttributes).toList());
+    public LinkedTableEntityBuilder<P> attributes$wrap(Attribute ... attributes) {
+    	return attributes$wrap(new ListBuilder<Attribute>().add(attributes).toList());
     }
 
-    public LinkedTableEntityBuilder<P> scalarAttributes$wrap(Collection<? extends ScalarAttribute> scalarAttributes) {
+    public LinkedTableEntityBuilder<P> attributes$wrap(Collection<? extends Attribute> attributes) {
 		verifyMutable();
 
-		if (this.scalarAttributes == null) {
-			this.scalarAttributes = new ArrayList<ScalarAttributeBuilder<?>>();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
 		}
-		if (scalarAttributes != null) {
-			for (ScalarAttribute e : scalarAttributes) {
-				ScalarAttributeBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ScalarAttributeBuilder.class);
-				CollectionUtils.addItem(this.scalarAttributes, wrapped);
+		if (attributes != null) {
+			for (Attribute e : attributes) {
+				AttributeBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AttributeBuilder.class);
+				CollectionUtils.addItem(this.attributes, wrapped);
 			}
 		}
 		return this;
     }
     
-    public LinkedTableEntityBuilder<P> scalarAttributes$restoreFrom(BuilderRepository repo, Object ... builderIds) {
-    	return scalarAttributes$restoreFrom(repo, new ListBuilder<Object>().add(builderIds).toList());
+    public LinkedTableEntityBuilder<P> attributes$restoreFrom(BuilderRepository repo, Object ... builderIds) {
+    	return attributes$restoreFrom(repo, new ListBuilder<Object>().add(builderIds).toList());
     }
 
-    public LinkedTableEntityBuilder<P> scalarAttributes$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
+    public LinkedTableEntityBuilder<P> attributes$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
 		verifyMutable();
 
-		if (this.scalarAttributes == null) {
-			this.scalarAttributes = new ArrayList<ScalarAttributeBuilder<?>>();
+		if (this.attributes == null) {
+			this.attributes = new ArrayList<AttributeBuilder<?>>();
 		}
 		if (builderIds != null) {
 	    	for (Object builderId : builderIds) {
@@ -361,7 +421,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						CollectionUtils.addItem(LinkedTableEntityBuilder.this.scalarAttributes, arguments[0]);
+	    						CollectionUtils.addItem(LinkedTableEntityBuilder.this.attributes, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -369,11 +429,11 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	                    throw new IllegalStateException("Object does not exist with id " + builderId);
 	            	}
 	            }
-	            else if (!(restoredObject instanceof ScalarAttributeBuilder)) {
-	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ScalarAttributeBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+	            else if (!(restoredObject instanceof AttributeBuilder)) {
+	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + AttributeBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                CollectionUtils.addItem(this.scalarAttributes, restoredObject);
+	                CollectionUtils.addItem(this.attributes, restoredObject);
 	            }
 	    	}
 		}

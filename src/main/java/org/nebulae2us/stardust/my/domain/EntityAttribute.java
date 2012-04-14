@@ -42,6 +42,11 @@ public class EntityAttribute extends Attribute {
 	private final JoinType joinType;
 	
 	/**
+	 * true for ManyToOne relationship, may be true for OneToOne relationship
+	 */
+	private final boolean owningSide;
+	
+	/**
 	 * These columns belong to owning entity
 	 */
 	private final List<Column> leftColumns;
@@ -68,6 +73,7 @@ public class EntityAttribute extends Attribute {
 		this.entity = mirror.to(Entity.class, "entity");
 		this.relationalType = mirror.to(RelationalType.class, "relationalType");
 		this.joinType = mirror.to(JoinType.class, "joinType");
+		this.owningSide = mirror.toBooleanValue("owningSide");
 		this.leftColumns = mirror.toListOf(Column.class, "leftColumns");
 		this.rightColumns = mirror.toListOf(Column.class, "rightColumns");
 		this.junctionLeftColumns = mirror.toListOf(Column.class, "junctionLeftColumns");
@@ -84,6 +90,10 @@ public class EntityAttribute extends Attribute {
 
 	public JoinType getJoinType() {
 		return joinType;
+	}
+
+	public boolean isOwningSide() {
+		return owningSide;
 	}
 
 	public List<Column> getLeftColumns() {
@@ -104,7 +114,6 @@ public class EntityAttribute extends Attribute {
 
 	@Override
 	public String toString() {
-		return this.getName() + ": E " + entity.getDeclaringClass().getSimpleName();
+		return this.getFullName() + ": E " + entity.getDeclaringClass().getSimpleName();
 	}
-	
 }
