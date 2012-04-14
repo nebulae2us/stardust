@@ -15,9 +15,9 @@
  */
 package org.nebulae2us.stardust.my.domain;
 
-import java.util.List;
-
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.electron.util.ImmutableList;
+import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
 
@@ -49,22 +49,22 @@ public class EntityAttribute extends Attribute {
 	/**
 	 * These columns belong to owning entity
 	 */
-	private final List<Column> leftColumns;
+	private final ImmutableList<Column> leftColumns;
 	
 	/**
 	 * These columns belong to attribute entity
 	 */
-	private final List<Column> rightColumns;
+	private final ImmutableList<Column> rightColumns;
 
 	/**
 	 * These columns belong to junction table in case a junction table is required (such as many-to-many relationship)
 	 */
-	private final List<Column> junctionLeftColumns;
+	private final ImmutableList<Column> junctionLeftColumns;
 
 	/**
 	 * These columns belong to junction table in case a junction table is required (such as many-to-many relationship)
 	 */
-	private final List<Column> junctionRightColumns;
+	private final ImmutableList<Column> junctionRightColumns;
 
 	public EntityAttribute(Mirror mirror) {
 		super(mirror);
@@ -74,10 +74,10 @@ public class EntityAttribute extends Attribute {
 		this.relationalType = mirror.to(RelationalType.class, "relationalType");
 		this.joinType = mirror.to(JoinType.class, "joinType");
 		this.owningSide = mirror.toBooleanValue("owningSide");
-		this.leftColumns = mirror.toListOf(Column.class, "leftColumns");
-		this.rightColumns = mirror.toListOf(Column.class, "rightColumns");
-		this.junctionLeftColumns = mirror.toListOf(Column.class, "junctionLeftColumns");
-		this.junctionRightColumns = mirror.toListOf(Column.class, "junctionRightColumns");
+		this.leftColumns = Immutables.$(mirror.toListOf(Column.class, "leftColumns"));
+		this.rightColumns = Immutables.$(mirror.toListOf(Column.class, "rightColumns"));
+		this.junctionLeftColumns = Immutables.$(mirror.toListOf(Column.class, "junctionLeftColumns"));
+		this.junctionRightColumns = Immutables.$(mirror.toListOf(Column.class, "junctionRightColumns"));
 	}
 
 	public Entity getEntity() {
@@ -96,19 +96,19 @@ public class EntityAttribute extends Attribute {
 		return owningSide;
 	}
 
-	public List<Column> getLeftColumns() {
+	public ImmutableList<Column> getLeftColumns() {
 		return leftColumns;
 	}
 
-	public List<Column> getRightColumns() {
+	public ImmutableList<Column> getRightColumns() {
 		return rightColumns;
 	}
 
-	public List<Column> getJunctionLeftColumns() {
+	public ImmutableList<Column> getJunctionLeftColumns() {
 		return junctionLeftColumns;
 	}
 
-	public List<Column> getJunctionRightColumns() {
+	public ImmutableList<Column> getJunctionRightColumns() {
 		return junctionRightColumns;
 	}
 

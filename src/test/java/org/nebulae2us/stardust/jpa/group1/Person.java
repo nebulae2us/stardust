@@ -55,13 +55,13 @@ public class Person extends AbstractEntity {
 	private Gender gender;
 
 	@ManyToMany
-	@JoinTable(name="ONWER_HOUSE",
+	@JoinTable(name="OWNER_DWELLING",
 		joinColumns={
 			@JoinColumn(name="OWNER_SSN", referencedColumnName="SSN"),
 			@JoinColumn(name="OWNER_DATE_BORN", referencedColumnName="DATE_BORN")},
 		inverseJoinColumns={
-			@JoinColumn(name="HOUSE_ID", referencedColumnName="HOUSE_ID"),
-			@JoinColumn(name="HOUSE_LETTER", referencedColumnName="HOUSE_LETTER")
+			@JoinColumn(name="DWELLING_HOUSE_ID", referencedColumnName="HOUSE_ID"),
+			@JoinColumn(name="DWELLING_HOUSE_LETTER", referencedColumnName="HOUSE_LETTER")
 	}
 	)
 	private List<House> houses;

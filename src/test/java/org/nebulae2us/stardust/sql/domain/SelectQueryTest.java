@@ -91,8 +91,6 @@ public class SelectQueryTest {
 			
 		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
 		
-		System.out.println(parseResult.toString());
-
 		List<String> columns = extractSelectColumns(parseResult.toString());
 
 		assertThat(columns, hasItems("house_id", "house_letter", "sequence_number", "room_type", "red", "green", "blue", "door_count"));
@@ -106,9 +104,11 @@ public class SelectQueryTest {
 			
 		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
 		
-//		System.out.println(parseResult.toString());
+		System.out.println(parseResult.toString());
 
 		List<String> columns = extractSelectColumns(parseResult.toString());
+		
+		assertThat(columns, hasItems("house_id", "house_letter", "house_type_id"));
 //		System.out.println(columns);
 		
 	}

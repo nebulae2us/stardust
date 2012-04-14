@@ -17,6 +17,8 @@ import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.AttributeBuilder;
 import org.nebulae2us.stardust.my.domain.AttributeHolder;
 import org.nebulae2us.stardust.my.domain.AttributeHolderBuilder;
+import org.nebulae2us.stardust.my.domain.EntityDiscriminator;
+import org.nebulae2us.stardust.my.domain.EntityDiscriminatorBuilder;
 import org.nebulae2us.stardust.sql.domain.AliasJoin;
 import org.nebulae2us.stardust.sql.domain.AliasJoinBuilder;
 import org.nebulae2us.stardust.sql.domain.LinkedEntity;
@@ -57,6 +59,7 @@ public class Builders {
 				.put(Expression.class, ExpressionBuilder.class)
 				.put(Attribute.class, AttributeBuilder.class)
 				.put(AttributeHolder.class, AttributeHolderBuilder.class)
+				.put(EntityDiscriminator.class, EntityDiscriminatorBuilder.class)
 				.put(AliasJoin.class, AliasJoinBuilder.class)
 				.put(LinkedEntity.class, LinkedEntityBuilder.class)
 				.put(LinkedEntityBundle.class, LinkedEntityBundleBuilder.class)
@@ -195,6 +198,23 @@ public class Builders {
     
     public static AttributeHolderBuilder<?> wrap(AttributeHolder attributeHolder) {
     	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(attributeHolder).to(AttributeHolderBuilder.class);
+    }
+
+    public static EntityDiscriminatorBuilder<?> entityDiscriminator() {
+        return new EntityDiscriminatorBuilder<Object>();
+    }
+
+    public static EntityDiscriminatorBuilder<?> entityDiscriminator$restoreFrom(BuilderRepository repo, int builderId) {
+        return (EntityDiscriminatorBuilder<?>)repo.get(builderId);
+    }
+
+    public static EntityDiscriminatorBuilder<?> entityDiscriminator$copyFrom(EntityDiscriminator entityDiscriminator) {
+    	EntityDiscriminatorBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityDiscriminator).to(EntityDiscriminatorBuilder.class);
+    	return result;
+    }
+    
+    public static EntityDiscriminatorBuilder<?> wrap(EntityDiscriminator entityDiscriminator) {
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(entityDiscriminator).to(EntityDiscriminatorBuilder.class);
     }
 
     public static AliasJoinBuilder<?> aliasJoin() {

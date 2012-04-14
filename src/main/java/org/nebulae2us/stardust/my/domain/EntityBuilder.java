@@ -226,30 +226,30 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 		return this;
 	}
 
-	private ScalarAttributeBuilder<?> discriminator;
+	private EntityDiscriminatorBuilder<?> entityDiscriminator;
 	
-	public ScalarAttributeBuilder<?> getDiscriminator() {
-		return discriminator;
+	public EntityDiscriminatorBuilder<?> getEntityDiscriminator() {
+		return entityDiscriminator;
 	}
 
-	public void setDiscriminator(ScalarAttributeBuilder<?> discriminator) {
+	public void setEntityDiscriminator(EntityDiscriminatorBuilder<?> entityDiscriminator) {
 		verifyMutable();
-		this.discriminator = discriminator;
+		this.entityDiscriminator = entityDiscriminator;
 	}
 
-	public EntityBuilder<P> discriminator(ScalarAttributeBuilder<?> discriminator) {
+	public EntityBuilder<P> entityDiscriminator(EntityDiscriminatorBuilder<?> entityDiscriminator) {
 		verifyMutable();
-		this.discriminator = discriminator;
+		this.entityDiscriminator = entityDiscriminator;
 		return this;
 	}
 
-    public EntityBuilder<P> discriminator$wrap(ScalarAttribute discriminator) {
+    public EntityBuilder<P> entityDiscriminator$wrap(EntityDiscriminator entityDiscriminator) {
     	verifyMutable();
-    	this.discriminator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(discriminator).to(ScalarAttributeBuilder.class);
+    	this.entityDiscriminator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(entityDiscriminator).to(EntityDiscriminatorBuilder.class);
         return this;
     }
     
-    public EntityBuilder<P> discriminator$restoreFrom(BuilderRepository repo, Object builderId) {
+    public EntityBuilder<P> entityDiscriminator$restoreFrom(BuilderRepository repo, Object builderId) {
     	verifyMutable();
     	
         Object restoredObject = repo.get(builderId);
@@ -257,7 +257,62 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
         	if (repo.isSupportLazy()) {
         		repo.addObjectStoredListener(builderId, new Procedure() {
 					public void execute(Object... arguments) {
-						EntityBuilder.this.discriminator = (ScalarAttributeBuilder<?>)arguments[0];
+						EntityBuilder.this.entityDiscriminator = (EntityDiscriminatorBuilder<?>)arguments[0];
+					}
+				});
+        	}
+        	else {
+                throw new IllegalStateException("Object does not exist with id " + builderId);
+        	}
+        }
+        else if (!(restoredObject instanceof EntityDiscriminatorBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + EntityDiscriminatorBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
+        else {
+            this.entityDiscriminator = (EntityDiscriminatorBuilder<?>)restoredObject;
+        }
+        return this;
+    }
+
+	public EntityDiscriminatorBuilder<? extends EntityBuilder<P>> entityDiscriminator$begin() {
+		verifyMutable();
+		EntityDiscriminatorBuilder<EntityBuilder<P>> result = new EntityDiscriminatorBuilder<EntityBuilder<P>>(this);
+		this.entityDiscriminator = result;
+		return result;
+	}
+
+	private ScalarAttributeBuilder<?> version;
+	
+	public ScalarAttributeBuilder<?> getVersion() {
+		return version;
+	}
+
+	public void setVersion(ScalarAttributeBuilder<?> version) {
+		verifyMutable();
+		this.version = version;
+	}
+
+	public EntityBuilder<P> version(ScalarAttributeBuilder<?> version) {
+		verifyMutable();
+		this.version = version;
+		return this;
+	}
+
+    public EntityBuilder<P> version$wrap(ScalarAttribute version) {
+    	verifyMutable();
+    	this.version = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(version).to(ScalarAttributeBuilder.class);
+        return this;
+    }
+    
+    public EntityBuilder<P> version$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
+        	if (repo.isSupportLazy()) {
+        		repo.addObjectStoredListener(builderId, new Procedure() {
+					public void execute(Object... arguments) {
+						EntityBuilder.this.version = (ScalarAttributeBuilder<?>)arguments[0];
 					}
 				});
         	}
@@ -269,33 +324,16 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
         	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ScalarAttributeBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
         }
         else {
-            this.discriminator = (ScalarAttributeBuilder<?>)restoredObject;
+            this.version = (ScalarAttributeBuilder<?>)restoredObject;
         }
         return this;
     }
 
-	public ScalarAttributeBuilder<? extends EntityBuilder<P>> discriminator$begin() {
+	public ScalarAttributeBuilder<? extends EntityBuilder<P>> version$begin() {
 		verifyMutable();
 		ScalarAttributeBuilder<EntityBuilder<P>> result = new ScalarAttributeBuilder<EntityBuilder<P>>(this);
-		this.discriminator = result;
+		this.version = result;
 		return result;
-	}
-
-	private String discriminatorValue;
-	
-	public String getDiscriminatorValue() {
-		return discriminatorValue;
-	}
-
-	public void setDiscriminatorValue(String discriminatorValue) {
-		verifyMutable();
-		this.discriminatorValue = discriminatorValue;
-	}
-
-	public EntityBuilder<P> discriminatorValue(String discriminatorValue) {
-		verifyMutable();
-		this.discriminatorValue = discriminatorValue;
-		return this;
 	}
 
 	@Override

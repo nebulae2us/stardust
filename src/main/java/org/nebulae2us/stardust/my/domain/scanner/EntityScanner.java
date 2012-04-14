@@ -27,6 +27,9 @@ import java.util.Map;
 
 import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
+import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
@@ -34,6 +37,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
+import javax.persistence.Version;
 
 import org.nebulae2us.electron.Constants;
 import org.nebulae2us.electron.WrapConverter;
@@ -44,6 +48,7 @@ import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttributeBuilder;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
+import org.nebulae2us.stardust.my.domain.EntityDiscriminatorBuilder;
 import org.nebulae2us.stardust.my.domain.EntityIdentifierBuilder;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
 import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
@@ -154,8 +159,26 @@ public class EntityScanner {
 			return wrap;
 		}
 
-		EntityBuilder<?> rootEntity = null;
+		EntityBuilder<?> result = entity()
+				.declaringClass(entityClass)
+				;
+		
 		List<Class<?>> relatedClasses = extractRelatedClasses();
+
+		populateTableInheritance(result, relatedClasses);
+		
+		populateIdentifier(result, relatedClasses);
+		
+		scannedEntityBuilders.put(entityClass, result);
+		
+		populateAttributes(result, relatedClasses);
+
+		return result;
+	}
+
+	private void populateTableInheritance(EntityBuilder<?> result, List<Class<?>> relatedClasses) {
+		
+		EntityBuilder<?> rootEntity = null;
 		for (Class<?> relatedClass : relatedClasses) {
 			if (relatedClass != entityClass && relatedClass.getAnnotation(javax.persistence.Entity.class) != null) {
 				rootEntity = new EntityScanner(relatedClass, scannedEntityBuilders, scannedEntities).produceRaw();
@@ -165,25 +188,52 @@ public class EntityScanner {
 		Class<?> rootEntityClass = rootEntity != null ? rootEntity.getDeclaringClass() : entityClass;
 		InheritanceType inheritanceType = determineInheritanceType(rootEntityClass);
 		
-		EntityBuilder<?> result = entity()
-				.declaringClass(entityClass)
-				.linkedTableBundle(ScannerUtils.extractTableInfo(entityClass, rootEntityClass, inheritanceType))
-				.inheritanceType(inheritanceType)
-				.rootEntity(rootEntity)
-				;
+		result
+			.linkedTableBundle(ScannerUtils.extractTableInfo(entityClass, rootEntityClass, inheritanceType))
+			.inheritanceType(inheritanceType)
+			.rootEntity(rootEntity)
+			;
 		
 		if (rootEntity == null) {
 			rootEntity = result;
 			result.setRootEntity(rootEntity);
 		}
 		
-		populateIdentifier(result, relatedClasses);
-		
-		scannedEntityBuilders.put(entityClass, result);
-		
-		populateAttributes(result, relatedClasses);
-
-		return result;
+		if (inheritanceType == InheritanceType.JOINED) {
+			
+			EntityDiscriminatorBuilder<?> discriminator = result.entityDiscriminator$begin();
+			DiscriminatorColumn discriminatorColumn = rootEntityClass.getAnnotation(DiscriminatorColumn.class);
+			DiscriminatorValue discriminatorValue = this.entityClass.getAnnotation(DiscriminatorValue.class);
+			
+			DiscriminatorType discriminatorType = discriminatorColumn != null ? discriminatorColumn.discriminatorType() : DiscriminatorType.STRING;
+			
+			discriminator.column$begin()
+				.name(discriminatorColumn != null && ObjectUtils.notEmpty(discriminatorColumn.name()) ? discriminatorColumn.name().trim().toUpperCase() : "DTYPE")
+				.table(result.getLinkedTableBundle().getRoot().getTable())
+			.end();
+			
+			String value = discriminatorValue != null && ObjectUtils.notEmpty(discriminatorValue.value()) ? discriminatorValue.value() : this.entityClass.getSimpleName();
+			
+			switch (discriminatorType) {
+			case STRING:
+				discriminator.value(value);
+				break;
+			case CHAR:
+				discriminator.value(value.length() == 1 ? value.charAt(0) : value);
+				break;
+			case INTEGER:
+				try {
+					discriminator.value(Integer.valueOf(value));
+				}
+				catch (Exception e) {
+					discriminator.value(value);
+				}
+				break;
+			default:
+				throw new IllegalStateException("Unknown discriminatorType");
+			}
+			
+		}
 	}
 
 	private void populateAttributes(EntityBuilder<?> result,
@@ -203,7 +253,12 @@ public class EntityScanner {
 						continue;
 					}
 					
-					result.attributes(new ScalarAttributeScanner(result, field, "").produce());
+					ScalarAttributeBuilder<?> scalarAttribute = new ScalarAttributeScanner(result, field, "").produce();
+					result.attributes(scalarAttribute);
+					
+					if (field.getAnnotation(Version.class) != null) {
+						result.version(scalarAttribute);
+					}
 					
 				}
 				else if (field.getAnnotation(Embedded.class) != null || field.getAnnotation(EmbeddedId.class) != null || fieldClass.getAnnotation(Embeddable.class) != null) {
@@ -236,12 +291,7 @@ public class EntityScanner {
 						
 						EntityBuilder<?> subEntityBuilder = new EntityScanner(fieldSubClass, scannedEntityBuilders, scannedEntities).produceRaw();
 						
-						EntityAttributeBuilder<?> attributeBuilder = entityAttribute()
-								.fullName(field.getName())
-								.field(field)
-								.entity(subEntityBuilder)
-								.owningEntity(result)
-								;
+						EntityAttributeBuilder<?> attributeBuilder = new EntityAttributeScanner(result, field, subEntityBuilder).produce();
 						
 						result.attributes(attributeBuilder);
 					}

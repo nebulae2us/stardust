@@ -253,121 +253,121 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 		return this;
 	}
 
-	private List<AttributeBuilder<?>> attributes;
+	private List<AttributeBuilder<?>> owningSideAttributes;
 	
-	public List<AttributeBuilder<?>> getAttributes() {
-		return attributes;
+	public List<AttributeBuilder<?>> getOwningSideAttributes() {
+		return owningSideAttributes;
 	}
 
-	public void setAttributes(List<AttributeBuilder<?>> attributes) {
+	public void setOwningSideAttributes(List<AttributeBuilder<?>> owningSideAttributes) {
 		verifyMutable();
-		this.attributes = attributes;
+		this.owningSideAttributes = owningSideAttributes;
 	}
 
-	public LinkedTableEntityBuilder<P> attributes(AttributeBuilder<?> ... attributes) {
+	public LinkedTableEntityBuilder<P> owningSideAttributes(AttributeBuilder<?> ... owningSideAttributes) {
 		verifyMutable();
-		return attributes(new ListBuilder<AttributeBuilder<?>>().add(attributes).toList());
+		return owningSideAttributes(new ListBuilder<AttributeBuilder<?>>().add(owningSideAttributes).toList());
 	}
 	
-	public LinkedTableEntityBuilder<P> attributes(Collection<AttributeBuilder<?>> attributes) {
+	public LinkedTableEntityBuilder<P> owningSideAttributes(Collection<AttributeBuilder<?>> owningSideAttributes) {
 		verifyMutable();
-		if (this.attributes == null) {
-			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		if (this.owningSideAttributes == null) {
+			this.owningSideAttributes = new ArrayList<AttributeBuilder<?>>();
 		}
-		if (attributes != null) {
-			for (AttributeBuilder<?> e : attributes) {
-				CollectionUtils.addItem(this.attributes, e);
+		if (owningSideAttributes != null) {
+			for (AttributeBuilder<?> e : owningSideAttributes) {
+				CollectionUtils.addItem(this.owningSideAttributes, e);
 			}
 		}
 		return this;
 	}
 
-	public AttributeBuilder<? extends LinkedTableEntityBuilder<P>> attributes$addAttribute() {
+	public AttributeBuilder<? extends LinkedTableEntityBuilder<P>> owningSideAttributes$addAttribute() {
 		verifyMutable();
-		if (this.attributes == null) {
-			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		if (this.owningSideAttributes == null) {
+			this.owningSideAttributes = new ArrayList<AttributeBuilder<?>>();
 		}
 		
 		AttributeBuilder<LinkedTableEntityBuilder<P>> result =
 				new AttributeBuilder<LinkedTableEntityBuilder<P>>(this);
 		
-		CollectionUtils.addItem(this.attributes, result);
+		CollectionUtils.addItem(this.owningSideAttributes, result);
 		
 		return result;
 	}
 	
-	public EntityAttributeBuilder<? extends LinkedTableEntityBuilder<P>> attributes$addEntityAttribute() {
+	public EntityAttributeBuilder<? extends LinkedTableEntityBuilder<P>> owningSideAttributes$addEntityAttribute() {
 		verifyMutable();
-		if (this.attributes == null) {
-			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		if (this.owningSideAttributes == null) {
+			this.owningSideAttributes = new ArrayList<AttributeBuilder<?>>();
 		}
 		
 		EntityAttributeBuilder<LinkedTableEntityBuilder<P>> result =
 				new EntityAttributeBuilder<LinkedTableEntityBuilder<P>>(this);
 		
-		CollectionUtils.addItem(this.attributes, result);
+		CollectionUtils.addItem(this.owningSideAttributes, result);
 		
 		return result;
 	}
 	
-	public ScalarAttributeBuilder<? extends LinkedTableEntityBuilder<P>> attributes$addScalarAttribute() {
+	public ScalarAttributeBuilder<? extends LinkedTableEntityBuilder<P>> owningSideAttributes$addScalarAttribute() {
 		verifyMutable();
-		if (this.attributes == null) {
-			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		if (this.owningSideAttributes == null) {
+			this.owningSideAttributes = new ArrayList<AttributeBuilder<?>>();
 		}
 		
 		ScalarAttributeBuilder<LinkedTableEntityBuilder<P>> result =
 				new ScalarAttributeBuilder<LinkedTableEntityBuilder<P>>(this);
 		
-		CollectionUtils.addItem(this.attributes, result);
+		CollectionUtils.addItem(this.owningSideAttributes, result);
 		
 		return result;
 	}
 	
-	public ValueObjectAttributeBuilder<? extends LinkedTableEntityBuilder<P>> attributes$addValueObjectAttribute() {
+	public ValueObjectAttributeBuilder<? extends LinkedTableEntityBuilder<P>> owningSideAttributes$addValueObjectAttribute() {
 		verifyMutable();
-		if (this.attributes == null) {
-			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		if (this.owningSideAttributes == null) {
+			this.owningSideAttributes = new ArrayList<AttributeBuilder<?>>();
 		}
 		
 		ValueObjectAttributeBuilder<LinkedTableEntityBuilder<P>> result =
 				new ValueObjectAttributeBuilder<LinkedTableEntityBuilder<P>>(this);
 		
-		CollectionUtils.addItem(this.attributes, result);
+		CollectionUtils.addItem(this.owningSideAttributes, result);
 		
 		return result;
 	}
 	
 
-	public class Attributes$$$builder<P1 extends LinkedTableEntityBuilder<P>> {
+	public class OwningSideAttributes$$$builder<P1 extends LinkedTableEntityBuilder<P>> {
 	
 		private final P1 $$$parentBuilder1;
 	
-		protected Attributes$$$builder(P1 parentBuilder) {
+		protected OwningSideAttributes$$$builder(P1 parentBuilder) {
 			this.$$$parentBuilder1 = parentBuilder;
 		}
 
-		public AttributeBuilder<Attributes$$$builder<P1>> attribute$begin() {
-			AttributeBuilder<Attributes$$$builder<P1>> result = new AttributeBuilder<Attributes$$$builder<P1>>(this);
-			CollectionUtils.addItem(LinkedTableEntityBuilder.this.attributes, result);
+		public AttributeBuilder<OwningSideAttributes$$$builder<P1>> attribute$begin() {
+			AttributeBuilder<OwningSideAttributes$$$builder<P1>> result = new AttributeBuilder<OwningSideAttributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(LinkedTableEntityBuilder.this.owningSideAttributes, result);
 			return result;
 		}
 		
-		public EntityAttributeBuilder<Attributes$$$builder<P1>> entityAttribute$begin() {
-			EntityAttributeBuilder<Attributes$$$builder<P1>> result = new EntityAttributeBuilder<Attributes$$$builder<P1>>(this);
-			CollectionUtils.addItem(LinkedTableEntityBuilder.this.attributes, result);
+		public EntityAttributeBuilder<OwningSideAttributes$$$builder<P1>> entityAttribute$begin() {
+			EntityAttributeBuilder<OwningSideAttributes$$$builder<P1>> result = new EntityAttributeBuilder<OwningSideAttributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(LinkedTableEntityBuilder.this.owningSideAttributes, result);
 			return result;
 		}
 		
-		public ScalarAttributeBuilder<Attributes$$$builder<P1>> scalarAttribute$begin() {
-			ScalarAttributeBuilder<Attributes$$$builder<P1>> result = new ScalarAttributeBuilder<Attributes$$$builder<P1>>(this);
-			CollectionUtils.addItem(LinkedTableEntityBuilder.this.attributes, result);
+		public ScalarAttributeBuilder<OwningSideAttributes$$$builder<P1>> scalarAttribute$begin() {
+			ScalarAttributeBuilder<OwningSideAttributes$$$builder<P1>> result = new ScalarAttributeBuilder<OwningSideAttributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(LinkedTableEntityBuilder.this.owningSideAttributes, result);
 			return result;
 		}
 		
-		public ValueObjectAttributeBuilder<Attributes$$$builder<P1>> valueObjectAttribute$begin() {
-			ValueObjectAttributeBuilder<Attributes$$$builder<P1>> result = new ValueObjectAttributeBuilder<Attributes$$$builder<P1>>(this);
-			CollectionUtils.addItem(LinkedTableEntityBuilder.this.attributes, result);
+		public ValueObjectAttributeBuilder<OwningSideAttributes$$$builder<P1>> valueObjectAttribute$begin() {
+			ValueObjectAttributeBuilder<OwningSideAttributes$$$builder<P1>> result = new ValueObjectAttributeBuilder<OwningSideAttributes$$$builder<P1>>(this);
+			CollectionUtils.addItem(LinkedTableEntityBuilder.this.owningSideAttributes, result);
 			return result;
 		}
 		
@@ -377,42 +377,42 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 		}
 	}
 	
-	public Attributes$$$builder<? extends LinkedTableEntityBuilder<P>> attributes$list() {
+	public OwningSideAttributes$$$builder<? extends LinkedTableEntityBuilder<P>> owningSideAttributes$list() {
 		verifyMutable();
-		if (this.attributes == null) {
-			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		if (this.owningSideAttributes == null) {
+			this.owningSideAttributes = new ArrayList<AttributeBuilder<?>>();
 		}
-		return new Attributes$$$builder<LinkedTableEntityBuilder<P>>(this);
+		return new OwningSideAttributes$$$builder<LinkedTableEntityBuilder<P>>(this);
 	}
 
-    public LinkedTableEntityBuilder<P> attributes$wrap(Attribute ... attributes) {
-    	return attributes$wrap(new ListBuilder<Attribute>().add(attributes).toList());
+    public LinkedTableEntityBuilder<P> owningSideAttributes$wrap(Attribute ... owningSideAttributes) {
+    	return owningSideAttributes$wrap(new ListBuilder<Attribute>().add(owningSideAttributes).toList());
     }
 
-    public LinkedTableEntityBuilder<P> attributes$wrap(Collection<? extends Attribute> attributes) {
+    public LinkedTableEntityBuilder<P> owningSideAttributes$wrap(Collection<? extends Attribute> owningSideAttributes) {
 		verifyMutable();
 
-		if (this.attributes == null) {
-			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		if (this.owningSideAttributes == null) {
+			this.owningSideAttributes = new ArrayList<AttributeBuilder<?>>();
 		}
-		if (attributes != null) {
-			for (Attribute e : attributes) {
+		if (owningSideAttributes != null) {
+			for (Attribute e : owningSideAttributes) {
 				AttributeBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AttributeBuilder.class);
-				CollectionUtils.addItem(this.attributes, wrapped);
+				CollectionUtils.addItem(this.owningSideAttributes, wrapped);
 			}
 		}
 		return this;
     }
     
-    public LinkedTableEntityBuilder<P> attributes$restoreFrom(BuilderRepository repo, Object ... builderIds) {
-    	return attributes$restoreFrom(repo, new ListBuilder<Object>().add(builderIds).toList());
+    public LinkedTableEntityBuilder<P> owningSideAttributes$restoreFrom(BuilderRepository repo, Object ... builderIds) {
+    	return owningSideAttributes$restoreFrom(repo, new ListBuilder<Object>().add(builderIds).toList());
     }
 
-    public LinkedTableEntityBuilder<P> attributes$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
+    public LinkedTableEntityBuilder<P> owningSideAttributes$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
 		verifyMutable();
 
-		if (this.attributes == null) {
-			this.attributes = new ArrayList<AttributeBuilder<?>>();
+		if (this.owningSideAttributes == null) {
+			this.owningSideAttributes = new ArrayList<AttributeBuilder<?>>();
 		}
 		if (builderIds != null) {
 	    	for (Object builderId : builderIds) {
@@ -421,7 +421,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	            	if (repo.isSupportLazy()) {
 	            		repo.addObjectStoredListener(builderId, new Procedure() {
 	    					public void execute(Object... arguments) {
-	    						CollectionUtils.addItem(LinkedTableEntityBuilder.this.attributes, arguments[0]);
+	    						CollectionUtils.addItem(LinkedTableEntityBuilder.this.owningSideAttributes, arguments[0]);
 	    					}
 	    				});
 	            	}
@@ -433,7 +433,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + AttributeBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
 	            }
 	            else {
-	                CollectionUtils.addItem(this.attributes, restoredObject);
+	                CollectionUtils.addItem(this.owningSideAttributes, restoredObject);
 	            }
 	    	}
 		}

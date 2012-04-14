@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.nebulae2us.electron.Mirror;
-import org.nebulae2us.electron.util.EqualityComparator;
 import org.nebulae2us.electron.util.ImmutableList;
 
 import static org.nebulae2us.stardust.Builders.*;
@@ -32,7 +31,6 @@ import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
-import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 
 /**
  * @author Trung Phan
@@ -104,7 +102,7 @@ public class SelectQuery {
 		
 		for (LinkedEntity linkedEntity : linkedEntityBundle.getLinkedEntities()) {
 			LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle = buildLinkedTableEntityBundle(entityRepository, linkedEntity.getEntity().getDeclaringClass());
-			populateAlias(linkedTableEntityBundle, linkedEntity.getAlias(), linkedEntityBundle.getRecommendedDefaultAlias());
+			populateAlias(linkedTableEntityBundle, linkedEntity.getAlias(), linkedEntityBundle);
 			
 			LinkedTableEntityBuilder<?> linkedTableEntity = linkedTableEntityBundle.getRoot();
 
@@ -134,20 +132,55 @@ public class SelectQuery {
 	 * @param alias
 	 * @param recommendedDefaultAlias
 	 */
-	private void populateAlias(
-			LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle,
-			String alias, String tableAlias) {
+	private void populateAlias(LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle, String alias, LinkedEntityBundle linkedEntityBundle) {
 
+		ImmutableList<String> aliases = linkedEntityBundle.getAliases().elementToLowerCase();
+		String tableAlias = alias;
+		if (tableAlias.length() == 0) {
+			tableAlias = getDefaultAlias(aliases);
+		}
+		
 		int i = 0;
 		for (LinkedTableEntityBuilder<?> linkedTableEntity : linkedTableEntityBundle.getLinkedTableEntities()) {
+			
 			linkedTableEntity
 				.alias(alias)
 				.tableAlias(i == 0 ? tableAlias : tableAlias + i)
 			;
-			
-			i++;
+
+			while (true) {
+				i++;
+				String nextUnsedAlias = tableAlias + i;
+				if (!aliases.contains(nextUnsedAlias)) {
+					break;
+				}
+			}
+
 		}
 		
+	}
+
+	private String getDefaultAlias(ImmutableList<String> aliases) {
+		if (!aliases.contains("b")) {
+			return "b";
+		}
+
+		for (char c = 'a'; c  <= 'z'; c++) {
+			if (!aliases.contains(c)) {
+				return String.valueOf(c);
+			}
+		}
+
+		for (char c = 'a'; c  <= 'z'; c++) {
+			for (char c2 = 'a'; c2 <= 'z'; c2++) {
+				String newAlias = "" + c + c2;
+				if (!aliases.contains(newAlias)) {
+					return newAlias;
+				}
+			}
+		}		
+
+		throw new IllegalStateException("Cannot find unused alias");
 	}
 
 	private LinkedTableEntityBundleBuilder<?> buildLinkedTableEntityBundle(EntityRepository entityRepository, Class<?> entityClass) {
@@ -165,8 +198,7 @@ public class SelectQuery {
 				.linkedTableEntities$addLinkedTableEntity()
 					.table$wrap(primaryTable)
 					.entity$wrap(entity)
-					.attributes$wrap(entity.getScalarAttributes(primaryTable))
-					.attributes$wrap(entity.getOwningSideEntityAttributes(primaryTable))
+					.owningSideAttributes$wrap(entity.getOwningSideAttributes(primaryTable))
 				.end()
 				;
 		
@@ -182,8 +214,7 @@ public class SelectQuery {
 				.parent(linkedTable2LinkedTableEntity.get(linkedTable.getParent()))
 				.table$wrap(secondaryTable)
 				.entity$wrap(entity)
-				.attributes$wrap(entity.getScalarAttributes(secondaryTable))
-				.attributes$wrap(entity.getOwningSideEntityAttributes(secondaryTable))
+				.owningSideAttributes$wrap(entity.getOwningSideAttributes(secondaryTable))
 				.columns$wrap(linkedTable.getColumns())
 				.parentColumns$wrap(linkedTable.getParentColumns())
 				.joinType(linkedTable.getJoinType())
@@ -197,30 +228,30 @@ public class SelectQuery {
 		for (Entity subEntity : subEntities) {
 			
 			for (LinkedTable subLinkedTable : subEntity.getLinkedTableBundle().getLinkedTables()) {
-				ImmutableList<ScalarAttribute> subScalarAttributes = subEntity.getScalarAttributes(subLinkedTable.getTable());
-				ImmutableList<ScalarAttribute> scalarAttributes = subEntity.getScalarAttributes(subLinkedTable.getTable());
-				if (subScalarAttributes.size() > 0) {
-					if (scalarAttributes.size() == 0) {
+				ImmutableList<Attribute> subOwningSideAttributes = subEntity.getOwningSideAttributes(subLinkedTable.getTable());
+				ImmutableList<Attribute> owningSideAttributes = entity.getOwningSideAttributes(subLinkedTable.getTable());
+				if (subOwningSideAttributes.size() > 0) {
+					if (owningSideAttributes.size() == 0) {
 						result.linkedTableEntities$addLinkedTableEntity()
 							.table$wrap(subLinkedTable.getTable())
 							.entity$wrap(subEntity)
 							.parent(result.getRoot())
-							.attributes$wrap(subScalarAttributes)
+							.owningSideAttributes$wrap(subOwningSideAttributes)
 							.columns$wrap(subLinkedTable.getColumns())
 							.parentColumns$wrap(subLinkedTable.getParentColumns())
 							.joinType(subLinkedTable.getJoinType())
 						.end();
 					}
 					else {
-						subScalarAttributes = subScalarAttributes
-								.changeComparator(Attribute.COMPARATOR_BY_NAME).minus(entity.getScalarAttributes(subLinkedTable.getTable()));
+						subOwningSideAttributes = subOwningSideAttributes
+								.changeComparator(Attribute.COMPARATOR_BY_NAME).minus(owningSideAttributes);
 						
-						if (subScalarAttributes.size() > 0) {
+						if (subOwningSideAttributes.size() > 0) {
 							for (Entry<LinkedTable, LinkedTableEntityBuilder<?>> entry : linkedTable2LinkedTableEntity.entrySet()) {
 								LinkedTable linkedTable = entry.getKey();
 								if (linkedTable.getTable().equals(subLinkedTable.getTable())) {
 									LinkedTableEntityBuilder<?> linkedTableEntity = entry.getValue();
-									linkedTableEntity.attributes$wrap(subScalarAttributes);
+									linkedTableEntity.owningSideAttributes$wrap(subOwningSideAttributes);
 								}
 							}
 						}

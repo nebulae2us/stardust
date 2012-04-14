@@ -47,6 +47,7 @@ public class GenerateBuilders {
 					Entity.class,
 					EntityAttribute.class,
 					EntityIdentifier.class,
+					EntityDiscriminator.class,
 					ScalarAttribute.class,
 					ValueObject.class,
 					ValueObjectAttribute.class,

@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.nebulae2us.electron.*;
+import org.nebulae2us.electron.util.ImmutableList;
+import org.nebulae2us.electron.util.Immutables;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -31,11 +33,11 @@ public class LinkedTable {
 
 	private final LinkedTable parent;
 	
-	private final List<Column> parentColumns;
+	private final ImmutableList<Column> parentColumns;
 	
 	private final Table table;
 	
-	private final List<Column> columns;
+	private final ImmutableList<Column> columns;
 	
 	private final JoinType joinType;
 	
@@ -43,9 +45,9 @@ public class LinkedTable {
 		mirror.bind(this);
 		
 		this.parent = mirror.to(LinkedTable.class, "parent");
-		this.parentColumns = mirror.toListOf(Column.class, "parentColumns");
+		this.parentColumns = Immutables.$(mirror.toListOf(Column.class, "parentColumns"));
 		this.table = mirror.to(Table.class, "table");
-		this.columns = mirror.toListOf(Column.class, "columns");
+		this.columns = Immutables.$(mirror.toListOf(Column.class, "columns"));
 		this.joinType = mirror.to(JoinType.class, "joinType");
 		
 		assertInvariant();
@@ -85,7 +87,7 @@ public class LinkedTable {
 		return parent;
 	}
 
-	public List<Column> getParentColumns() {
+	public ImmutableList<Column> getParentColumns() {
 		return parentColumns;
 	}
 
@@ -93,7 +95,7 @@ public class LinkedTable {
 		return table;
 	}
 
-	public List<Column> getColumns() {
+	public ImmutableList<Column> getColumns() {
 		return columns;
 	}
 

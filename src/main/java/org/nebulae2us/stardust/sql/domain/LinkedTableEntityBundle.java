@@ -68,9 +68,17 @@ public class LinkedTableEntityBundle {
 		result.append("select ");
 		
 		for (LinkedTableEntity linkedTableEntity : this.linkedTableEntities) {
-			Set<Column> columns = new LinkedHashSet<Column>();
 			
-			for (Attribute attribute : linkedTableEntity.getAttributes()) {
+			Set<Column> columns = new LinkedHashSet<Column>();
+
+			if (linkedTableEntity.getEntity().getEntityDiscriminator() != null) {
+				Column column = linkedTableEntity.getEntity().getEntityDiscriminator().getColumn();
+				if (column.getTable().equals(linkedTableEntity.getTable())) {
+					columns.add(column);
+				}
+			}
+			
+			for (Attribute attribute : linkedTableEntity.getOwningSideAttributes()) {
 				if (attribute instanceof ScalarAttribute) {
 					ScalarAttribute scalarAttribute = (ScalarAttribute)attribute;
 					columns.add(scalarAttribute.getColumn());

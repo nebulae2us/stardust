@@ -32,9 +32,9 @@ public class Entity extends AttributeHolder {
 	
 	private final InheritanceType inheritanceType;
 	
-	private final ScalarAttribute discriminator;
+	private final EntityDiscriminator entityDiscriminator;
 	
-	private final String discriminatorValue;
+	private final ScalarAttribute version;
 	
 	public Entity(Mirror mirror) {
 		super(mirror);
@@ -44,8 +44,8 @@ public class Entity extends AttributeHolder {
 		this.entityIdentifier = mirror.to(EntityIdentifier.class, "entityIdentifier");
 		this.rootEntity = mirror.to(Entity.class, "rootEntity");
 		this.inheritanceType = mirror.to(InheritanceType.class, "inheritanceType");
-		this.discriminator = mirror.to(ScalarAttribute.class, "discriminator");
-		this.discriminatorValue = mirror.toString("discriminatorValue");
+		this.entityDiscriminator = mirror.to(EntityDiscriminator.class, "entityDiscriminator");
+		this.version = mirror.to(ScalarAttribute.class, "version");
 	}
 
 	public EntityIdentifier getEntityIdentifier() {
@@ -56,12 +56,8 @@ public class Entity extends AttributeHolder {
 		return rootEntity;
 	}
 
-	public ScalarAttribute getDiscriminator() {
-		return discriminator;
-	}
-
-	public String getDiscriminatorValue() {
-		return discriminatorValue;
+	public EntityDiscriminator getEntityDiscriminator() {
+		return entityDiscriminator;
 	}
 
 	public InheritanceType getInheritanceType() {
@@ -91,6 +87,10 @@ public class Entity extends AttributeHolder {
 
 	public LinkedTableBundle getLinkedTableBundle() {
 		return linkedTableBundle;
+	}
+
+	public ScalarAttribute getVersion() {
+		return version;
 	}
 
 	

@@ -81,8 +81,8 @@ public class AttributeHolder {
 	 * @param table
 	 * @return
 	 */
-	public ImmutableList<ScalarAttribute> getScalarAttributes(Table table) {
-		List<ScalarAttribute> result = new ArrayList<ScalarAttribute>();
+	public ImmutableList<Attribute> getOwningSideAttributes(Table table) {
+		List<Attribute> result = new ArrayList<Attribute>();
 		
 		for (Attribute attribute : this.attributes) {
 			if (attribute instanceof ScalarAttribute) {
@@ -101,9 +101,17 @@ public class AttributeHolder {
 					}
 				}
 			}
+			else if (attribute instanceof EntityAttribute) {
+				EntityAttribute entityAttribute = (EntityAttribute)attribute;
+				if (entityAttribute.isOwningSide()) {
+					if (entityAttribute.getLeftColumns().get(0).getTable().equals(table)) {
+						result.add(entityAttribute);
+					}
+				}
+			}
 		}
 		
-		return new ImmutableList<ScalarAttribute>(result);
+		return new ImmutableList<Attribute>(result);
 
 	}
 	
@@ -127,24 +135,5 @@ public class AttributeHolder {
 		return new ImmutableList<EntityAttribute>(result);
 
 	}
-
-	public ImmutableList<EntityAttribute> getOwningSideEntityAttributes(Table table) {
-		List<EntityAttribute> result = new ArrayList<EntityAttribute>();
-		
-		for (Attribute attribute : this.attributes) {
-			if (attribute instanceof EntityAttribute) {
-				EntityAttribute entityAttribute = (EntityAttribute)attribute;
-				if (entityAttribute.isOwningSide()) {
-					if (entityAttribute.getLeftColumns().get(0).getTable().equals(table)) {
-						result.add(entityAttribute);
-					}
-				}
-			}
-		}
-		
-		return new ImmutableList<EntityAttribute>(result);
-
-	}
-
 
 }

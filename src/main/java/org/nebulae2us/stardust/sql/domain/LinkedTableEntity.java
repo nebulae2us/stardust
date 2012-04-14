@@ -24,7 +24,6 @@ import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
-import org.nebulae2us.stardust.my.domain.RelationalType;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
@@ -45,7 +44,7 @@ public class LinkedTableEntity {
 	
 	private final String tableAlias; // in most case, alias == tableAlias, only when there is joined inheritance or secondary table, then they are different
 	
-	private final List<Attribute> attributes;
+	private final List<Attribute> owningSideAttributes;
 	
 	private final List<Column> parentColumns;
 	
@@ -61,7 +60,7 @@ public class LinkedTableEntity {
 		this.entity = mirror.to(Entity.class, "entity");
 		this.tableAlias = mirror.toString("tableAlias");
 		this.alias = mirror.toString("alias");
-		this.attributes = mirror.toListOf(Attribute.class, "attributes");
+		this.owningSideAttributes = mirror.toListOf(Attribute.class, "owningSideAttributes");
 		
 		this.parentColumns = mirror.toListOf(Column.class, "parentColumns");
 		this.columns = mirror.toListOf(Column.class, "columns");
@@ -99,12 +98,12 @@ public class LinkedTableEntity {
 
 		}
 		
-		for (Attribute attribute : this.attributes) {
-			if (attribute instanceof ScalarAttribute) {
-				Assert.isTrue(this.table.equals(((ScalarAttribute)attribute).getColumn().getTable()), "Invalid scalarAttributes.");
+		for (Attribute owningSideAttribute : this.owningSideAttributes) {
+			if (owningSideAttribute instanceof ScalarAttribute) {
+				Assert.isTrue(this.table.equals(((ScalarAttribute)owningSideAttribute).getColumn().getTable()), "Invalid scalarAttributes.");
 			}
-			else if (attribute instanceof EntityAttribute) {
-				EntityAttribute entityAttribute = (EntityAttribute)attribute;
+			else if (owningSideAttribute instanceof EntityAttribute) {
+				EntityAttribute entityAttribute = (EntityAttribute)owningSideAttribute;
 				Assert.isTrue(entityAttribute.isOwningSide(), "invalide entity Attribute");
 			}
 		}
@@ -131,8 +130,8 @@ public class LinkedTableEntity {
 		return tableAlias;
 	}
 
-	public List<Attribute> getAttributes() {
-		return attributes;
+	public List<Attribute> getOwningSideAttributes() {
+		return owningSideAttributes;
 	}
 
 	public List<Column> getParentColumns() {

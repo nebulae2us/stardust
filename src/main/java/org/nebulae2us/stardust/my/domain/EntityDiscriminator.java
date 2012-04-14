@@ -13,26 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust;
+package org.nebulae2us.stardust.my.domain;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-import org.nebulae2us.stardust.my.domain.Group1EntityRepositoryTest;
-import org.nebulae2us.stardust.sql.domain.LinkedEntityBundleTest;
-import org.nebulae2us.stardust.sql.domain.SelectQueryTest;
+import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.stardust.db.domain.Column;
 
 /**
  * @author Trung Phan
  *
  */
-@RunWith(Suite.class)
-@SuiteClasses({
-	Group1EntityRepositoryTest.class, 
-	LinkedEntityBundleTest.class, 
-	SelectQueryTest.class})
-public class AllTests {
-	
-	
+public class EntityDiscriminator {
 
+	private final Column column;
+	
+	private final Object value;
+	
+	public EntityDiscriminator(Mirror mirror) {
+		mirror.bind(this);
+		
+		this.column = mirror.to(Column.class, "column");
+		this.value = mirror.toObject("value");
+	}
+
+	public Column getColumn() {
+		return column;
+	}
+
+	public Object getValue() {
+		return value;
+	}
+	
 }

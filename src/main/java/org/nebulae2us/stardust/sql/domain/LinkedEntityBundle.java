@@ -88,31 +88,6 @@ public class LinkedEntityBundle {
 		return result.toList();
 	}
 	
-	public String getRecommendedDefaultAlias() {
-		if (getRoot().getAlias().length() > 0) {
-			return getRoot().getAlias();
-		}
-		
-		List<String> aliases = getAliases();
-		
-		for (char c = 'a'; c  <= 'z'; c++) {
-			if (!aliases.contains(c)) {
-				return String.valueOf(c);
-			}
-		}
-		
-		for (char c = 'a'; c  <= 'z'; c++) {
-			for (char c2 = 'a'; c2 <= 'z'; c2++) {
-				String newAlias = "" + c + c2;
-				if (!aliases.contains(newAlias)) {
-					return newAlias;
-				}
-			}
-		}		
-		
-		return "base";
-	}
-
 	public static LinkedEntityBundle newInstance(final Entity entity, final String initialAlias, final List<AliasJoin> aliasJoins) {
 		
 		Assert.notNull(entity, "entity cannot be null");
