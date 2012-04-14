@@ -148,6 +148,8 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
      * 
      */
      
-     
+     public String getName() {
+    	 return this.field.getName();
+     }
      
 }

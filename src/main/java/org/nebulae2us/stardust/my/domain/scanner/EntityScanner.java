@@ -43,6 +43,7 @@ import org.nebulae2us.electron.Constants;
 import org.nebulae2us.electron.WrapConverter;
 import org.nebulae2us.electron.internal.util.ClassUtils;
 import org.nebulae2us.stardust.Builders;
+import org.nebulae2us.stardust.db.domain.ColumnBuilder;
 import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Entity;
@@ -236,9 +237,14 @@ public class EntityScanner {
 		}
 	}
 
-	private void populateAttributes(EntityBuilder<?> result,
-			List<Class<?>> relatedClasses) {
+	private void populateAttributes(EntityBuilder<?> result, List<Class<?>> relatedClasses) {
+		
+		AttributeOverrideScanner globalAttributeOverrideScanner = new AttributeOverrideScanner();
+		
 		for (Class<?> relatedClass : relatedClasses) {
+			
+			globalAttributeOverrideScanner = globalAttributeOverrideScanner.combine(result.getLinkedTableBundle().getRoot().getTable().getName(), 
+					relatedClass.getAnnotation(AttributeOverride.class), relatedClass.getAnnotation(AttributeOverrides.class), false);
 			
 			for (Field field : relatedClass.getDeclaredFields()) {
 				
@@ -254,6 +260,12 @@ public class EntityScanner {
 					}
 					
 					ScalarAttributeBuilder<?> scalarAttribute = new ScalarAttributeScanner(result, field, "").produce();
+					
+					if (globalAttributeOverrideScanner.getColumns().containsKey(scalarAttribute.getName())) {
+						ColumnBuilder<?> column = globalAttributeOverrideScanner.getColumns().get(scalarAttribute.getName());
+						scalarAttribute.column(column);
+					}
+					
 					result.attributes(scalarAttribute);
 					
 					if (field.getAnnotation(Version.class) != null) {
@@ -266,9 +278,8 @@ public class EntityScanner {
 						continue;
 					}
 					
-					AttributeOverrideScanner attributeOverrideAnnots = new AttributeOverrideScanner(result, field.getAnnotation(AttributeOverride.class), field.getAnnotation(AttributeOverrides.class));
-
-					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass, field.getName(), attributeOverrideAnnots).produce();
+					AttributeOverrideScanner attributeOverrideScanner = globalAttributeOverrideScanner.sub(field.getName()).combine(result.getLinkedTableBundle().getRoot().getTable().getName(), field.getAnnotation(AttributeOverride.class), field.getAnnotation(AttributeOverrides.class), true);
+					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass, field.getName(), attributeOverrideScanner).produce();
 					
 					ValueObjectAttributeBuilder<?> attributeBuilder = valueObjectAttribute()
 							.fullName(field.getName())
@@ -343,9 +354,9 @@ public class EntityScanner {
 								entityIdentifierBuilder = Builders.entityIdentifier();
 							}
 
-							AttributeOverrideScanner attributeOverrideAnnots = new AttributeOverrideScanner(result, field.getAnnotation(AttributeOverride.class), field.getAnnotation(AttributeOverrides.class));
+							AttributeOverrideScanner attributeOverrideScanner = new AttributeOverrideScanner(result, field.getAnnotation(AttributeOverride.class), field.getAnnotation(AttributeOverrides.class));
 
-							ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass, field.getName(), attributeOverrideAnnots).produce();
+							ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass, field.getName(), attributeOverrideScanner).produce();
 							
 							ValueObjectAttributeBuilder<?> attributeBuilder = valueObjectAttribute()
 									.fullName(field.getName())

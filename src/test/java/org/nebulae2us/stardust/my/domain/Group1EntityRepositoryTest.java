@@ -180,6 +180,16 @@ public class Group1EntityRepositoryTest {
 	}
 	
 	@Test
+	public void passport_version_override() {
+		Entity passport = entityRepository.getEntity(Passport.class);
+		ScalarAttribute attribute = (ScalarAttribute)passport.getAttribute("version");
+		
+		assertNotNull(attribute);
+		assertEquals("PASSPORT_VERSION", attribute.getColumn().getName());
+		assertEquals("PASSPORT", attribute.getColumn().getTable().getName());
+	}
+	
+	@Test
 	public void room_to_house_many_to_one() {
 		
 		Entity room = entityRepository.getEntity(Room.class);
@@ -257,5 +267,42 @@ public class Group1EntityRepositoryTest {
 		
 	}
 	
-	
+	@Test
+	public void passport_to_person_one_to_one() {
+		Entity passport = entityRepository.getEntity(Passport.class);
+		
+		EntityAttribute attribute = (EntityAttribute)passport.getAttribute("owner");
+		
+		assertEquals(RelationalType.ONE_TO_ONE, attribute.getRelationalType());
+		assertEquals(JoinType.INNER_JOIN, attribute.getJoinType());
+		
+		assertEquals(Arrays.asList("OWNER_SSN", "OWNER_DATE_BORN"), attribute.getLeftColumns().toList(EXTRACT_COLUMN_NAME));
+		assertEquals(Arrays.asList("PASSPORT", "PASSPORT"), attribute.getLeftColumns().toList(EXTRACT_TABLE_NAME));
+
+		assertEquals(Arrays.asList("SSN", "DATE_BORN"), attribute.getRightColumns().toList(EXTRACT_COLUMN_NAME));
+		assertEquals(Arrays.asList("PERSON", "PERSON"), attribute.getRightColumns().toList(EXTRACT_TABLE_NAME));
+		
+		assertEquals(0, attribute.getJunctionLeftColumns().size());
+		assertEquals(0, attribute.getJunctionRightColumns().size());
+	}
+
+	@Test
+	public void person_to_passport_one_to_one() {
+		Entity person = entityRepository.getEntity(Person.class);
+		
+		EntityAttribute attribute = (EntityAttribute)person.getAttribute("passport");
+		
+		assertEquals(RelationalType.ONE_TO_ONE, attribute.getRelationalType());
+		assertEquals(JoinType.LEFT_JOIN, attribute.getJoinType());
+		
+		assertEquals(Arrays.asList("SSN", "DATE_BORN"), attribute.getLeftColumns().toList(EXTRACT_COLUMN_NAME));
+		assertEquals(Arrays.asList("PERSON", "PERSON"), attribute.getLeftColumns().toList(EXTRACT_TABLE_NAME));
+
+		assertEquals(Arrays.asList("OWNER_SSN", "OWNER_DATE_BORN"), attribute.getRightColumns().toList(EXTRACT_COLUMN_NAME));
+		assertEquals(Arrays.asList("PASSPORT", "PASSPORT"), attribute.getRightColumns().toList(EXTRACT_TABLE_NAME));
+
+		assertEquals(0, attribute.getJunctionLeftColumns().size());
+		assertEquals(0, attribute.getJunctionRightColumns().size());
+	}
+
 }

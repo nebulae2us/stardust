@@ -26,6 +26,7 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.nebulae2us.electron.util.ImmutableList;
 import org.nebulae2us.electron.util.ListBuilder;
@@ -126,6 +127,69 @@ public class EntityAttributeScanner {
 				}
 				
 			}
+		}
+		else if (this.field.getAnnotation(OneToOne.class) != null) {
+			OneToOne oneToOne = this.field.getAnnotation(OneToOne.class);
+			if (ObjectUtils.notEmpty(oneToOne.mappedBy())) {
+				Class<?> fieldEntityClass = this.fieldEntity.getDeclaringClass();
+				try {
+					Field field = fieldEntityClass.getDeclaredField(oneToOne.mappedBy());
+					AssertState.notNull(field.getAnnotation(OneToOne.class), "Failed to find conresponding definition by using mappedBy: %s", oneToOne.mappedBy());
+					
+					EntityAttributeBuilder<?> foreignAttributeBuilder = new EntityAttributeScanner(this.fieldEntity, field, this.ownningEntity).produce();
+					attributeBuilder
+							.relationalType(RelationalType.ONE_TO_ONE)
+							.joinType(JoinType.LEFT_JOIN)
+							.leftColumns(foreignAttributeBuilder.getRightColumns())
+							.junctionLeftColumns(foreignAttributeBuilder.getJunctionRightColumns())
+							.rightColumns(foreignAttributeBuilder.getLeftColumns())
+							.junctionRightColumns(foreignAttributeBuilder.getJunctionLeftColumns())
+							;
+					
+				} catch (Exception e) {
+					throw new IllegalStateException("Failed to find conresponding definition by using mappedBy: " + oneToOne.mappedBy());
+				}
+				
+			}
+			else {
+				attributeBuilder.relationalType(RelationalType.ONE_TO_ONE)
+					.owningSide(true)
+					.rightColumns(this.fieldEntity.getEntityIdentifier().getColumns())
+					;
+	
+				List<JoinColumn> joinColumns = new ListBuilder<JoinColumn>()
+						.addNonNullElements(this.field.getAnnotation(JoinColumn.class))
+						.addNonNullElements(this.field.getAnnotation(JoinColumns.class) != null ? this.field.getAnnotation(JoinColumns.class).value() : null)
+						.toList();
+				
+				if (joinColumns.size() > 0) {
+					boolean nullable = false;
+					for (JoinColumn joinColumn : joinColumns) {
+						ColumnBuilder<?> column = attributeBuilder.leftColumns$addColumn()
+							.name(joinColumn.name().trim().toUpperCase())
+							.table$begin()
+								.name(joinColumn.table().trim().toUpperCase())
+							.end();
+						
+						if (ObjectUtils.isEmpty(column.getTable().getName()) ) {
+							column.table(this.ownningEntity.getLinkedTableBundle().getRoot().getTable());
+						}
+						
+						if (joinColumn.nullable()) {
+							nullable = true;
+						}
+					}
+					attributeBuilder.joinType(nullable ? JoinType.LEFT_JOIN : JoinType.INNER_JOIN);
+				}
+				else {
+					attributeBuilder.joinType(JoinType.LEFT_JOIN)
+						.leftColumns$addColumn()
+							.name(NameUtils.camelCaseToUpperCase(field.getName()));
+				}
+				
+				
+			}
+
 		}
 		else if (this.field.getAnnotation(ManyToMany.class) != null) {
 			

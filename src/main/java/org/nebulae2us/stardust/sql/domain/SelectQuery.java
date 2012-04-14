@@ -15,6 +15,7 @@
  */
 package org.nebulae2us.stardust.sql.domain;
 
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -134,7 +135,7 @@ public class SelectQuery {
 	 */
 	private void populateAlias(LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle, String alias, LinkedEntityBundle linkedEntityBundle) {
 
-		ImmutableList<String> aliases = linkedEntityBundle.getAliases().elementToLowerCase();
+		List<String> aliases = new ArrayList<String>(linkedEntityBundle.getAliases().elementToLowerCase());
 		String tableAlias = alias;
 		if (tableAlias.length() == 0) {
 			tableAlias = getDefaultAlias(aliases);
@@ -152,6 +153,7 @@ public class SelectQuery {
 				i++;
 				String nextUnsedAlias = tableAlias + i;
 				if (!aliases.contains(nextUnsedAlias)) {
+					aliases.add(nextUnsedAlias);
 					break;
 				}
 			}
@@ -160,7 +162,7 @@ public class SelectQuery {
 		
 	}
 
-	private String getDefaultAlias(ImmutableList<String> aliases) {
+	private String getDefaultAlias(List<String> aliases) {
 		if (!aliases.contains("b")) {
 			return "b";
 		}
@@ -258,20 +260,6 @@ public class SelectQuery {
 						
 					}
 				}
-				
-//				List<ScalarAttribute> subScalarAttributes = subEntity.getScalarAttributes(subLinkedTable.getTable())
-//						.changeComparator(new EqualityComparator<ScalarAttribute>() {
-//							public int hashCode(ScalarAttribute object) {
-//								return 0;
-//							}
-//							public boolean compare(ScalarAttribute sa1, ScalarAttribute sa2) {
-//								return sa1.getFullName().equals(sa2.getFullName());
-//							}
-//						}).minus(entity.getScalarAttributes(subLinkedTable.getTable()));
-//
-//				if (subScalarAttributes.size() > 0) {
-//				}
-				
 			}
 
 		}

@@ -27,6 +27,7 @@ import org.nebulae2us.electron.util.ImmutableMap;
 import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.electron.util.ObjectEqualityComparator;
 import org.nebulae2us.stardust.db.domain.ColumnBuilder;
+import org.nebulae2us.stardust.db.domain.TableBuilder;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
 
@@ -39,6 +40,10 @@ import static org.nebulae2us.stardust.Builders.*;
 public class AttributeOverrideScanner {
 
 	private final Map<String, ColumnBuilder<?>> columns;
+	
+	public AttributeOverrideScanner() {
+		this.columns = new ImmutableMap<String, ColumnBuilder<?>>();
+	}
 	
 	public AttributeOverrideScanner(EntityBuilder<?> owningEntity, AttributeOverride attributeOverride, AttributeOverrides attributeOverrides) {
 		this.columns = new HashMap<String, ColumnBuilder<?>>();
@@ -91,6 +96,42 @@ public class AttributeOverrideScanner {
 		}
 		
 		return new AttributeOverrideScanner(newColumnMap);
+	}
+
+	/**
+	 * @param table
+	 * @param annotation
+	 * @param annotation2
+	 * @return
+	 */
+	public AttributeOverrideScanner combine(String defaultTableName, AttributeOverride attributeOverride, AttributeOverrides attributeOverrides, boolean overrideMode) {
+		HashMap<String, ColumnBuilder<?>> newColumns = new HashMap<String, ColumnBuilder<?>>(this.columns);
+		
+		List<AttributeOverride> overrides = new ListBuilder<AttributeOverride>()
+				.addNonNullElements(attributeOverride)
+				.addNonNullElements(attributeOverrides == null ? null : attributeOverrides.value())
+				.toList()
+				;
+		
+		for (AttributeOverride override : overrides) {
+			ColumnBuilder<?> column = column()
+						.name(override.column().name());
+			if (ObjectUtils.isEmpty(override.column().table())) {
+				column.table$begin()
+					.name(defaultTableName);
+			}
+			else {
+				column.table$begin()
+					.name(override.column().table())
+				.end();
+			}
+
+			if (overrideMode || !newColumns.containsKey(override.name())) {
+				newColumns.put(override.name(), column);
+			}
+		}
+		
+		return new AttributeOverrideScanner(newColumns);
 	}
 	
 }

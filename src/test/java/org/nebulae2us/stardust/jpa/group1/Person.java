@@ -25,6 +25,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -53,6 +54,9 @@ public class Person extends AbstractEntity {
 	
 	@Column(name="GENDER")
 	private Gender gender;
+	
+	@OneToOne(mappedBy="owner")
+	private Passport passport;
 
 	@ManyToMany
 	@JoinTable(name="OWNER_DWELLING",
@@ -104,6 +108,14 @@ public class Person extends AbstractEntity {
 
 	public void setGender(Gender gender) {
 		this.gender = gender;
+	}
+
+	public Passport getPassport() {
+		return passport;
+	}
+
+	public void setPassport(Passport passport) {
+		this.passport = passport;
 	}
 	
 	
