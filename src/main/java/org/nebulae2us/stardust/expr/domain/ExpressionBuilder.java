@@ -3,7 +3,6 @@ package org.nebulae2us.stardust.expr.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
 
 @Builder(destination=Expression.class)
 public class ExpressionBuilder<P> implements Wrappable<Expression> {
@@ -23,6 +22,9 @@ public class ExpressionBuilder<P> implements Wrappable<Expression> {
 	}
 
 	protected ExpressionBuilder(Expression wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -47,7 +49,7 @@ public class ExpressionBuilder<P> implements Wrappable<Expression> {
 	}
 
     public Expression toExpression() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Expression.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(Expression.class);
     }
 
 
@@ -55,6 +57,11 @@ public class ExpressionBuilder<P> implements Wrappable<Expression> {
 	private boolean negated;
 	
 	public boolean getNegated() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.negated, boolean.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Expression.class, "negated");
+			this.negated = new WrapConverter(ExprBuilders.DESTINATION_CLASS_RESOLVER).convert(o).to(boolean.class);
+		}
+
 		return negated;
 	}
 

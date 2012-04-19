@@ -23,6 +23,9 @@ public class LinkedTableBundleBuilder<P> implements Wrappable<LinkedTableBundle>
 	}
 
 	protected LinkedTableBundleBuilder(LinkedTableBundle wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -47,7 +50,7 @@ public class LinkedTableBundleBuilder<P> implements Wrappable<LinkedTableBundle>
 	}
 
     public LinkedTableBundle toLinkedTableBundle() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(LinkedTableBundle.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(LinkedTableBundle.class);
     }
 
 
@@ -55,6 +58,11 @@ public class LinkedTableBundleBuilder<P> implements Wrappable<LinkedTableBundle>
 	private List<LinkedTableBuilder<?>> linkedTables;
 	
 	public List<LinkedTableBuilder<?>> getLinkedTables() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.linkedTables, List.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableBundle.class, "linkedTables");
+			this.linkedTables = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+		}
+
 		return linkedTables;
 	}
 
@@ -187,11 +195,11 @@ public class LinkedTableBundleBuilder<P> implements Wrappable<LinkedTableBundle>
      */
      
      public LinkedTableBuilder<?> getRoot() {
-    	 return this.linkedTables.get(0);
+    	 return this.getLinkedTables().get(0);
      }
 
      public List<LinkedTableBuilder<?>> getNonRoots() {
-    	 return this.linkedTables.subList(1, this.linkedTables.size());
+    	 return this.getLinkedTables().subList(1, this.getLinkedTables().size());
      }
 
 }

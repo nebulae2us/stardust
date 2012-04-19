@@ -24,6 +24,9 @@ public class EntityDiscriminatorBuilder<P> implements Wrappable<EntityDiscrimina
 	}
 
 	protected EntityDiscriminatorBuilder(EntityDiscriminator wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -48,7 +51,7 @@ public class EntityDiscriminatorBuilder<P> implements Wrappable<EntityDiscrimina
 	}
 
     public EntityDiscriminator toEntityDiscriminator() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(EntityDiscriminator.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(EntityDiscriminator.class);
     }
 
 
@@ -56,6 +59,11 @@ public class EntityDiscriminatorBuilder<P> implements Wrappable<EntityDiscrimina
 	private ColumnBuilder<?> column;
 	
 	public ColumnBuilder<?> getColumn() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.column, ColumnBuilder.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityDiscriminator.class, "column");
+			this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(ColumnBuilder.class);
+		}
+
 		return column;
 	}
 
@@ -111,6 +119,11 @@ public class EntityDiscriminatorBuilder<P> implements Wrappable<EntityDiscrimina
 	private Object value;
 	
 	public Object getValue() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.value, Object.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityDiscriminator.class, "value");
+			this.value = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(Object.class);
+		}
+
 		return value;
 	}
 

@@ -24,6 +24,9 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 	}
 
 	protected AttributeHolderBuilder(AttributeHolder wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -48,7 +51,7 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 	}
 
     public AttributeHolder toAttributeHolder() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(AttributeHolder.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(AttributeHolder.class);
     }
 
 
@@ -56,6 +59,11 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 	private Class<?> declaringClass;
 	
 	public Class<?> getDeclaringClass() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.declaringClass, Class.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, AttributeHolder.class, "declaringClass");
+			this.declaringClass = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(Class.class);
+		}
+
 		return declaringClass;
 	}
 
@@ -73,6 +81,11 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 	private List<AttributeBuilder<?>> attributes;
 	
 	public List<AttributeBuilder<?>> getAttributes() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.attributes, List.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, AttributeHolder.class, "attributes");
+			this.attributes = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+		}
+
 		return attributes;
 	}
 
@@ -267,7 +280,7 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
     public List<EntityAttributeBuilder<?>> getEntityAttributes() {
 		List<EntityAttributeBuilder<?>> result = new ArrayList<EntityAttributeBuilder<?>>();
 		
-		for (AttributeBuilder<?> attribute : attributes) {
+		for (AttributeBuilder<?> attribute : this.getAttributes()) {
 			if (attribute instanceof EntityAttributeBuilder) {
 				result.add((EntityAttributeBuilder<?>)attribute);
 			}
@@ -279,7 +292,7 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
     public List<ScalarAttributeBuilder<?>> getScalarAttributes() {
 		List<ScalarAttributeBuilder<?>> result = new ArrayList<ScalarAttributeBuilder<?>>();
 		
-		for (AttributeBuilder<?> attribute : attributes) {
+		for (AttributeBuilder<?> attribute : this.getAttributes()) {
 			if (attribute instanceof ScalarAttributeBuilder) {
 				result.add((ScalarAttributeBuilder<?>)attribute);
 			}
@@ -297,7 +310,7 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
     public List<ColumnBuilder<?>> getColumns() {
 		List<ColumnBuilder<?>> result = new ArrayList<ColumnBuilder<?>>();
 		
-		for (AttributeBuilder<?> attribute : attributes) {
+		for (AttributeBuilder<?> attribute : this.getAttributes()) {
 			if (attribute instanceof ScalarAttributeBuilder) {
 				result.add(((ScalarAttributeBuilder<?>)attribute).getColumn());
 			}

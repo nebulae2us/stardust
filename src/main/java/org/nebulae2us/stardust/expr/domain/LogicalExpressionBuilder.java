@@ -3,7 +3,6 @@ package org.nebulae2us.stardust.expr.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
 
 @Builder(destination=LogicalExpression.class)
 public class LogicalExpressionBuilder<P> extends ExpressionBuilder<P> {
@@ -32,13 +31,13 @@ public class LogicalExpressionBuilder<P> extends ExpressionBuilder<P> {
 	}
 
     public LogicalExpression toLogicalExpression() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(LogicalExpression.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(LogicalExpression.class);
     }
     
 
 	@Override
     public LogicalExpression toExpression() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(LogicalExpression.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(LogicalExpression.class);
     }
     
 
@@ -46,6 +45,11 @@ public class LogicalExpressionBuilder<P> extends ExpressionBuilder<P> {
 	private List<ExpressionBuilder<?>> expressions;
 	
 	public List<ExpressionBuilder<?>> getExpressions() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.expressions, List.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, LogicalExpression.class, "expressions");
+			this.expressions = new WrapConverter(ExprBuilders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+		}
+
 		return expressions;
 	}
 
@@ -86,6 +90,34 @@ public class LogicalExpressionBuilder<P> extends ExpressionBuilder<P> {
 		return result;
 	}
 	
+	public ComparisonExpressionBuilder<? extends LogicalExpressionBuilder<P>> expressions$addComparisonExpression() {
+		verifyMutable();
+		if (this.expressions == null) {
+			this.expressions = new ArrayList<ExpressionBuilder<?>>();
+		}
+		
+		ComparisonExpressionBuilder<LogicalExpressionBuilder<P>> result =
+				new ComparisonExpressionBuilder<LogicalExpressionBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.expressions, result);
+		
+		return result;
+	}
+	
+	public InListExpressionBuilder<? extends LogicalExpressionBuilder<P>> expressions$addInListExpression() {
+		verifyMutable();
+		if (this.expressions == null) {
+			this.expressions = new ArrayList<ExpressionBuilder<?>>();
+		}
+		
+		InListExpressionBuilder<LogicalExpressionBuilder<P>> result =
+				new InListExpressionBuilder<LogicalExpressionBuilder<P>>(this);
+		
+		CollectionUtils.addItem(this.expressions, result);
+		
+		return result;
+	}
+	
 	public LogicalExpressionBuilder<? extends LogicalExpressionBuilder<P>> expressions$addLogicalExpression() {
 		verifyMutable();
 		if (this.expressions == null) {
@@ -111,6 +143,18 @@ public class LogicalExpressionBuilder<P> extends ExpressionBuilder<P> {
 
 		public ExpressionBuilder<Expressions$$$builder<P1>> expression$begin() {
 			ExpressionBuilder<Expressions$$$builder<P1>> result = new ExpressionBuilder<Expressions$$$builder<P1>>(this);
+			CollectionUtils.addItem(LogicalExpressionBuilder.this.expressions, result);
+			return result;
+		}
+		
+		public ComparisonExpressionBuilder<Expressions$$$builder<P1>> comparisonExpression$begin() {
+			ComparisonExpressionBuilder<Expressions$$$builder<P1>> result = new ComparisonExpressionBuilder<Expressions$$$builder<P1>>(this);
+			CollectionUtils.addItem(LogicalExpressionBuilder.this.expressions, result);
+			return result;
+		}
+		
+		public InListExpressionBuilder<Expressions$$$builder<P1>> inListExpression$begin() {
+			InListExpressionBuilder<Expressions$$$builder<P1>> result = new InListExpressionBuilder<Expressions$$$builder<P1>>(this);
 			CollectionUtils.addItem(LogicalExpressionBuilder.this.expressions, result);
 			return result;
 		}
@@ -147,7 +191,7 @@ public class LogicalExpressionBuilder<P> extends ExpressionBuilder<P> {
 		}
 		if (expressions != null) {
 			for (Expression e : expressions) {
-				ExpressionBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ExpressionBuilder.class);
+				ExpressionBuilder<?> wrapped = new WrapConverter(ExprBuilders.DESTINATION_CLASS_RESOLVER).convert(e).to(ExpressionBuilder.class);
 				CollectionUtils.addItem(this.expressions, wrapped);
 			}
 		}
@@ -194,6 +238,11 @@ public class LogicalExpressionBuilder<P> extends ExpressionBuilder<P> {
 	private LogicalOperator operator;
 	
 	public LogicalOperator getOperator() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.operator, LogicalOperator.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, LogicalExpression.class, "operator");
+			this.operator = new WrapConverter(ExprBuilders.DESTINATION_CLASS_RESOLVER).convert(o).to(LogicalOperator.class);
+		}
+
 		return operator;
 	}
 

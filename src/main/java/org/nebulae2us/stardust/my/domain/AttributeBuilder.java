@@ -24,6 +24,9 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	}
 
 	protected AttributeBuilder(Attribute wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -48,7 +51,7 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	}
 
     public Attribute toAttribute() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Attribute.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(Attribute.class);
     }
 
 
@@ -56,6 +59,11 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	private String fullName;
 	
 	public String getFullName() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.fullName, String.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "fullName");
+			this.fullName = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+		}
+
 		return fullName;
 	}
 
@@ -73,6 +81,11 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	private Field field;
 	
 	public Field getField() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.field, Field.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "field");
+			this.field = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(Field.class);
+		}
+
 		return field;
 	}
 
@@ -90,6 +103,11 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	private EntityBuilder<?> owningEntity;
 	
 	public EntityBuilder<?> getOwningEntity() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.owningEntity, EntityBuilder.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "owningEntity");
+			this.owningEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(EntityBuilder.class);
+		}
+
 		return owningEntity;
 	}
 

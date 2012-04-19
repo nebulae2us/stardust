@@ -23,6 +23,9 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
 	}
 
 	protected ColumnBuilder(Column wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -47,7 +50,7 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
 	}
 
     public Column toColumn() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Column.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(Column.class);
     }
 
 
@@ -55,6 +58,11 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
 	private String name;
 	
 	public String getName() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.name, String.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Column.class, "name");
+			this.name = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+		}
+
 		return name;
 	}
 
@@ -72,6 +80,11 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
 	private TableBuilder<?> table;
 	
 	public TableBuilder<?> getTable() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.table, TableBuilder.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Column.class, "table");
+			this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(TableBuilder.class);
+		}
+
 		return table;
 	}
 

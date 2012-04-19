@@ -23,6 +23,9 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
 	}
 
 	protected SelectQueryParseResultBuilder(SelectQueryParseResult wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -47,7 +50,7 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
 	}
 
     public SelectQueryParseResult toSelectQueryParseResult() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(SelectQueryParseResult.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(SelectQueryParseResult.class);
     }
 
 
@@ -55,6 +58,11 @@ public class SelectQueryParseResultBuilder<P> implements Wrappable<SelectQueryPa
 	private LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle;
 	
 	public LinkedTableEntityBundleBuilder<?> getLinkedTableEntityBundle() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.linkedTableEntityBundle, LinkedTableEntityBundleBuilder.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, SelectQueryParseResult.class, "linkedTableEntityBundle");
+			this.linkedTableEntityBundle = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(LinkedTableEntityBundleBuilder.class);
+		}
+
 		return linkedTableEntityBundle;
 	}
 

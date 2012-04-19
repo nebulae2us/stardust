@@ -23,6 +23,9 @@ public class LinkedEntityBundleBuilder<P> implements Wrappable<LinkedEntityBundl
 	}
 
 	protected LinkedEntityBundleBuilder(LinkedEntityBundle wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -47,7 +50,7 @@ public class LinkedEntityBundleBuilder<P> implements Wrappable<LinkedEntityBundl
 	}
 
     public LinkedEntityBundle toLinkedEntityBundle() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(LinkedEntityBundle.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(LinkedEntityBundle.class);
     }
 
 
@@ -55,6 +58,11 @@ public class LinkedEntityBundleBuilder<P> implements Wrappable<LinkedEntityBundl
 	private List<LinkedEntityBuilder<?>> linkedEntities;
 	
 	public List<LinkedEntityBuilder<?>> getLinkedEntities() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.linkedEntities, List.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedEntityBundle.class, "linkedEntities");
+			this.linkedEntities = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+		}
+
 		return linkedEntities;
 	}
 

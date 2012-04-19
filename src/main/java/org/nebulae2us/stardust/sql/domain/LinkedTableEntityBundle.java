@@ -69,6 +69,10 @@ public class LinkedTableEntityBundle {
 		
 		for (LinkedTableEntity linkedTableEntity : this.linkedTableEntities) {
 			
+			if (linkedTableEntity.getEntity() == null) {
+				continue;
+			}
+			
 			Set<Column> columns = new LinkedHashSet<Column>();
 
 			if (linkedTableEntity.getEntity().getEntityDiscriminator() != null) {

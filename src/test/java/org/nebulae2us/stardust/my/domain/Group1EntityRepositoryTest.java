@@ -198,6 +198,7 @@ public class Group1EntityRepositoryTest {
 
 		assertEquals(RelationalType.MANY_TO_ONE, attribute.getRelationalType());
 		assertEquals(JoinType.INNER_JOIN, attribute.getJoinType());
+		assertTrue(attribute.isOwningSide());
 		
 		assertEquals(Arrays.asList("HOUSE_ID", "HOUSE_LETTER"), attribute.getLeftColumns().toList(EXTRACT_COLUMN_NAME));
 		assertEquals(Arrays.asList("ROOM", "ROOM"), attribute.getLeftColumns().toList(EXTRACT_TABLE_NAME));
@@ -275,6 +276,7 @@ public class Group1EntityRepositoryTest {
 		
 		assertEquals(RelationalType.ONE_TO_ONE, attribute.getRelationalType());
 		assertEquals(JoinType.INNER_JOIN, attribute.getJoinType());
+		assertTrue(attribute.isOwningSide());
 		
 		assertEquals(Arrays.asList("OWNER_SSN", "OWNER_DATE_BORN"), attribute.getLeftColumns().toList(EXTRACT_COLUMN_NAME));
 		assertEquals(Arrays.asList("PASSPORT", "PASSPORT"), attribute.getLeftColumns().toList(EXTRACT_TABLE_NAME));
@@ -294,6 +296,7 @@ public class Group1EntityRepositoryTest {
 		
 		assertEquals(RelationalType.ONE_TO_ONE, attribute.getRelationalType());
 		assertEquals(JoinType.LEFT_JOIN, attribute.getJoinType());
+		assertFalse(attribute.isOwningSide());
 		
 		assertEquals(Arrays.asList("SSN", "DATE_BORN"), attribute.getLeftColumns().toList(EXTRACT_COLUMN_NAME));
 		assertEquals(Arrays.asList("PERSON", "PERSON"), attribute.getLeftColumns().toList(EXTRACT_TABLE_NAME));

@@ -15,34 +15,27 @@
  */
 package org.nebulae2us.stardust.expr.domain;
 
-import org.nebulae2us.electron.Converter;
-import org.nebulae2us.electron.DestinationClassResolver;
+import java.util.List;
+
 import org.nebulae2us.electron.Mirror;
-import org.nebulae2us.stardust.Builders;
 
 /**
  * @author Trung Phan
  *
  */
-public abstract class Expression {
+public class InListExpression<T> extends Expression {
 
-	private final boolean negated;
+	private final List<T> values;
 	
-	public Expression(Mirror mirror) {
+	public InListExpression(Mirror mirror) {
+		super(mirror);
 		mirror.bind(this);
 		
-		this.negated = mirror.toBooleanValue("negated");
+		this.values = (List<T>)mirror.toListOf(Object.class, "values");
 	}
 
-	public boolean isNegated() {
-		return negated;
+	public List<T> getValues() {
+		return values;
 	}
 	
-	public Expression negate() {
-		return new Converter(getDestinationClassResolver(), true).convert(this).to(Expression.class);
-	}
-	
-	protected DestinationClassResolver getDestinationClassResolver() {
-		return null;
-	}
 }

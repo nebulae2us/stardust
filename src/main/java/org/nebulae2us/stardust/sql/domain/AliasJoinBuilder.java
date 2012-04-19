@@ -24,6 +24,9 @@ public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
 	}
 
 	protected AliasJoinBuilder(AliasJoin wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -48,7 +51,7 @@ public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
 	}
 
     public AliasJoin toAliasJoin() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(AliasJoin.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(AliasJoin.class);
     }
 
 
@@ -56,6 +59,11 @@ public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
 	private String name;
 	
 	public String getName() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.name, String.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, AliasJoin.class, "name");
+			this.name = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+		}
+
 		return name;
 	}
 
@@ -73,6 +81,11 @@ public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
 	private String alias;
 	
 	public String getAlias() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.alias, String.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, AliasJoin.class, "alias");
+			this.alias = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+		}
+
 		return alias;
 	}
 
@@ -90,6 +103,11 @@ public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
 	private JoinType joinType;
 	
 	public JoinType getJoinType() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.joinType, JoinType.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, AliasJoin.class, "joinType");
+			this.joinType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(JoinType.class);
+		}
+
 		return joinType;
 	}
 

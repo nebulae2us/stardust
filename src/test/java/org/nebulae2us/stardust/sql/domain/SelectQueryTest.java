@@ -23,6 +23,7 @@ import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.nebulae2us.electron.util.ImmutableList;
+import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.jpa.group1.BedRoom;
 import org.nebulae2us.stardust.jpa.group1.House;
 import org.nebulae2us.stardust.jpa.group1.Kitchen;
@@ -59,7 +60,7 @@ public class SelectQueryTest {
 		
 		return $(selectClause.split(","))
 				.trimElement()
-				.extractMatchFromElement(Pattern.compile("(.+\\.)?([^ ]+) .*"), 2);
+				.extractMatchFromElement(Pattern.compile("([^ ]+) (.*)"), 2);
 
 	}
 	
@@ -75,7 +76,7 @@ public class SelectQueryTest {
 
 		List<String> columns = extractSelectColumns(parseResult.toString());
 		
-		assertThat(columns, hasItems("ssn", "date_born", "gender", "first_name", "last_name", "version", "updated_date"));
+		assertThat(columns, hasItems("b_ssn", "b_date_born", "b_gender", "b_first_name", "b_last_name", "b_version", "b_updated_date"));
 		
 	}
 	
@@ -104,17 +105,73 @@ public class SelectQueryTest {
 			
 		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
 		
-		System.out.println(parseResult.toString());
-
 		List<String> columns = extractSelectColumns(parseResult.toString());
 		
 		assertThat(columns, hasItems("house_id", "house_letter", "house_type_id"));
-//		System.out.println(columns);
 		
 	}
 	
 	
+	@Test
+	public void select_room_with_house() {
+		
+		SelectQuery selectQuery = selectQuery()
+				.entityClass(Room.class)
+				.aliasJoins$addAliasJoin()
+					.alias("h")
+					.name("house")
+					.joinType(JoinType.INNER_JOIN)
+				.end()
+				.toSelectQuery();
+		
+		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
+		
+		List<String> columns = extractSelectColumns(parseResult.toString());
+		
+		assertThat(columns, hasItems("house_id", "house_letter", "sequence_number", "h_house_id", "h_house_letter", "h_house_type_id"));
+		
+		
+	}
 	
+	@Test
+	public void select_house_with_rooms() {
+		SelectQuery selectQuery = selectQuery()
+				.entityClass(House.class)
+				.aliasJoins$addAliasJoin()
+					.alias("r")
+					.name("rooms")
+					.joinType(JoinType.LEFT_JOIN)
+				.end()
+				.toSelectQuery();
+		
+		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
+		
+		List<String> columns = extractSelectColumns(parseResult.toString());
+		
+		assertThat(columns, hasItems("house_id", "house_letter", "house_type_id", "r_house_id", "r_house_letter", "r_sequence_number"));
+		
+	}
+	
+	@Test
+	public void select_person_with_houses() {
+		SelectQuery selectQuery = selectQuery()
+				.entityClass(Person.class)
+				.aliasJoins$addAliasJoin()
+					.alias("h")
+					.name("houses")
+					.joinType(JoinType.LEFT_JOIN)
+				.end()
+				.toSelectQuery();
+		
+		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
+		
+		System.out.println(parseResult.toString());
+		
+		List<String> columns = extractSelectColumns(parseResult.toString());
+		
+//		assertThat(columns, hasItems("house_id", "house_letter", "house_type_id", "r_house_id", "r_house_letter", "r_sequence_number"));
+		
+	}
 	
 	
 }

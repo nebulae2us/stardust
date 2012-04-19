@@ -108,23 +108,28 @@ public class EntityAttributeScanner {
 			OneToMany oneToMany = this.field.getAnnotation(OneToMany.class);
 			if (ObjectUtils.notEmpty(oneToMany.mappedBy())) {
 				Class<?> fieldEntityClass = this.fieldEntity.getDeclaringClass();
+
+				Field field;
 				try {
-					Field field = fieldEntityClass.getDeclaredField(oneToMany.mappedBy());
-					AssertState.notNull(field.getAnnotation(ManyToOne.class), "Failed to find conresponding definition by using mappedBy: %s",oneToMany.mappedBy());
-					
-					EntityAttributeBuilder<?> foreignAttributeBuilder = new EntityAttributeScanner(this.fieldEntity, field, this.ownningEntity).produce();
-					attributeBuilder
-							.relationalType(RelationalType.ONE_TO_MANY)
-							.joinType(JoinType.LEFT_JOIN)
-							.leftColumns(foreignAttributeBuilder.getRightColumns())
-							.junctionLeftColumns(foreignAttributeBuilder.getJunctionRightColumns())
-							.rightColumns(foreignAttributeBuilder.getLeftColumns())
-							.junctionRightColumns(foreignAttributeBuilder.getJunctionLeftColumns())
-							;
-					
-				} catch (Exception e) {
-					throw new IllegalStateException("Failed to find conresponding definition by using mappedBy: " + oneToMany.mappedBy());
+					field = fieldEntityClass.getDeclaredField(oneToMany.mappedBy());
+				} catch (SecurityException e) {
+					throw new IllegalStateException("Failed to find conresponding definition by using mappedBy: " + oneToMany.mappedBy(), e);
+				} catch (NoSuchFieldException e) {
+					throw new IllegalStateException("Failed to find conresponding definition by using mappedBy: " + oneToMany.mappedBy(), e);
 				}
+				AssertState.notNull(field.getAnnotation(ManyToOne.class), "Failed to find conresponding definition by using mappedBy: %s",oneToMany.mappedBy());
+				
+				EntityAttributeBuilder<?> foreignAttributeBuilder = new EntityAttributeScanner(this.fieldEntity, field, this.ownningEntity).produce();
+				attributeBuilder
+						.relationalType(RelationalType.ONE_TO_MANY)
+						.joinType(JoinType.LEFT_JOIN)
+						.leftColumns(foreignAttributeBuilder.getRightColumns())
+						.rightColumns(foreignAttributeBuilder.getLeftColumns())
+						.junctionTable(foreignAttributeBuilder.getJunctionTable())
+						.junctionLeftColumns(foreignAttributeBuilder.getJunctionRightColumns())
+						.junctionRightColumns(foreignAttributeBuilder.getJunctionLeftColumns())
+						;
+					
 				
 			}
 		}
@@ -132,24 +137,28 @@ public class EntityAttributeScanner {
 			OneToOne oneToOne = this.field.getAnnotation(OneToOne.class);
 			if (ObjectUtils.notEmpty(oneToOne.mappedBy())) {
 				Class<?> fieldEntityClass = this.fieldEntity.getDeclaringClass();
+
+				Field field;
 				try {
-					Field field = fieldEntityClass.getDeclaredField(oneToOne.mappedBy());
-					AssertState.notNull(field.getAnnotation(OneToOne.class), "Failed to find conresponding definition by using mappedBy: %s", oneToOne.mappedBy());
-					
-					EntityAttributeBuilder<?> foreignAttributeBuilder = new EntityAttributeScanner(this.fieldEntity, field, this.ownningEntity).produce();
-					attributeBuilder
-							.relationalType(RelationalType.ONE_TO_ONE)
-							.joinType(JoinType.LEFT_JOIN)
-							.leftColumns(foreignAttributeBuilder.getRightColumns())
-							.junctionLeftColumns(foreignAttributeBuilder.getJunctionRightColumns())
-							.rightColumns(foreignAttributeBuilder.getLeftColumns())
-							.junctionRightColumns(foreignAttributeBuilder.getJunctionLeftColumns())
-							;
-					
-				} catch (Exception e) {
-					throw new IllegalStateException("Failed to find conresponding definition by using mappedBy: " + oneToOne.mappedBy());
+					field = fieldEntityClass.getDeclaredField(oneToOne.mappedBy());
+				} catch (SecurityException e) {
+					throw new IllegalStateException("Failed to find conresponding definition by using mappedBy: " + oneToOne.mappedBy(), e);
+				} catch (NoSuchFieldException e) {
+					throw new IllegalStateException("Failed to find conresponding definition by using mappedBy: " + oneToOne.mappedBy(), e);
 				}
+				AssertState.notNull(field.getAnnotation(OneToOne.class), "Failed to find conresponding definition by using mappedBy: %s", oneToOne.mappedBy());
 				
+				EntityAttributeBuilder<?> foreignAttributeBuilder = new EntityAttributeScanner(this.fieldEntity, field, this.ownningEntity).produce();
+				attributeBuilder
+						.relationalType(RelationalType.ONE_TO_ONE)
+						.joinType(JoinType.LEFT_JOIN)
+						.leftColumns(foreignAttributeBuilder.getRightColumns())
+						.rightColumns(foreignAttributeBuilder.getLeftColumns())
+						.junctionTable(foreignAttributeBuilder.getJunctionTable())
+						.junctionLeftColumns(foreignAttributeBuilder.getJunctionRightColumns())
+						.junctionRightColumns(foreignAttributeBuilder.getJunctionLeftColumns())
+						;
+					
 			}
 			else {
 				attributeBuilder.relationalType(RelationalType.ONE_TO_ONE)
@@ -198,24 +207,29 @@ public class EntityAttributeScanner {
 			
 			if (ObjectUtils.notEmpty(manyToMany.mappedBy())) {
 				Class<?> fieldEntityClass = this.fieldEntity.getDeclaringClass();
+
+				Field field;
 				try {
-					Field field = fieldEntityClass.getDeclaredField(manyToMany.mappedBy());
-					AssertState.notNull(field.getAnnotation(ManyToMany.class), "Failed to find conresponding definition by using mappedBy: %s", manyToMany.mappedBy());
-					AssertState.empty(field.getAnnotation(ManyToMany.class).mappedBy(), "Failed to find conresponding definition by using mappedBy: %s", manyToMany.mappedBy());
-					
-					EntityAttributeBuilder<?> foreignAttributeBuilder = new EntityAttributeScanner(this.fieldEntity, field, this.ownningEntity).produce();
-					attributeBuilder
-							.relationalType(RelationalType.MANY_TO_MANY)
-							.joinType(JoinType.LEFT_JOIN)
-							.leftColumns(foreignAttributeBuilder.getRightColumns())
-							.junctionLeftColumns(foreignAttributeBuilder.getJunctionRightColumns())
-							.rightColumns(foreignAttributeBuilder.getLeftColumns())
-							.junctionRightColumns(foreignAttributeBuilder.getJunctionLeftColumns())
-							;
-					
-				} catch (Exception e) {
-					throw new IllegalStateException("Failed to find conresponding definition by using mappedBy: " + manyToMany.mappedBy());
+					field = fieldEntityClass.getDeclaredField(manyToMany.mappedBy());
+				} catch (SecurityException e) {
+					throw new IllegalStateException("Failed to find conresponding definition by using mappedBy: " + manyToMany.mappedBy(), e);
+				} catch (NoSuchFieldException e) {
+					throw new IllegalStateException("Failed to find conresponding definition by using mappedBy: " + manyToMany.mappedBy(), e);
 				}
+				AssertState.notNull(field.getAnnotation(ManyToMany.class), "Failed to find conresponding definition by using mappedBy: %s", manyToMany.mappedBy());
+				AssertState.empty(field.getAnnotation(ManyToMany.class).mappedBy(), "Failed to find conresponding definition by using mappedBy: %s", manyToMany.mappedBy());
+				
+				EntityAttributeBuilder<?> foreignAttributeBuilder = new EntityAttributeScanner(this.fieldEntity, field, this.ownningEntity).produce();
+				attributeBuilder
+						.relationalType(RelationalType.MANY_TO_MANY)
+						.joinType(JoinType.LEFT_JOIN)
+						.leftColumns(foreignAttributeBuilder.getRightColumns())
+						.rightColumns(foreignAttributeBuilder.getLeftColumns())
+						.junctionTable(foreignAttributeBuilder.getJunctionTable())
+						.junctionLeftColumns(foreignAttributeBuilder.getJunctionRightColumns())
+						.junctionRightColumns(foreignAttributeBuilder.getJunctionLeftColumns())
+						;
+					
 
 			}
 			else {
@@ -227,7 +241,7 @@ public class EntityAttributeScanner {
 					JoinTable joinTableAnnot = this.field.getAnnotation(JoinTable.class);
 					
 					if (joinTableAnnot != null) {
-						TableBuilder<?> joinTable = table()
+						TableBuilder<?> junctionTable = attributeBuilder.junctionTable$begin()
 								.name(joinTableAnnot.name())
 								.schemaName(joinTableAnnot.schema())
 								.catalogName(joinTableAnnot.catalog());
@@ -237,6 +251,9 @@ public class EntityAttributeScanner {
 						
 						
 						if (joinColumns.size() > 0) {
+							
+							
+							
 							for (JoinColumn joinColumn : joinColumns) {
 								
 								
@@ -247,7 +264,7 @@ public class EntityAttributeScanner {
 								
 								ColumnBuilder<?> junctionColumn = attributeBuilder.junctionLeftColumns$addColumn()
 										.name(joinColumn.name().trim().toUpperCase())
-										.table(joinTable)
+										.table(junctionTable)
 										;
 								
 							}
@@ -263,7 +280,7 @@ public class EntityAttributeScanner {
 								
 								EntityAttributeBuilder<?> junctionRightColumn = attributeBuilder.junctionRightColumns$addColumn()
 										.name(inverseJoinColumn.name().trim().toUpperCase())
-										.table(joinTable)
+										.table(junctionTable)
 										.end();
 							}
 						}

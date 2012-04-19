@@ -24,6 +24,9 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 	}
 
 	protected SelectQueryBuilder(SelectQuery wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -48,7 +51,7 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 	}
 
     public SelectQuery toSelectQuery() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(SelectQuery.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(SelectQuery.class);
     }
 
 
@@ -56,6 +59,11 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 	private Class<?> entityClass;
 	
 	public Class<?> getEntityClass() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.entityClass, Class.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, SelectQuery.class, "entityClass");
+			this.entityClass = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(Class.class);
+		}
+
 		return entityClass;
 	}
 
@@ -73,6 +81,11 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 	private String initialAlias;
 	
 	public String getInitialAlias() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.initialAlias, String.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, SelectQuery.class, "initialAlias");
+			this.initialAlias = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+		}
+
 		return initialAlias;
 	}
 
@@ -90,6 +103,11 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
 	private List<AliasJoinBuilder<?>> aliasJoins;
 	
 	public List<AliasJoinBuilder<?>> getAliasJoins() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.aliasJoins, List.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, SelectQuery.class, "aliasJoins");
+			this.aliasJoins = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+		}
+
 		return aliasJoins;
 	}
 
@@ -215,152 +233,40 @@ public class SelectQueryBuilder<P> implements Wrappable<SelectQuery> {
     }
 
 
-	private List<ExpressionBuilder<?>> expressions;
+	private List<Expression> expressions;
 	
-	public List<ExpressionBuilder<?>> getExpressions() {
+	public List<Expression> getExpressions() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.expressions, List.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, SelectQuery.class, "expressions");
+			this.expressions = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+		}
+
 		return expressions;
 	}
 
-	public void setExpressions(List<ExpressionBuilder<?>> expressions) {
+	public void setExpressions(List<Expression> expressions) {
 		verifyMutable();
 		this.expressions = expressions;
 	}
 
-	public SelectQueryBuilder<P> expressions(ExpressionBuilder<?> ... expressions) {
+	public SelectQueryBuilder<P> expressions(Expression ... expressions) {
 		verifyMutable();
-		return expressions(new ListBuilder<ExpressionBuilder<?>>().add(expressions).toList());
+		return expressions(new ListBuilder<Expression>().add(expressions).toList());
 	}
 	
-	public SelectQueryBuilder<P> expressions(Collection<ExpressionBuilder<?>> expressions) {
+	public SelectQueryBuilder<P> expressions(Collection<Expression> expressions) {
 		verifyMutable();
 		if (this.expressions == null) {
-			this.expressions = new ArrayList<ExpressionBuilder<?>>();
+			this.expressions = new ArrayList<Expression>();
 		}
 		if (expressions != null) {
-			for (ExpressionBuilder<?> e : expressions) {
+			for (Expression e : expressions) {
 				CollectionUtils.addItem(this.expressions, e);
 			}
 		}
 		return this;
 	}
 
-	public ExpressionBuilder<? extends SelectQueryBuilder<P>> expressions$addExpression() {
-		verifyMutable();
-		if (this.expressions == null) {
-			this.expressions = new ArrayList<ExpressionBuilder<?>>();
-		}
-		
-		ExpressionBuilder<SelectQueryBuilder<P>> result =
-				new ExpressionBuilder<SelectQueryBuilder<P>>(this);
-		
-		CollectionUtils.addItem(this.expressions, result);
-		
-		return result;
-	}
-	
-	public LogicalExpressionBuilder<? extends SelectQueryBuilder<P>> expressions$addLogicalExpression() {
-		verifyMutable();
-		if (this.expressions == null) {
-			this.expressions = new ArrayList<ExpressionBuilder<?>>();
-		}
-		
-		LogicalExpressionBuilder<SelectQueryBuilder<P>> result =
-				new LogicalExpressionBuilder<SelectQueryBuilder<P>>(this);
-		
-		CollectionUtils.addItem(this.expressions, result);
-		
-		return result;
-	}
-	
-
-	public class Expressions$$$builder<P1 extends SelectQueryBuilder<P>> {
-	
-		private final P1 $$$parentBuilder1;
-	
-		protected Expressions$$$builder(P1 parentBuilder) {
-			this.$$$parentBuilder1 = parentBuilder;
-		}
-
-		public ExpressionBuilder<Expressions$$$builder<P1>> expression$begin() {
-			ExpressionBuilder<Expressions$$$builder<P1>> result = new ExpressionBuilder<Expressions$$$builder<P1>>(this);
-			CollectionUtils.addItem(SelectQueryBuilder.this.expressions, result);
-			return result;
-		}
-		
-		public LogicalExpressionBuilder<Expressions$$$builder<P1>> logicalExpression$begin() {
-			LogicalExpressionBuilder<Expressions$$$builder<P1>> result = new LogicalExpressionBuilder<Expressions$$$builder<P1>>(this);
-			CollectionUtils.addItem(SelectQueryBuilder.this.expressions, result);
-			return result;
-		}
-		
-
-		public P1 end() {
-			return this.$$$parentBuilder1;
-		}
-	}
-	
-	public Expressions$$$builder<? extends SelectQueryBuilder<P>> expressions$list() {
-		verifyMutable();
-		if (this.expressions == null) {
-			this.expressions = new ArrayList<ExpressionBuilder<?>>();
-		}
-		return new Expressions$$$builder<SelectQueryBuilder<P>>(this);
-	}
-
-    public SelectQueryBuilder<P> expressions$wrap(Expression ... expressions) {
-    	return expressions$wrap(new ListBuilder<Expression>().add(expressions).toList());
-    }
-
-    public SelectQueryBuilder<P> expressions$wrap(Collection<? extends Expression> expressions) {
-		verifyMutable();
-
-		if (this.expressions == null) {
-			this.expressions = new ArrayList<ExpressionBuilder<?>>();
-		}
-		if (expressions != null) {
-			for (Expression e : expressions) {
-				ExpressionBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ExpressionBuilder.class);
-				CollectionUtils.addItem(this.expressions, wrapped);
-			}
-		}
-		return this;
-    }
-    
-    public SelectQueryBuilder<P> expressions$restoreFrom(BuilderRepository repo, Object ... builderIds) {
-    	return expressions$restoreFrom(repo, new ListBuilder<Object>().add(builderIds).toList());
-    }
-
-    public SelectQueryBuilder<P> expressions$restoreFrom(BuilderRepository repo, Collection<Object> builderIds) {
-		verifyMutable();
-
-		if (this.expressions == null) {
-			this.expressions = new ArrayList<ExpressionBuilder<?>>();
-		}
-		if (builderIds != null) {
-	    	for (Object builderId : builderIds) {
-	            Object restoredObject = repo.get(builderId);
-	            if (restoredObject == null) {
-	            	if (repo.isSupportLazy()) {
-	            		repo.addObjectStoredListener(builderId, new Procedure() {
-	    					public void execute(Object... arguments) {
-	    						CollectionUtils.addItem(SelectQueryBuilder.this.expressions, arguments[0]);
-	    					}
-	    				});
-	            	}
-	            	else {
-	                    throw new IllegalStateException("Object does not exist with id " + builderId);
-	            	}
-	            }
-	            else if (!(restoredObject instanceof ExpressionBuilder)) {
-	            	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + ExpressionBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
-	            }
-	            else {
-	                CollectionUtils.addItem(this.expressions, restoredObject);
-	            }
-	    	}
-		}
-        return this;
-    }
 
 
     /* CUSTOM CODE *********************************

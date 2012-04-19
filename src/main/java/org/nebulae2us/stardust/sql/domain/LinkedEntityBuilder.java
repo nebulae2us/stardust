@@ -25,6 +25,9 @@ public class LinkedEntityBuilder<P> implements Wrappable<LinkedEntity> {
 	}
 
 	protected LinkedEntityBuilder(LinkedEntity wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -49,7 +52,7 @@ public class LinkedEntityBuilder<P> implements Wrappable<LinkedEntity> {
 	}
 
     public LinkedEntity toLinkedEntity() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(LinkedEntity.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(LinkedEntity.class);
     }
 
 
@@ -57,6 +60,11 @@ public class LinkedEntityBuilder<P> implements Wrappable<LinkedEntity> {
 	private LinkedEntityBuilder<?> parent;
 	
 	public LinkedEntityBuilder<?> getParent() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.parent, LinkedEntityBuilder.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedEntity.class, "parent");
+			this.parent = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(LinkedEntityBuilder.class);
+		}
+
 		return parent;
 	}
 
@@ -112,6 +120,11 @@ public class LinkedEntityBuilder<P> implements Wrappable<LinkedEntity> {
 	private EntityBuilder<?> entity;
 	
 	public EntityBuilder<?> getEntity() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.entity, EntityBuilder.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedEntity.class, "entity");
+			this.entity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(EntityBuilder.class);
+		}
+
 		return entity;
 	}
 
@@ -167,6 +180,11 @@ public class LinkedEntityBuilder<P> implements Wrappable<LinkedEntity> {
 	private String alias;
 	
 	public String getAlias() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.alias, String.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedEntity.class, "alias");
+			this.alias = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+		}
+
 		return alias;
 	}
 
@@ -184,6 +202,11 @@ public class LinkedEntityBuilder<P> implements Wrappable<LinkedEntity> {
 	private EntityAttributeBuilder<?> attribute;
 	
 	public EntityAttributeBuilder<?> getAttribute() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.attribute, EntityAttributeBuilder.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedEntity.class, "attribute");
+			this.attribute = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(EntityAttributeBuilder.class);
+		}
+
 		return attribute;
 	}
 
@@ -239,6 +262,11 @@ public class LinkedEntityBuilder<P> implements Wrappable<LinkedEntity> {
 	private JoinType joinType;
 	
 	public JoinType getJoinType() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.joinType, JoinType.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedEntity.class, "joinType");
+			this.joinType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(JoinType.class);
+		}
+
 		return joinType;
 	}
 

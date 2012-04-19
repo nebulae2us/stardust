@@ -23,6 +23,9 @@ public class TableBuilder<P> implements Wrappable<Table> {
 	}
 
 	protected TableBuilder(Table wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -47,7 +50,7 @@ public class TableBuilder<P> implements Wrappable<Table> {
 	}
 
     public Table toTable() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(Table.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(Table.class);
     }
 
 
@@ -55,6 +58,11 @@ public class TableBuilder<P> implements Wrappable<Table> {
 	private String name;
 	
 	public String getName() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.name, String.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Table.class, "name");
+			this.name = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+		}
+
 		return name;
 	}
 
@@ -72,6 +80,11 @@ public class TableBuilder<P> implements Wrappable<Table> {
 	private String schemaName;
 	
 	public String getSchemaName() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.schemaName, String.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Table.class, "schemaName");
+			this.schemaName = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+		}
+
 		return schemaName;
 	}
 
@@ -89,6 +102,11 @@ public class TableBuilder<P> implements Wrappable<Table> {
 	private String catalogName;
 	
 	public String getCatalogName() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.catalogName, String.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Table.class, "catalogName");
+			this.catalogName = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+		}
+
 		return catalogName;
 	}
 

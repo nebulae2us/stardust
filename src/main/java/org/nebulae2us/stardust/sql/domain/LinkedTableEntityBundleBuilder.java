@@ -23,6 +23,9 @@ public class LinkedTableEntityBundleBuilder<P> implements Wrappable<LinkedTableE
 	}
 
 	protected LinkedTableEntityBundleBuilder(LinkedTableEntityBundle wrapped) {
+		if (wrapped == null) {
+			throw new NullPointerException();
+		}
 		this.$$$wrapped = wrapped;
 		this.$$$parentBuilder = null;
 	}
@@ -47,7 +50,7 @@ public class LinkedTableEntityBundleBuilder<P> implements Wrappable<LinkedTableE
 	}
 
     public LinkedTableEntityBundle toLinkedTableEntityBundle() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(LinkedTableEntityBundle.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(LinkedTableEntityBundle.class);
     }
 
 
@@ -55,6 +58,11 @@ public class LinkedTableEntityBundleBuilder<P> implements Wrappable<LinkedTableE
 	private List<LinkedTableEntityBuilder<?>> linkedTableEntities;
 	
 	public List<LinkedTableEntityBuilder<?>> getLinkedTableEntities() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.linkedTableEntities, List.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableEntityBundle.class, "linkedTableEntities");
+			this.linkedTableEntities = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+		}
+
 		return linkedTableEntities;
 	}
 
@@ -187,7 +195,12 @@ public class LinkedTableEntityBundleBuilder<P> implements Wrappable<LinkedTableE
      */
      
 	public LinkedTableEntityBuilder<?> getRoot() {
-		return this.linkedTableEntities.get(0);
+		return this.getLinkedTableEntities().get(0);
+	}
+	
+	
+	public List<LinkedTableEntityBuilder<?>> getNonRoots() {
+		return this.getLinkedTableEntities().subList(1, this.getLinkedTableEntities().size());
 	}
      
      

@@ -34,13 +34,13 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	}
 
     public EntityAttribute toEntityAttribute() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(EntityAttribute.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(EntityAttribute.class);
     }
     
 
 	@Override
     public EntityAttribute toAttribute() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(EntityAttribute.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(EntityAttribute.class);
     }
     
 
@@ -48,6 +48,11 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	private EntityBuilder<?> entity;
 	
 	public EntityBuilder<?> getEntity() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.entity, EntityBuilder.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttribute.class, "entity");
+			this.entity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(EntityBuilder.class);
+		}
+
 		return entity;
 	}
 
@@ -103,6 +108,11 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	private RelationalType relationalType;
 	
 	public RelationalType getRelationalType() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.relationalType, RelationalType.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttribute.class, "relationalType");
+			this.relationalType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(RelationalType.class);
+		}
+
 		return relationalType;
 	}
 
@@ -120,6 +130,11 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	private JoinType joinType;
 	
 	public JoinType getJoinType() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.joinType, JoinType.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttribute.class, "joinType");
+			this.joinType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(JoinType.class);
+		}
+
 		return joinType;
 	}
 
@@ -137,6 +152,11 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	private boolean owningSide;
 	
 	public boolean getOwningSide() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.owningSide, boolean.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttribute.class, "owningSide");
+			this.owningSide = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(boolean.class);
+		}
+
 		return owningSide;
 	}
 
@@ -154,6 +174,11 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	private List<ColumnBuilder<?>> leftColumns;
 	
 	public List<ColumnBuilder<?>> getLeftColumns() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.leftColumns, List.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttribute.class, "leftColumns");
+			this.leftColumns = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+		}
+
 		return leftColumns;
 	}
 
@@ -282,6 +307,11 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	private List<ColumnBuilder<?>> rightColumns;
 	
 	public List<ColumnBuilder<?>> getRightColumns() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.rightColumns, List.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttribute.class, "rightColumns");
+			this.rightColumns = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+		}
+
 		return rightColumns;
 	}
 
@@ -407,9 +437,74 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
     }
 
 
+	private TableBuilder<?> junctionTable;
+	
+	public TableBuilder<?> getJunctionTable() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.junctionTable, TableBuilder.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttribute.class, "junctionTable");
+			this.junctionTable = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(TableBuilder.class);
+		}
+
+		return junctionTable;
+	}
+
+	public void setJunctionTable(TableBuilder<?> junctionTable) {
+		verifyMutable();
+		this.junctionTable = junctionTable;
+	}
+
+	public EntityAttributeBuilder<P> junctionTable(TableBuilder<?> junctionTable) {
+		verifyMutable();
+		this.junctionTable = junctionTable;
+		return this;
+	}
+
+    public EntityAttributeBuilder<P> junctionTable$wrap(Table junctionTable) {
+    	verifyMutable();
+    	this.junctionTable = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(junctionTable).to(TableBuilder.class);
+        return this;
+    }
+    
+    public EntityAttributeBuilder<P> junctionTable$restoreFrom(BuilderRepository repo, Object builderId) {
+    	verifyMutable();
+    	
+        Object restoredObject = repo.get(builderId);
+        if (restoredObject == null) {
+        	if (repo.isSupportLazy()) {
+        		repo.addObjectStoredListener(builderId, new Procedure() {
+					public void execute(Object... arguments) {
+						EntityAttributeBuilder.this.junctionTable = (TableBuilder<?>)arguments[0];
+					}
+				});
+        	}
+        	else {
+                throw new IllegalStateException("Object does not exist with id " + builderId);
+        	}
+        }
+        else if (!(restoredObject instanceof TableBuilder)) {
+        	throw new IllegalStateException("Type mismatch for id: " + builderId + ". " + TableBuilder.class.getSimpleName() + " vs " + restoredObject.getClass().getSimpleName());
+        }
+        else {
+            this.junctionTable = (TableBuilder<?>)restoredObject;
+        }
+        return this;
+    }
+
+	public TableBuilder<? extends EntityAttributeBuilder<P>> junctionTable$begin() {
+		verifyMutable();
+		TableBuilder<EntityAttributeBuilder<P>> result = new TableBuilder<EntityAttributeBuilder<P>>(this);
+		this.junctionTable = result;
+		return result;
+	}
+
 	private List<ColumnBuilder<?>> junctionLeftColumns;
 	
 	public List<ColumnBuilder<?>> getJunctionLeftColumns() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.junctionLeftColumns, List.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttribute.class, "junctionLeftColumns");
+			this.junctionLeftColumns = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+		}
+
 		return junctionLeftColumns;
 	}
 
@@ -538,6 +633,11 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 	private List<ColumnBuilder<?>> junctionRightColumns;
 	
 	public List<ColumnBuilder<?>> getJunctionRightColumns() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.junctionRightColumns, List.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttribute.class, "junctionRightColumns");
+			this.junctionRightColumns = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+		}
+
 		return junctionRightColumns;
 	}
 

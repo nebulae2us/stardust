@@ -32,13 +32,13 @@ public class ValueObjectBuilder<P> extends AttributeHolderBuilder<P> {
 	}
 
     public ValueObject toValueObject() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ValueObject.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ValueObject.class);
     }
     
 
 	@Override
     public ValueObject toAttributeHolder() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ValueObject.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ValueObject.class);
     }
     
 
@@ -46,6 +46,11 @@ public class ValueObjectBuilder<P> extends AttributeHolderBuilder<P> {
 	private ValueObjectBuilder<?> superValueObject;
 	
 	public ValueObjectBuilder<?> getSuperValueObject() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.superValueObject, ValueObjectBuilder.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, ValueObject.class, "superValueObject");
+			this.superValueObject = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(ValueObjectBuilder.class);
+		}
+
 		return superValueObject;
 	}
 

@@ -11,8 +11,6 @@ import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
 import org.nebulae2us.stardust.db.domain.LinkedTableBundleBuilder;
 import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.db.domain.TableBuilder;
-import org.nebulae2us.stardust.expr.domain.Expression;
-import org.nebulae2us.stardust.expr.domain.ExpressionBuilder;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.AttributeBuilder;
 import org.nebulae2us.stardust.my.domain.AttributeHolder;
@@ -33,8 +31,6 @@ import org.nebulae2us.stardust.sql.domain.SelectQuery;
 import org.nebulae2us.stardust.sql.domain.SelectQueryBuilder;
 import org.nebulae2us.stardust.sql.domain.SelectQueryParseResult;
 import org.nebulae2us.stardust.sql.domain.SelectQueryParseResultBuilder;
-import org.nebulae2us.stardust.expr.domain.LogicalExpression;
-import org.nebulae2us.stardust.expr.domain.LogicalExpressionBuilder;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
@@ -56,7 +52,6 @@ public class Builders {
 				.put(LinkedTable.class, LinkedTableBuilder.class)
 				.put(LinkedTableBundle.class, LinkedTableBundleBuilder.class)
 				.put(Table.class, TableBuilder.class)
-				.put(Expression.class, ExpressionBuilder.class)
 				.put(Attribute.class, AttributeBuilder.class)
 				.put(AttributeHolder.class, AttributeHolderBuilder.class)
 				.put(EntityDiscriminator.class, EntityDiscriminatorBuilder.class)
@@ -67,7 +62,6 @@ public class Builders {
 				.put(LinkedTableEntityBundle.class, LinkedTableEntityBundleBuilder.class)
 				.put(SelectQuery.class, SelectQueryBuilder.class)
 				.put(SelectQueryParseResult.class, SelectQueryParseResultBuilder.class)
-				.put(LogicalExpression.class, LogicalExpressionBuilder.class)
 				.put(Entity.class, EntityBuilder.class)
 				.put(EntityAttribute.class, EntityAttributeBuilder.class)
 				.put(EntityIdentifier.class, EntityIdentifierBuilder.class)
@@ -147,23 +141,6 @@ public class Builders {
     
     public static TableBuilder<?> wrap(Table table) {
     	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(table).to(TableBuilder.class);
-    }
-
-    public static ExpressionBuilder<?> expression() {
-        return new ExpressionBuilder<Object>();
-    }
-
-    public static ExpressionBuilder<?> expression$restoreFrom(BuilderRepository repo, int builderId) {
-        return (ExpressionBuilder<?>)repo.get(builderId);
-    }
-
-    public static ExpressionBuilder<?> expression$copyFrom(Expression expression) {
-    	ExpressionBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(expression).to(ExpressionBuilder.class);
-    	return result;
-    }
-    
-    public static ExpressionBuilder<?> wrap(Expression expression) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(expression).to(ExpressionBuilder.class);
     }
 
     public static AttributeBuilder<?> attribute() {
@@ -334,23 +311,6 @@ public class Builders {
     
     public static SelectQueryParseResultBuilder<?> wrap(SelectQueryParseResult selectQueryParseResult) {
     	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(selectQueryParseResult).to(SelectQueryParseResultBuilder.class);
-    }
-
-    public static LogicalExpressionBuilder<?> logicalExpression() {
-        return new LogicalExpressionBuilder<Object>();
-    }
-
-    public static LogicalExpressionBuilder<?> logicalExpression$restoreFrom(BuilderRepository repo, int builderId) {
-        return (LogicalExpressionBuilder<?>)repo.get(builderId);
-    }
-
-    public static LogicalExpressionBuilder<?> logicalExpression$copyFrom(LogicalExpression logicalExpression) {
-    	LogicalExpressionBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(logicalExpression).to(LogicalExpressionBuilder.class);
-    	return result;
-    }
-    
-    public static LogicalExpressionBuilder<?> wrap(LogicalExpression logicalExpression) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(logicalExpression).to(LogicalExpressionBuilder.class);
     }
 
     public static EntityBuilder<?> entity() {

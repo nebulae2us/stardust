@@ -20,6 +20,9 @@ import org.nebulae2us.electron.util.ImmutableList;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
+import org.nebulae2us.stardust.db.domain.Table;
+
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * 
@@ -55,6 +58,8 @@ public class EntityAttribute extends Attribute {
 	 * These columns belong to attribute entity
 	 */
 	private final ImmutableList<Column> rightColumns;
+	
+	private final Table junctionTable;
 
 	/**
 	 * These columns belong to junction table in case a junction table is required (such as many-to-many relationship)
@@ -76,8 +81,32 @@ public class EntityAttribute extends Attribute {
 		this.owningSide = mirror.toBooleanValue("owningSide");
 		this.leftColumns = Immutables.$(mirror.toListOf(Column.class, "leftColumns"));
 		this.rightColumns = Immutables.$(mirror.toListOf(Column.class, "rightColumns"));
+		this.junctionTable = mirror.to(Table.class, "junctionTable");
 		this.junctionLeftColumns = Immutables.$(mirror.toListOf(Column.class, "junctionLeftColumns"));
 		this.junctionRightColumns = Immutables.$(mirror.toListOf(Column.class, "junctionRightColumns"));
+		
+		assertInvariant();
+	}
+	
+	private void assertInvariant() {
+		Assert.notNull(this.entity, "entity cannot be null");
+		Assert.notNull(this.relationalType, "relationalType cannot be null");
+		Assert.notNull(this.joinType, "joinType cannot be null");
+		Assert.notEmpty(this.leftColumns, "leftColumns cannot be empty");
+		Assert.notEmpty(this.rightColumns, "rightColumns cannot be empty");
+		Assert.isTrue(this.leftColumns.size() == this.rightColumns.size(), "size mismatch between leftColumns and rightColumns: %d vs. %d", this.leftColumns.size(), this.rightColumns.size());
+		
+		if (this.junctionTable == null) {
+			Assert.empty(this.junctionLeftColumns, "junctionLeftColumns must be empty");
+			Assert.empty(this.junctionRightColumns, "junctionRightColumns must be empty");
+		}
+		else {
+			Assert.notEmpty(this.junctionLeftColumns, "junctionLeftColumns cannot be empty");
+			Assert.notEmpty(this.junctionRightColumns, "junctionRightColumns cannot be empty");
+			Assert.isTrue(this.junctionLeftColumns.size() == this.junctionRightColumns.size(), "size mismatch between junctionLeftColumns and junctionRightColumns: %d vs %d", this.junctionLeftColumns.size(), this.junctionRightColumns.size());
+			Assert.isTrue(this.leftColumns.size() == this.junctionLeftColumns.size(), "size mismatch between columns and junctionColumns");
+		}
+		
 	}
 
 	public Entity getEntity() {
@@ -110,6 +139,10 @@ public class EntityAttribute extends Attribute {
 
 	public ImmutableList<Column> getJunctionRightColumns() {
 		return junctionRightColumns;
+	}
+
+	public Table getJunctionTable() {
+		return junctionTable;
 	}
 
 	@Override

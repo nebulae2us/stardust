@@ -71,9 +71,13 @@ public class LinkedTableEntity {
 
 	private void assertInvariant() {
 		Assert.notNull(this.table, "table cannot be null");
-		Assert.notNull(this.entity, "entity cannot be null");
-		Assert.notNull(this.alias, "alias cannot be null");
 		Assert.notEmpty(this.tableAlias, "tableAlias cannot be null");
+		Assert.notNull(this.owningSideAttributes, "attributes cannot be null");
+		
+		// entity is null when this table is a junction table, which is only for join purpose
+		Assert.isTrue((this.entity != null && this.alias != null)
+				|| (this.entity == null && this.alias == null && this.owningSideAttributes.size() == 0), "Invalid alias");
+		
 		
 		if (this.parent == null) {
 			Assert.empty(this.parentColumns, "parentColumns cannot be set for root node");

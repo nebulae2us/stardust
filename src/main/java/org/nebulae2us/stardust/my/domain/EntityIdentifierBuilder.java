@@ -32,13 +32,13 @@ public class EntityIdentifierBuilder<P> extends AttributeHolderBuilder<P> {
 	}
 
     public EntityIdentifier toEntityIdentifier() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(EntityIdentifier.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(EntityIdentifier.class);
     }
     
 
 	@Override
     public EntityIdentifier toAttributeHolder() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(EntityIdentifier.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(EntityIdentifier.class);
     }
     
 

@@ -34,13 +34,13 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	}
 
     public ScalarAttribute toScalarAttribute() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ScalarAttribute.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ScalarAttribute.class);
     }
     
 
 	@Override
     public ScalarAttribute toAttribute() {
-    	return new Converter(new BuilderAnnotationDestinationClassResolver(), true).convert(this).to(ScalarAttribute.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ScalarAttribute.class);
     }
     
 
@@ -48,6 +48,11 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	private Class<?> scalarType;
 	
 	public Class<?> getScalarType() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.scalarType, Class.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, ScalarAttribute.class, "scalarType");
+			this.scalarType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(Class.class);
+		}
+
 		return scalarType;
 	}
 
@@ -65,6 +70,11 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	private ColumnBuilder<?> column;
 	
 	public ColumnBuilder<?> getColumn() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.column, ColumnBuilder.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, ScalarAttribute.class, "column");
+			this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(ColumnBuilder.class);
+		}
+
 		return column;
 	}
 

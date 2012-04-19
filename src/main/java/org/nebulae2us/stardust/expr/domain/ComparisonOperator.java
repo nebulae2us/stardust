@@ -15,34 +15,17 @@
  */
 package org.nebulae2us.stardust.expr.domain;
 
-import org.nebulae2us.electron.Converter;
-import org.nebulae2us.electron.DestinationClassResolver;
-import org.nebulae2us.electron.Mirror;
-import org.nebulae2us.stardust.Builders;
-
 /**
  * @author Trung Phan
  *
  */
-public abstract class Expression {
+public enum ComparisonOperator {
 
-	private final boolean negated;
+	EQ,
+	NE,
+	LT,
+	LE,
+	GT,
+	GE
 	
-	public Expression(Mirror mirror) {
-		mirror.bind(this);
-		
-		this.negated = mirror.toBooleanValue("negated");
-	}
-
-	public boolean isNegated() {
-		return negated;
-	}
-	
-	public Expression negate() {
-		return new Converter(getDestinationClassResolver(), true).convert(this).to(Expression.class);
-	}
-	
-	protected DestinationClassResolver getDestinationClassResolver() {
-		return null;
-	}
 }

@@ -13,51 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust;
+package org.nebulae2us.stardust.expr.domain;
 
 import java.io.File;
 
 import org.nebulae2us.electron.BuilderGenerator;
-import org.nebulae2us.stardust.db.domain.*;
-import org.nebulae2us.stardust.expr.domain.*;
-import org.nebulae2us.stardust.my.domain.*;
-import org.nebulae2us.stardust.sql.domain.*;
 
 /**
  * 
  * @author Trung Phan
  *
  */
-public class GenerateBuilders {
+public class GenerateExprBuilders {
 
 	public static void main(String ... arguments) {
 		File genFolder = new File("src/main/java");
 		
 		new BuilderGenerator()
 			.baseFolder(genFolder)
-			.buildersClassName("org.nebulae2us.stardust.Builders")
+			.buildersClassName("org.nebulae2us.stardust.expr.domain.ExprBuilders")
 			.builderSuffix("Builder")
 			.generate(
-					Table.class,
-					Column.class,
-					LinkedTable.class,
-					LinkedTableBundle.class,
-					Attribute.class,
-					AttributeHolder.class,
-					Entity.class,
-					EntityAttribute.class,
-					EntityIdentifier.class,
-					EntityDiscriminator.class,
-					ScalarAttribute.class,
-					ValueObject.class,
-					ValueObjectAttribute.class,
-					AliasJoin.class,
-					LinkedEntity.class,
-					LinkedEntityBundle.class,
-					SelectQuery.class,
-					LinkedTableEntity.class,
-					LinkedTableEntityBundle.class,
-					SelectQueryParseResult.class
+					Expression.class,
+					LogicalExpression.class,
+					InListExpression.class,
+					ComparisonExpression.class
 					);
 		
 	}
