@@ -31,6 +31,7 @@ import org.nebulae2us.stardust.sql.domain.*;
 	LinkedEntityBundleTest.class, 
 	SelectQueryTest.class,
 	EntityMappingTest.class,
+	EntityMappingWithJoinsTest.class,
 	LinkedEntityBundleDataReaderTest.class})
 public class AllTests {
 	

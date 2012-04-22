@@ -47,57 +47,10 @@ public class MockedDataReader extends DataReader {
 		return idx < 0 ? -1 : idx + 1;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T readObject(Class<T> expectedClass, int columnIndex) {
 		return (T)this.data.get(currentPos)[columnIndex - 1];
-	}
-
-	@Override
-	public int readInt(int columnIndex) {
-		Number number = readObject(Number.class, columnIndex);
-		return number != null ? number.intValue() : 0;
-	}
-
-	@Override
-	public long readLong(int columnIndex) {
-		Number number = readObject(Number.class, columnIndex);
-		return number != null ? number.longValue() : 0L;
-	}
-
-	@Override
-	public short readShort(int columnIndex) {
-		Number number = readObject(Number.class, columnIndex);
-		return number != null ? number.shortValue() : 0;
-	}
-
-	@Override
-	public byte readByte(int columnIndex) {
-		Number number = readObject(Number.class, columnIndex);
-		return number != null ? number.byteValue() : 0;
-	}
-
-	@Override
-	public char readChar(int columnIndex) {
-		Character character = readObject(Character.class, columnIndex);
-		return character != null ? character.charValue() : 0;
-	}
-
-	@Override
-	public double readDouble(int columnIndex) {
-		Number number = readObject(Number.class, columnIndex);
-		return number != null ? number.doubleValue() : 0.0;
-	}
-
-	@Override
-	public float readFloat(int columnIndex) {
-		Number number = readObject(Number.class, columnIndex);
-		return number != null ? number.floatValue() : 0.0F;
-	}
-
-	@Override
-	public boolean readBoolean(int columnIndex) {
-		Boolean bool = readObject(Boolean.class, columnIndex);
-		return bool != null ? bool.booleanValue() : false;
 	}
 
 	@Override

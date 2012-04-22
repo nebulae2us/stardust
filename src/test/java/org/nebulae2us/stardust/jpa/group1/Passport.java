@@ -32,7 +32,7 @@ import javax.persistence.OneToOne;
 public class Passport extends AbstractEntity {
 
 	@Id
-	private int passwordNumber;
+	private int passportNumber;
 	
 	@OneToOne
 	@JoinColumns({
@@ -41,12 +41,12 @@ public class Passport extends AbstractEntity {
 	})
 	private Person owner;
 
-	public int getPasswordNumber() {
-		return passwordNumber;
+	public int getPassportNumber() {
+		return passportNumber;
 	}
 
-	public void setPasswordNumber(int passwordNumber) {
-		this.passwordNumber = passwordNumber;
+	public void setPassportNumber(int passportNumber) {
+		this.passportNumber = passportNumber;
 	}
 
 	public Person getOwner() {

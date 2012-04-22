@@ -32,6 +32,7 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
@@ -45,7 +46,7 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * 
- * EntityMappingRepository is meant be live for one LinkedEntityBundle; therefore, it's not shared among thread, hence it's not thread safe.
+ * EntityMappingRepository is meant be live within method LinkedEntityBundle.readData(); therefore, it's not shared among thread, hence it's not thread safe.
  * 
  * @author Trung Phan
  *
@@ -64,7 +65,7 @@ public class EntityMappingRepository {
 		
 		List<Object> result = new ArrayList<Object>();
 		
-		EntityMapping rootEntityMapping = getEntityMapping(rootLinkedEntity.getEntity(), rootLinkedEntity.getAlias(), dataReader);
+		EntityMapping rootEntityMapping = getEntityMapping(bundle, rootLinkedEntity.getAlias(), dataReader);
 		Map<Object, Object> rootCache = getMainCache(rootLinkedEntity.getAlias());
 
 		Map<String, Object> alias2Instance = new HashMap<String, Object>();
@@ -78,20 +79,20 @@ public class EntityMappingRepository {
 			alias2Instance.put(rootLinkedEntity.getAlias(), rootEntityInstance);
 			
 			int sizeAfter = rootCache.size();
-			if (sizeAfter > sizeBefore) {
+			if (rootEntityMapping.getIdentifierAttributeMappings().size() == 0 || sizeAfter > sizeBefore) {
 				result.add(rootEntityInstance);
 			}
 			
 			for (LinkedEntity linkedEntity : bundle.getNonRoots()) {
 				Object parentInstance = alias2Instance.get(linkedEntity.getParent().getAlias());
 				if (parentInstance != null) {
-					EntityMapping entityMapping = getEntityMapping(linkedEntity.getEntity(), linkedEntity.getAlias(), dataReader);
+					EntityMapping entityMapping = getEntityMapping(bundle, linkedEntity.getAlias(), dataReader);
 					Object entityInstance = readObject(linkedEntity.getAlias(), entityMapping, dataReader);
 					alias2Instance.put(linkedEntity.getAlias(), entityInstance);
 					
 					EntityAttribute entityAttribute = linkedEntity.getAttribute();
 					switch (entityAttribute.getRelationalType()) {
-					case MANY_TO_ONE:
+					case MANY_TO_ONE: {
 						setValue(entityAttribute.getField(), parentInstance, entityInstance);
 						if (ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
 							Attribute foreignAttribute = entityAttribute.getEntity().getAttribute(entityAttribute.getInverseAttributeName());
@@ -106,8 +107,8 @@ public class EntityMappingRepository {
 							((Collection)values).add(parentInstance);
 							
 						}
-						break;
-					case ONE_TO_MANY:
+						break; }
+					case ONE_TO_MANY: {
 						Object values = getValue(entityAttribute.getField(), parentInstance);
 						if (values == null) {
 							values = newCollectionInstance(entityAttribute.getField().getType());
@@ -122,7 +123,41 @@ public class EntityMappingRepository {
 							EntityAttribute foreignEntityAttribute = (EntityAttribute)foreignAttribute;
 							setValue(foreignEntityAttribute.getField(), entityInstance, parentInstance);
 						}
-						break;
+						break; }
+					case ONE_TO_ONE: {
+						setValue(entityAttribute.getField(), parentInstance, entityInstance);
+						if (ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
+							Attribute foreignAttribute = entityAttribute.getEntity().getAttribute(entityAttribute.getInverseAttributeName());
+							AssertState.isTrue(foreignAttribute instanceof EntityAttribute, "inverse attribute is invalid");
+							EntityAttribute foreignEntityAttribute = (EntityAttribute)foreignAttribute;
+							setValue(foreignEntityAttribute.getField(), entityInstance, parentInstance);
+							
+						}
+						break; }
+					case MANY_TO_MANY: {
+						Object values = getValue(entityAttribute.getField(), parentInstance);
+						if (values == null) {
+							values = newCollectionInstance(entityAttribute.getField().getType());
+							setValue(entityAttribute.getField(), parentInstance, values);
+						}
+						AssertState.isTrue(values instanceof Collection, "Unknown collection type %s", values.getClass());
+						((Collection)values).add(entityInstance);
+						
+						if (ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
+							Attribute foreignAttribute = entityAttribute.getEntity().getAttribute(entityAttribute.getInverseAttributeName());
+							AssertState.isTrue(foreignAttribute instanceof EntityAttribute, "inverse attribute is invalid");
+							EntityAttribute foreignEntityAttribute = (EntityAttribute)foreignAttribute;
+							Object inverseValues = getValue(foreignEntityAttribute.getField(), entityInstance);
+							if (inverseValues == null) {
+								inverseValues = newCollectionInstance(foreignEntityAttribute.getField().getType());
+								setValue(foreignEntityAttribute.getField(), entityInstance, inverseValues);
+							}
+							AssertState.isTrue(inverseValues instanceof Collection, "Unknown collection type %s", inverseValues.getClass());
+							((Collection)inverseValues).add(parentInstance);
+							
+						}
+						
+						break; }
 					}
 					
 				}
@@ -177,24 +212,26 @@ public class EntityMappingRepository {
 	}
 
 	private Object readIdValues(List<ScalarAttributeMapping> identifierAttributeMappings, DataReader dataReader) {
-		Object keyValue = null;
 		int idCount = identifierAttributeMappings.size();
 		if (idCount == 1) {
 			ScalarAttributeMapping identifierAttributeMapping = identifierAttributeMappings.get(0);
-			keyValue = dataReader.readObject(identifierAttributeMapping.getAttribute().getField().getType(), identifierAttributeMapping.getColumnIndex());
+			Object idValue = dataReader.readObject(identifierAttributeMapping.getAttribute().getField().getType(), identifierAttributeMapping.getColumnIndex());
+			return idValue;
 		}
 		else if (idCount > 1) {
-			keyValue = new Object[idCount];
+			Object[] idValues = new Object[idCount];
+			boolean isNull = true;
 			for (int i = 0; i < idCount; i++) {
 				ScalarAttributeMapping identifierAttributeMapping = identifierAttributeMappings.get(i);
-				((Object[])keyValue)[i] = dataReader.readObject(identifierAttributeMapping.getAttribute().getField().getType(), identifierAttributeMapping.getColumnIndex());
+				Object idValue = dataReader.readObject(identifierAttributeMapping.getAttribute().getField().getType(), identifierAttributeMapping.getColumnIndex());
+				if (idValue != null) {
+					isNull = false;
+				}
+				idValues[i] = idValue;
 			}
+			return isNull ? null : new ArrayWrapper(idValues);
 		}
-		
-		if (keyValue != null) {
-			return keyValue.getClass().isArray() ? new ArrayWrapper((Object[])keyValue) : keyValue;
-		}
-		
+
 		return null;
 	}
 	
@@ -210,7 +247,9 @@ public class EntityMappingRepository {
 		}
 		
 		result = readObject(alias, entityMapping.getEntity().getDeclaringClass(), entityMapping.getAttributeMappings(), dataReader);
-		mainCache.put(key, result);
+		if (key != null) {
+			mainCache.put(key, result);
+		}
 		return result;
 		
 	}
@@ -255,13 +294,15 @@ public class EntityMappingRepository {
 				EntityAttributeMapping entityAttributeMapping = (EntityAttributeMapping)attributeMapping;
 				
 				Object key = readIdValues(entityAttributeMapping.getIdentifierAttributeMappings(), dataReader);
-				Map<Object, Object> sideCache = getSideCache(alias, entityAttributeMapping.getAttribute().getField());
-				Object value = sideCache.get(key);
-				if (value == null) {
-					value = readObject(alias, entityAttributeMapping.getAttribute().getEntity().getDeclaringClass(), entityAttributeMapping.getAttributeMappings(), dataReader);
-					sideCache.put(key, value);
+				if (key != null) {
+					Map<Object, Object> sideCache = getSideCache(alias, entityAttributeMapping.getAttribute().getField());
+					Object value = sideCache.get(key);
+					if (value == null) {
+						value = readObject(alias, entityAttributeMapping.getAttribute().getEntity().getDeclaringClass(), entityAttributeMapping.getAttributeMappings(), dataReader);
+						sideCache.put(key, value);
+					}
+					setValue(attributeMapping.getAttribute().getField(), result, value);
 				}
-				setValue(attributeMapping.getAttribute().getField(), result, value);
 			}
 		}
 
@@ -280,7 +321,10 @@ public class EntityMappingRepository {
 		}
 	}
 	
-	public EntityMapping getEntityMapping(Entity entity, String alias, DataReader dataReader) {
+	public EntityMapping getEntityMapping(LinkedEntityBundle linkedEntityBundle, String alias, DataReader dataReader) {
+		
+		LinkedEntity linkedEntity = linkedEntityBundle.getLinkedEntity(alias);
+		Entity entity = linkedEntity.getEntity();
 		
 		EntityMapping result = entityMappings.get(new Pair<Entity, String>(entity, alias));
 		
@@ -301,6 +345,10 @@ public class EntityMappingRepository {
 		boolean hasAllIdentifierColumns = true;
 		for (ScalarAttribute identifierAttribute : identifierAttributes) {
 			int columnIndex = dataReader.findColumn(prefix + identifierAttribute.getColumn().getName());
+			if (columnIndex < 0) {
+				columnIndex = getColumnIndexOfReferencedColumn(dataReader, linkedEntity, identifierAttribute.getColumn());
+			}
+			
 			if (columnIndex < 0) {
 				hasAllIdentifierColumns = false;
 				break;
@@ -336,7 +384,7 @@ public class EntityMappingRepository {
 			}
 			else if (attribute instanceof EntityAttribute) {
 				EntityAttribute entityAttribute = (EntityAttribute)attribute;
-				if (entityAttribute.isOwningSide()) {
+				if (entityAttribute.isOwningSide() && !shoudBeOmitted(linkedEntityBundle, linkedEntity, entityAttribute)) {
 					EntityAttributeMappingBuilder<?> compositeAttributeMapping = getEntityAttributeMapping(entityAttribute, prefix, dataReader);
 					if (compositeAttributeMapping != null) {
 						resultBuilder.attributeMappings(compositeAttributeMapping);
@@ -351,6 +399,61 @@ public class EntityMappingRepository {
 		this.entityMappings.put(new Pair<Entity, String>(entity, alias), result);
 		
 		return result;
+	}
+
+	
+	/**
+	 * 
+	 * Determine if the entityAttribute is redundant.
+	 * 
+	 * @see EntityMappingWithJoinsTest#map_house_and_rooms_remove_redundant_house_mapping()
+	 * @see EntityMappingWithJoinsTest#map_room_and_house_remove_redundant_house_mapping()
+	 * @param linkedEntityBundle
+	 * @param entityAttribute
+	 * @return
+	 */
+	private boolean shoudBeOmitted(LinkedEntityBundle linkedEntityBundle, LinkedEntity parentLinkedEntity, EntityAttribute entityAttribute) {
+		
+		if (parentLinkedEntity.getAttribute() != null && entityAttribute.getFullName().equals(parentLinkedEntity.getAttribute().getInverseAttributeName())) {
+			return true;
+		}
+		
+		for (LinkedEntity linkedEntity : linkedEntityBundle.getNonRoots()) {
+			if (linkedEntity.getParent() == parentLinkedEntity && linkedEntity.getAttribute() == entityAttribute) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	
+	/**
+	 * 
+	 * Try finding the column index of referenced column. For example, Room and House has this join Room r inner join House h on (r.house_id = h.house_id).
+	 * If h_house_id is missing in the select statement, r_house_id can be used instead. This method is to find the column index of r_house_id if the column
+	 * h_house_id is missing.
+	 * 
+	 * This scenario is only valid if there is no junction table involved in the relationship between room and house.
+	 * 
+	 * @see EntityMappingWithJoinsTest#map_room_and_house_borrow_column()
+	 * 
+	 * @param dataReader
+	 * @param linkedEntity
+	 * @param identifierAttribute
+	 * @return
+	 */
+	private int getColumnIndexOfReferencedColumn(DataReader dataReader,	LinkedEntity linkedEntity, Column column) {
+		
+		if (linkedEntity.getParent() != null && linkedEntity.getAttribute().getJunctionTable() == null) {
+			String parentAlias = linkedEntity.getParent().getAlias();
+			int idx = linkedEntity.getAttribute().getRightColumns().indexOf(column);
+			if (idx > -1) {
+				return dataReader.findColumn((parentAlias.length() == 0 ? "" : parentAlias + '_') + linkedEntity.getAttribute().getLeftColumns().get(idx).getName());
+			}
+		}
+
+		return -1;
 	}
 	
 	private ValueObjectAttributeMappingBuilder<?> getValueObjectAttributeMapping(ValueObjectAttribute parentAttribute, String prefix, DataReader dataReader) {
@@ -397,6 +500,7 @@ public class EntityMappingRepository {
 			AssertState.isTrue(idx >= 0, "rightColumns does not contain id column");
 
 			int columnIndex = dataReader.findColumn(prefix + parentAttribute.getLeftColumns().get(idx).getName());
+			
 			if (columnIndex < 0) {
 				hasAllIdentifierColumns = false;
 				break;

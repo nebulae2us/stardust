@@ -13,18 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.sql.domain;
+package org.nebulae2us.stardust.exception;
 
 /**
  * @author Trung Phan
  *
  */
-public abstract class DataReader {
+public class IllegalSyntaxException extends RuntimeException {
 	
-	public abstract int findColumn(String columnName);
-	
-	public abstract <T> T readObject(Class<T> expectedClass, int columnIndex);
-	
-	public abstract boolean next();
+	private static final long serialVersionUID = 7363576067277276745L;
 
+	public IllegalSyntaxException() {
+	}
+	
+	public IllegalSyntaxException(Throwable cause) {
+		super(cause);
+	}
+	
+	public IllegalSyntaxException(String message) {
+		super(message);
+	}
+	
+	public IllegalSyntaxException(String message, Throwable cause) {
+		super(message, cause);
+	}
 }

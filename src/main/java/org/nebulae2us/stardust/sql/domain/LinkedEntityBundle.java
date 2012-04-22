@@ -117,37 +117,30 @@ public class LinkedEntityBundle {
 			}
 			else {
 				leftLinkedEntity = linkedEntities.get(firstSegment);
-				if (leftLinkedEntity == null) {
-					throw new IllegalStateException(firstSegment);
-				}
+				
+				AssertSyntax.notNull(leftLinkedEntity,
+						"Alias \"%s\" for \"%s\" is invalid.", aliasJoin.getAlias(), aliasJoin.getName());
 			}
 			
 			Entity leftEntity = leftLinkedEntity.getEntity().toEntity();
 			Attribute _attribute = leftEntity.getAttribute(secondSegment);
 			
-			if (_attribute == null || !(_attribute instanceof EntityAttribute)) {
-				throw new IllegalStateException("Invalid expression " + aliasJoin.getAlias());
-			}
+			AssertSyntax.isTrue(_attribute instanceof EntityAttribute,
+					"Alias \"%s\" for \"%s\" is invalid. \"%s\" is not a valid field or property for %s.", aliasJoin.getAlias(), aliasJoin.getName(), secondSegment, leftEntity.getDeclaringClass().getSimpleName());
 			
 			EntityAttribute attribute = (EntityAttribute)_attribute;
 
-			if (attribute instanceof EntityAttribute) {
-				LinkedEntityBuilder<?> linkedEntity = linkedEntity()
-						.parent(leftLinkedEntity)
-						.entity$wrap(attribute.getEntity())
-						.alias(aliasJoin.getAlias())
-						.attribute$wrap((EntityAttribute)attribute)
-						.joinType(aliasJoin.getJoinType())
-						;
-				
-				result.linkedEntities(linkedEntity);
-				
-				linkedEntities.put(aliasJoin.getAlias(), linkedEntity);
-				
-			}
-			else {
-				throw new IllegalStateException();
-			}
+			LinkedEntityBuilder<?> linkedEntity = linkedEntity()
+					.parent(leftLinkedEntity)
+					.entity$wrap(attribute.getEntity())
+					.alias(aliasJoin.getAlias())
+					.attribute$wrap((EntityAttribute)attribute)
+					.joinType(aliasJoin.getJoinType())
+					;
+			
+			result.linkedEntities(linkedEntity);
+			
+			linkedEntities.put(aliasJoin.getAlias(), linkedEntity);
 		}
 		
 		return result.toLinkedEntityBundle();

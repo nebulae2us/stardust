@@ -19,14 +19,17 @@ import java.lang.reflect.Constructor;
 import java.util.List;
 
 import org.nebulae2us.stardust.db.domain.Column;
+import org.nebulae2us.stardust.exception.IllegalSyntaxException;
 
 /**
  * @author Trung Phan
  *
  */
 public class BaseAssert<T extends Throwable> {
+	
     public static BaseAssert<IllegalArgumentException> Assert = BaseAssert.newAssertion(IllegalArgumentException.class);
     public static BaseAssert<IllegalStateException> AssertState = BaseAssert.newAssertion(IllegalStateException.class);
+    public static BaseAssert<IllegalSyntaxException> AssertSyntax = BaseAssert.newAssertion(IllegalSyntaxException.class);
 
     public static <T extends Throwable> BaseAssert<T> newAssertion(Class<T> exceptionClass) {
         return new BaseAssert<T>(exceptionClass);

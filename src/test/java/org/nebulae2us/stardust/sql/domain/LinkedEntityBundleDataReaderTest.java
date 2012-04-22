@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.jpa.group1.House;
+import org.nebulae2us.stardust.jpa.group1.Passport;
 import org.nebulae2us.stardust.jpa.group1.Person;
 import org.nebulae2us.stardust.jpa.group1.Room;
 import org.nebulae2us.stardust.my.domain.Entity;
@@ -276,4 +277,102 @@ public class LinkedEntityBundleDataReaderTest {
 		
 	}
 	
+	@Test
+	public void read_person_and_passport() {
+		List<String> columnNames = Arrays.asList("SSN", "DATE_BORN", "PP_PASSPORT_NUMBER");
+		
+		List<Object[]> data = new ListBuilder<Object[]>().add(
+				new Object[]{"123-12-0001", new Date(1001), 1}
+				).toList();
+
+		DataReader dataReader = new MockedDataReader(columnNames, data);
+
+		Entity entity = entityRepository.getEntity(Person.class);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
+				Arrays.asList(aliasJoin().alias("pp").name("passport").joinType(JoinType.INNER_JOIN).toAliasJoin()));
+		
+		List<Person> people = (List<Person>)bundle.readData(dataReader);
+		
+		assertEquals(1, people.size());
+		Person person = people.get(0);
+		Passport passport = person.getPassport();
+		assertNotNull(passport);
+		assertTrue(person.getPassport().getOwner() == person);
+	}
+	
+	@Test
+	public void read_passport_and_person() {
+		List<String> columnNames = Arrays.asList("PASSPORT_NUMBER", "O_SSN", "O_DATE_BORN");
+		
+		List<Object[]> data = new ListBuilder<Object[]>().add(
+				new Object[]{1, "123-12-0001", new Date(1001)}
+				).toList();
+
+		DataReader dataReader = new MockedDataReader(columnNames, data);
+
+		Entity entity = entityRepository.getEntity(Passport.class);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
+				Arrays.asList(aliasJoin().alias("o").name("owner").joinType(JoinType.INNER_JOIN).toAliasJoin()));
+		
+		List<Passport> passports = (List<Passport>)bundle.readData(dataReader);
+		
+		assertEquals(1, passports.size());
+		Passport passport = passports.get(0);
+		Person person = passport.getOwner();
+		assertNotNull(person);
+		assertTrue(passport.getOwner().getPassport() == passport);
+	}
+	
+	@Test
+	public void read_person_house() {
+		List<String> columnNames = Arrays.asList("SSN", "DATE_BORN", "H_HOUSE_ID", "H_HOUSE_LETTER");
+		
+		List<Object[]> data = new ListBuilder<Object[]>().add(
+				new Object[]{"123-12-0001", new Date(1001), 1, "a"}
+				).toList();
+
+		DataReader dataReader = new MockedDataReader(columnNames, data);
+
+		Entity entity = entityRepository.getEntity(Person.class);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
+				Arrays.asList(aliasJoin().alias("h").name("houses").joinType(JoinType.INNER_JOIN).toAliasJoin()));
+		
+		List<Person> people = (List<Person>)bundle.readData(dataReader);
+
+		assertEquals(1, people.size());
+		
+		Person person  = people.get(0);
+		
+		assertEquals(1, person.getHouses().size());
+		
+		House house = person.getHouses().get(0);
+		
+		assertTrue(person == house.getOwners().get(0));
+	}
+
+	@Test
+	public void read_people_houses() {
+		List<String> columnNames = Arrays.asList("SSN", "DATE_BORN", "H_HOUSE_ID", "H_HOUSE_LETTER");
+		
+		List<Object[]> data = new ListBuilder<Object[]>().add(
+				new Object[]{"123-12-0001", new Date(1001), 1, "a"},
+				new Object[]{"123-12-0001", new Date(1001), 1, "b"},
+				new Object[]{"123-12-0002", new Date(1002), 1, "a"},
+				new Object[]{"123-12-0002", new Date(1002), 1, "c"}
+				).toList();
+
+		DataReader dataReader = new MockedDataReader(columnNames, data);
+
+		Entity entity = entityRepository.getEntity(Person.class);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
+				Arrays.asList(aliasJoin().alias("h").name("houses").joinType(JoinType.INNER_JOIN).toAliasJoin()));
+		
+		List<Person> people = (List<Person>)bundle.readData(dataReader);
+
+		assertEquals(2, people.size());
+		assertEquals(2, people.get(0).getHouses().get(0).getOwners().size());
+		
+	}
+
+
 }
