@@ -17,9 +17,11 @@ package org.nebulae2us.stardust.sql.domain;
 
 import static org.nebulae2us.stardust.Builders.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.electron.util.ImmutableList;
@@ -150,5 +152,11 @@ public class LinkedEntityBundle {
 		
 		return result.toLinkedEntityBundle();
 	}
+
+	public List<?> readData(DataReader dataReader) {
+		EntityMappingRepository repository = new EntityMappingRepository();
+		return repository.readData(this, dataReader);
+	}
+
 	
 }

@@ -13,26 +13,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust;
+package org.nebulae2us.stardust.sql.domain;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-import org.nebulae2us.stardust.my.domain.Group1EntityRepositoryTest;
-import org.nebulae2us.stardust.sql.domain.*;
+import org.nebulae2us.electron.Mirror;
 
 /**
  * @author Trung Phan
  *
  */
-@RunWith(Suite.class)
-@SuiteClasses({
-	Group1EntityRepositoryTest.class, 
-	LinkedEntityBundleTest.class, 
-	SelectQueryTest.class,
-	EntityMappingTest.class,
-	LinkedEntityBundleDataReaderTest.class})
-public class AllTests {
-	
+public class ScalarAttributeMapping extends AttributeMapping {
 
+	private final int columnIndex;
+	
+	public ScalarAttributeMapping(Mirror mirror) {
+		super(mirror);
+		mirror.bind(this);
+		
+		this.columnIndex = mirror.toIntValue("columnIndex");
+	}
+
+	public int getColumnIndex() {
+		return columnIndex;
+	}
+	
+	
 }

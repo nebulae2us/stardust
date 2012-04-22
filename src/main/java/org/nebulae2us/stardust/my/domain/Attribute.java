@@ -50,6 +50,8 @@ public abstract class Attribute {
 		this.owningEntity = mirror.to(Entity.class, "owningEntity");
 		this.fullName = mirror.toString("fullName");
 		
+		this.field.setAccessible(true);
+		
 		assertInvariant();
 	}
 

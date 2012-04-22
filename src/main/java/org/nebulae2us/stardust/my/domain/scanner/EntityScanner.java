@@ -98,6 +98,7 @@ public class EntityScanner {
 
 		for (EntityBuilder<?> entityBuilder : scannedEntityBuilders.values()) {
 			fillDefaultValuesForLinkedTableBundle(entityBuilder);
+			fixInverseEntityAttribute(entityBuilder);
 		}
 		
 //		for (EntityBuilder<?> entityBuilder : scannedEntityBuilders.values()) {
@@ -148,6 +149,28 @@ public class EntityScanner {
 		}
 	}
 	
+	/**
+	 * This is to link entityAttribute with its inverseEntityAttribute to make sure entityAttribute.inverseEntityAttribute.inverseEntityAttribute == entitAttribute
+	 * @param entityBuilder
+	 */
+	private void fixInverseEntityAttribute(EntityBuilder<?> entityBuilder) {
+		
+		for (EntityAttributeBuilder<?> entityAttribute : entityBuilder.getEntityAttributes()) {
+
+			if (ObjectUtils.isEmpty(entityAttribute.getInverseAttributeName())) {
+				EntityBuilder<?> foreignEntityBuilder = entityAttribute.getEntity();
+				List<EntityAttributeBuilder<?>> foreignEntityAttributes = foreignEntityBuilder.getEntityAttributes();
+				for (EntityAttributeBuilder<?> foreignEntityAttribute : foreignEntityAttributes) {
+					if (entityAttribute.getFullName().equals(foreignEntityAttribute.getInverseAttributeName())) {
+						entityAttribute.setInverseAttributeName(foreignEntityAttribute.getFullName());
+						break;
+					}
+				}
+			}
+		}
+		
+	}
+	
 	private EntityBuilder<?> produceRaw() {
 		
 		if (scannedEntityBuilders.containsKey(entityClass)) {
@@ -173,7 +196,7 @@ public class EntityScanner {
 		scannedEntityBuilders.put(entityClass, result);
 		
 		populateAttributes(result, relatedClasses);
-
+		
 		return result;
 	}
 

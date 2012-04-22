@@ -763,6 +763,28 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
     }
 
 
+	private String inverseAttributeName;
+	
+	public String getInverseAttributeName() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.inverseAttributeName, String.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttribute.class, "inverseAttributeName");
+			this.inverseAttributeName = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+		}
+
+		return inverseAttributeName;
+	}
+
+	public void setInverseAttributeName(String inverseAttributeName) {
+		verifyMutable();
+		this.inverseAttributeName = inverseAttributeName;
+	}
+
+	public EntityAttributeBuilder<P> inverseAttributeName(String inverseAttributeName) {
+		verifyMutable();
+		this.inverseAttributeName = inverseAttributeName;
+		return this;
+	}
+
 	@Override
 	public EntityAttributeBuilder<P> fullName(String fullName) {
 		return (EntityAttributeBuilder<P>)super.fullName(fullName);

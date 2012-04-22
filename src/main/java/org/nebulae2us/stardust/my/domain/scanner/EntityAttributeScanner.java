@@ -123,6 +123,7 @@ public class EntityAttributeScanner {
 				attributeBuilder
 						.relationalType(RelationalType.ONE_TO_MANY)
 						.joinType(JoinType.LEFT_JOIN)
+						.inverseAttributeName(oneToMany.mappedBy())
 						.leftColumns(foreignAttributeBuilder.getRightColumns())
 						.rightColumns(foreignAttributeBuilder.getLeftColumns())
 						.junctionTable(foreignAttributeBuilder.getJunctionTable())
@@ -130,7 +131,6 @@ public class EntityAttributeScanner {
 						.junctionRightColumns(foreignAttributeBuilder.getJunctionLeftColumns())
 						;
 					
-				
 			}
 		}
 		else if (this.field.getAnnotation(OneToOne.class) != null) {
@@ -152,13 +152,14 @@ public class EntityAttributeScanner {
 				attributeBuilder
 						.relationalType(RelationalType.ONE_TO_ONE)
 						.joinType(JoinType.LEFT_JOIN)
+						.inverseAttributeName(oneToOne.mappedBy())
 						.leftColumns(foreignAttributeBuilder.getRightColumns())
 						.rightColumns(foreignAttributeBuilder.getLeftColumns())
 						.junctionTable(foreignAttributeBuilder.getJunctionTable())
 						.junctionLeftColumns(foreignAttributeBuilder.getJunctionRightColumns())
 						.junctionRightColumns(foreignAttributeBuilder.getJunctionLeftColumns())
 						;
-					
+				
 			}
 			else {
 				attributeBuilder.relationalType(RelationalType.ONE_TO_ONE)
@@ -223,13 +224,13 @@ public class EntityAttributeScanner {
 				attributeBuilder
 						.relationalType(RelationalType.MANY_TO_MANY)
 						.joinType(JoinType.LEFT_JOIN)
+						.inverseAttributeName(manyToMany.mappedBy())
 						.leftColumns(foreignAttributeBuilder.getRightColumns())
 						.rightColumns(foreignAttributeBuilder.getLeftColumns())
 						.junctionTable(foreignAttributeBuilder.getJunctionTable())
 						.junctionLeftColumns(foreignAttributeBuilder.getJunctionRightColumns())
 						.junctionRightColumns(foreignAttributeBuilder.getJunctionLeftColumns())
 						;
-					
 
 			}
 			else {

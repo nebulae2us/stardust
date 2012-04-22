@@ -136,4 +136,21 @@ public class AttributeHolder {
 
 	}
 
+	/**
+	 * @param table
+	 * @return
+	 */
+	public ImmutableList<EntityAttribute> getEntityAttributes() {
+		List<EntityAttribute> result = new ArrayList<EntityAttribute>();
+		
+		for (Attribute attribute : this.attributes) {
+			if (attribute instanceof EntityAttribute) {
+				EntityAttribute entityAttribute = (EntityAttribute)attribute;
+				result.add(entityAttribute);
+			}
+		}
+		
+		return new ImmutableList<EntityAttribute>(result);
+
+	}
 }

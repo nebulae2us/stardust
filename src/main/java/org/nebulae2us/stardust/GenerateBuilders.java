@@ -57,7 +57,12 @@ public class GenerateBuilders {
 					SelectQuery.class,
 					LinkedTableEntity.class,
 					LinkedTableEntityBundle.class,
-					SelectQueryParseResult.class
+					SelectQueryParseResult.class,
+					AttributeMapping.class,
+					ScalarAttributeMapping.class,
+					ValueObjectAttributeMapping.class,
+					EntityAttributeMapping.class,
+					EntityMapping.class
 					);
 		
 	}

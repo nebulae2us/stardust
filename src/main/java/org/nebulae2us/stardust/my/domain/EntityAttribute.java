@@ -70,6 +70,11 @@ public class EntityAttribute extends Attribute {
 	 * These columns belong to junction table in case a junction table is required (such as many-to-many relationship)
 	 */
 	private final ImmutableList<Column> junctionRightColumns;
+	
+	/**
+	 * Nullable
+	 */
+	private final String inverseAttributeName;
 
 	public EntityAttribute(Mirror mirror) {
 		super(mirror);
@@ -84,6 +89,7 @@ public class EntityAttribute extends Attribute {
 		this.junctionTable = mirror.to(Table.class, "junctionTable");
 		this.junctionLeftColumns = Immutables.$(mirror.toListOf(Column.class, "junctionLeftColumns"));
 		this.junctionRightColumns = Immutables.$(mirror.toListOf(Column.class, "junctionRightColumns"));
+		this.inverseAttributeName = mirror.toString("inverseAttributeName");
 		
 		assertInvariant();
 	}
@@ -143,6 +149,10 @@ public class EntityAttribute extends Attribute {
 
 	public Table getJunctionTable() {
 		return junctionTable;
+	}
+
+	public String getInverseAttributeName() {
+		return inverseAttributeName;
 	}
 
 	@Override

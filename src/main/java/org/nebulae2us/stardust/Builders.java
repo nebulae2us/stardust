@@ -19,6 +19,10 @@ import org.nebulae2us.stardust.my.domain.EntityDiscriminator;
 import org.nebulae2us.stardust.my.domain.EntityDiscriminatorBuilder;
 import org.nebulae2us.stardust.sql.domain.AliasJoin;
 import org.nebulae2us.stardust.sql.domain.AliasJoinBuilder;
+import org.nebulae2us.stardust.sql.domain.AttributeMapping;
+import org.nebulae2us.stardust.sql.domain.AttributeMappingBuilder;
+import org.nebulae2us.stardust.sql.domain.EntityMapping;
+import org.nebulae2us.stardust.sql.domain.EntityMappingBuilder;
 import org.nebulae2us.stardust.sql.domain.LinkedEntity;
 import org.nebulae2us.stardust.sql.domain.LinkedEntityBuilder;
 import org.nebulae2us.stardust.sql.domain.LinkedEntityBundle;
@@ -43,6 +47,12 @@ import org.nebulae2us.stardust.my.domain.ValueObject;
 import org.nebulae2us.stardust.my.domain.ValueObjectBuilder;
 import org.nebulae2us.stardust.my.domain.ValueObjectAttribute;
 import org.nebulae2us.stardust.my.domain.ValueObjectAttributeBuilder;
+import org.nebulae2us.stardust.sql.domain.EntityAttributeMapping;
+import org.nebulae2us.stardust.sql.domain.EntityAttributeMappingBuilder;
+import org.nebulae2us.stardust.sql.domain.ScalarAttributeMapping;
+import org.nebulae2us.stardust.sql.domain.ScalarAttributeMappingBuilder;
+import org.nebulae2us.stardust.sql.domain.ValueObjectAttributeMapping;
+import org.nebulae2us.stardust.sql.domain.ValueObjectAttributeMappingBuilder;
 
 public class Builders {
 
@@ -56,6 +66,8 @@ public class Builders {
 				.put(AttributeHolder.class, AttributeHolderBuilder.class)
 				.put(EntityDiscriminator.class, EntityDiscriminatorBuilder.class)
 				.put(AliasJoin.class, AliasJoinBuilder.class)
+				.put(AttributeMapping.class, AttributeMappingBuilder.class)
+				.put(EntityMapping.class, EntityMappingBuilder.class)
 				.put(LinkedEntity.class, LinkedEntityBuilder.class)
 				.put(LinkedEntityBundle.class, LinkedEntityBundleBuilder.class)
 				.put(LinkedTableEntity.class, LinkedTableEntityBuilder.class)
@@ -68,6 +80,9 @@ public class Builders {
 				.put(ScalarAttribute.class, ScalarAttributeBuilder.class)
 				.put(ValueObject.class, ValueObjectBuilder.class)
 				.put(ValueObjectAttribute.class, ValueObjectAttributeBuilder.class)
+				.put(EntityAttributeMapping.class, EntityAttributeMappingBuilder.class)
+				.put(ScalarAttributeMapping.class, ScalarAttributeMappingBuilder.class)
+				.put(ValueObjectAttributeMapping.class, ValueObjectAttributeMappingBuilder.class)
 			.toMap()
 			);
 
@@ -209,6 +224,40 @@ public class Builders {
     
     public static AliasJoinBuilder<?> wrap(AliasJoin aliasJoin) {
     	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(aliasJoin).to(AliasJoinBuilder.class);
+    }
+
+    public static AttributeMappingBuilder<?> attributeMapping() {
+        return new AttributeMappingBuilder<Object>();
+    }
+
+    public static AttributeMappingBuilder<?> attributeMapping$restoreFrom(BuilderRepository repo, int builderId) {
+        return (AttributeMappingBuilder<?>)repo.get(builderId);
+    }
+
+    public static AttributeMappingBuilder<?> attributeMapping$copyFrom(AttributeMapping attributeMapping) {
+    	AttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(attributeMapping).to(AttributeMappingBuilder.class);
+    	return result;
+    }
+    
+    public static AttributeMappingBuilder<?> wrap(AttributeMapping attributeMapping) {
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(attributeMapping).to(AttributeMappingBuilder.class);
+    }
+
+    public static EntityMappingBuilder<?> entityMapping() {
+        return new EntityMappingBuilder<Object>();
+    }
+
+    public static EntityMappingBuilder<?> entityMapping$restoreFrom(BuilderRepository repo, int builderId) {
+        return (EntityMappingBuilder<?>)repo.get(builderId);
+    }
+
+    public static EntityMappingBuilder<?> entityMapping$copyFrom(EntityMapping entityMapping) {
+    	EntityMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityMapping).to(EntityMappingBuilder.class);
+    	return result;
+    }
+    
+    public static EntityMappingBuilder<?> wrap(EntityMapping entityMapping) {
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(entityMapping).to(EntityMappingBuilder.class);
     }
 
     public static LinkedEntityBuilder<?> linkedEntity() {
@@ -413,6 +462,57 @@ public class Builders {
     
     public static ValueObjectAttributeBuilder<?> wrap(ValueObjectAttribute valueObjectAttribute) {
     	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(valueObjectAttribute).to(ValueObjectAttributeBuilder.class);
+    }
+
+    public static EntityAttributeMappingBuilder<?> entityAttributeMapping() {
+        return new EntityAttributeMappingBuilder<Object>();
+    }
+
+    public static EntityAttributeMappingBuilder<?> entityAttributeMapping$restoreFrom(BuilderRepository repo, int builderId) {
+        return (EntityAttributeMappingBuilder<?>)repo.get(builderId);
+    }
+
+    public static EntityAttributeMappingBuilder<?> entityAttributeMapping$copyFrom(EntityAttributeMapping entityAttributeMapping) {
+    	EntityAttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityAttributeMapping).to(EntityAttributeMappingBuilder.class);
+    	return result;
+    }
+    
+    public static EntityAttributeMappingBuilder<?> wrap(EntityAttributeMapping entityAttributeMapping) {
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(entityAttributeMapping).to(EntityAttributeMappingBuilder.class);
+    }
+
+    public static ScalarAttributeMappingBuilder<?> scalarAttributeMapping() {
+        return new ScalarAttributeMappingBuilder<Object>();
+    }
+
+    public static ScalarAttributeMappingBuilder<?> scalarAttributeMapping$restoreFrom(BuilderRepository repo, int builderId) {
+        return (ScalarAttributeMappingBuilder<?>)repo.get(builderId);
+    }
+
+    public static ScalarAttributeMappingBuilder<?> scalarAttributeMapping$copyFrom(ScalarAttributeMapping scalarAttributeMapping) {
+    	ScalarAttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(scalarAttributeMapping).to(ScalarAttributeMappingBuilder.class);
+    	return result;
+    }
+    
+    public static ScalarAttributeMappingBuilder<?> wrap(ScalarAttributeMapping scalarAttributeMapping) {
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(scalarAttributeMapping).to(ScalarAttributeMappingBuilder.class);
+    }
+
+    public static ValueObjectAttributeMappingBuilder<?> valueObjectAttributeMapping() {
+        return new ValueObjectAttributeMappingBuilder<Object>();
+    }
+
+    public static ValueObjectAttributeMappingBuilder<?> valueObjectAttributeMapping$restoreFrom(BuilderRepository repo, int builderId) {
+        return (ValueObjectAttributeMappingBuilder<?>)repo.get(builderId);
+    }
+
+    public static ValueObjectAttributeMappingBuilder<?> valueObjectAttributeMapping$copyFrom(ValueObjectAttributeMapping valueObjectAttributeMapping) {
+    	ValueObjectAttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(valueObjectAttributeMapping).to(ValueObjectAttributeMappingBuilder.class);
+    	return result;
+    }
+    
+    public static ValueObjectAttributeMappingBuilder<?> wrap(ValueObjectAttributeMapping valueObjectAttributeMapping) {
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(valueObjectAttributeMapping).to(ValueObjectAttributeMappingBuilder.class);
     }
 
     /* CUSTOM CODE *********************************

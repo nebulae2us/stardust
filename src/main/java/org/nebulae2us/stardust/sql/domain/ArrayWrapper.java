@@ -13,26 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust;
+package org.nebulae2us.stardust.sql.domain;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-import org.nebulae2us.stardust.my.domain.Group1EntityRepositoryTest;
-import org.nebulae2us.stardust.sql.domain.*;
+import java.util.Arrays;
 
 /**
  * @author Trung Phan
  *
  */
-@RunWith(Suite.class)
-@SuiteClasses({
-	Group1EntityRepositoryTest.class, 
-	LinkedEntityBundleTest.class, 
-	SelectQueryTest.class,
-	EntityMappingTest.class,
-	LinkedEntityBundleDataReaderTest.class})
-public class AllTests {
-	
+public class ArrayWrapper {
 
+	private final Object[] object;
+	private final int hashCode;
+	
+	public ArrayWrapper(Object[] object) {
+		this.object = object;
+		this.hashCode = Arrays.hashCode(object);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || this.getClass() != o.getClass()) {
+			return false;
+		}
+		ArrayWrapper aw = (ArrayWrapper)o;
+		return Arrays.equals(this.object, aw.object);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Arrays.hashCode(this.object);
+	}
+	
 }
