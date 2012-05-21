@@ -18,8 +18,6 @@ package org.nebulae2us.stardust.expr.domain;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.nebulae2us.electron.Mirror;
-
 /**
  * @author Trung Phan
  *
@@ -35,10 +33,6 @@ public class AttributeExpression extends SelectorExpression {
 		}
 		
 		return null;
-	}
-	
-	public AttributeExpression(Mirror mirror) {
-		super(mirror);
 	}
 	
 	public AttributeExpression(String expression) {

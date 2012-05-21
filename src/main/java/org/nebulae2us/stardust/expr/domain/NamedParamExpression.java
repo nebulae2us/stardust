@@ -17,25 +17,17 @@ package org.nebulae2us.stardust.expr.domain;
 
 import java.util.regex.Pattern;
 
-import org.nebulae2us.electron.Mirror;
-
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan
  *
  */
-public class NamedParamExpression extends SelectorExpression {
+public final class NamedParamExpression extends SelectorExpression {
 
 	public static final Pattern PATTERN = Pattern.compile("[a-zA-Z0-9_]+");
 	
 	private final String paramName;
-	
-	public NamedParamExpression(Mirror mirror) {
-		super(mirror);
-		
-		this.paramName = mirror.toString("paramName");
-	}
 	
 	private NamedParamExpression(String paramName) {
 		super(paramName);

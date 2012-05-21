@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.electron.util.Immutables;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
@@ -98,13 +97,6 @@ public class FunctionExpression extends SelectorExpression {
 	private final String functionName;
 	
 	private final List<? extends SelectorExpression> params;
-	
-	public FunctionExpression(Mirror mirror) {
-		super(mirror);
-		
-		this.params = mirror.toListOf(SelectorExpression.class, "params");
-		this.functionName = mirror.toString("functionName");
-	}
 	
 	public FunctionExpression(String expression, String functionName, List<? extends SelectorExpression> params) {
 		super(expression);
@@ -194,11 +186,11 @@ public class FunctionExpression extends SelectorExpression {
 	}
 	
 
-	public List<? extends SelectorExpression> getParams() {
+	public final List<? extends SelectorExpression> getParams() {
 		return params;
 	}
 
-	public String getFunctionName() {
+	public final String getFunctionName() {
 		return functionName;
 	}
 	

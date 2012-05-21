@@ -18,8 +18,6 @@ package org.nebulae2us.stardust.expr.domain;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.nebulae2us.electron.Mirror;
-
 /**
  * @author Trung Phan
  *
@@ -32,13 +30,7 @@ public abstract class Expression {
 		this.expression = expression;
 	}
 
-	public Expression(Mirror mirror) {
-		mirror.bind(this);
-		
-		this.expression = mirror.toString("expression");
-	}
-
-	public String getExpression() {
+	public final String getExpression() {
 		return expression;
 	}
 	

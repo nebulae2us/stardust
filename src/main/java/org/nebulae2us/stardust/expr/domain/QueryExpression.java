@@ -17,8 +17,6 @@ package org.nebulae2us.stardust.expr.domain;
 
 import java.util.List;
 
-import org.nebulae2us.electron.Mirror;
-
 /**
  * @author Trung Phan
  *
@@ -39,18 +37,6 @@ public class QueryExpression extends Expression {
 	
 	private final List<OrderExpression> orders;
 	
-	public QueryExpression(Mirror mirror) {
-		super(mirror);
-
-		this.selectors = mirror.toListOf(SelectExpression.class, "selectors");
-		this.filters = mirror.toListOf(PredicateExpression.class, "orders");
-		this.orders = mirror.toListOf(OrderExpression.class, "orders");
-		this.distinct = mirror.toBooleanValue("distinct");
-		this.firstResult = mirror.toIntValue("firstResult");
-		this.maxResults = mirror.toIntValue("maxResults");
-		this.count = mirror.toBooleanValue("count");
-	}
-
 	public QueryExpression(String expression, 
 			List<SelectExpression> selectors, List<PredicateExpression> filters, List<OrderExpression> orders,
 			boolean distinct, int firstResult, int maxResults, boolean count) {

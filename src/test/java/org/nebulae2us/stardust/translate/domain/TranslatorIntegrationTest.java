@@ -150,7 +150,7 @@ public class TranslatorIntegrationTest {
 	@Test
 	public void comparison_expression_two_attributes() {
 		Pair<String, List<?>> pair = filter("name.firstName ne name.lastName");
-		assertEquals("b.FIRST_NAME != b.LAST_NAME", pair.getItem1());
+		assertEquals("b.FIRST_NAME <> b.LAST_NAME", pair.getItem1());
 		assertEquals(Collections.emptyList(), pair.getItem2());
 	}
 	

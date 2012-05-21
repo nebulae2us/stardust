@@ -24,8 +24,10 @@ import org.junit.Test;
 import org.nebulae2us.stardust.jpa.group1.House;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.translate.domain.AttributeTranslator;
+import org.nebulae2us.stardust.translate.domain.BetweenTranslator;
 import org.nebulae2us.stardust.translate.domain.ComparisonTranslator;
 import org.nebulae2us.stardust.translate.domain.InListTranslator;
+import org.nebulae2us.stardust.translate.domain.IsNullTranslator;
 import org.nebulae2us.stardust.translate.domain.LogicalTranslator;
 import org.nebulae2us.stardust.translate.domain.NamedParamTranslator;
 import org.nebulae2us.stardust.translate.domain.OrderTranslator;
@@ -54,6 +56,8 @@ public class QueryTest {
 		translators.add(new AttributeTranslator());
 		translators.add(new ComparisonTranslator());
 		translators.add(new InListTranslator());
+		translators.add(new BetweenTranslator());
+		translators.add(new IsNullTranslator());
 		translators.add(new WildcardTranslator());
 		translators.add(new NamedParamTranslator());
 		translators.add(new OrderTranslator());
@@ -77,9 +81,9 @@ public class QueryTest {
 		.distinct()
 		.select("houseId.houseId")
 		.filterBy()
-			  .predicate("doorColor.opacity = ?", 100)
+			  .predicate("doorColor.opacity is null")
 	    .and().predicate("houseId.houseLetter in (:letters)")
-	    .and().predicate("houseId.houseLetter in (?)", 2)
+	    .and().predicate("houseId.houseLetter not between ? and ?", "a", "b")
 		.and().group()
 		         .predicate("houseId.houseLetter in (?)", Arrays.asList("a", "b", "c", "d", "e"))
 		    .or().predicate(":age = ?", 1)

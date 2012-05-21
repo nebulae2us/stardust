@@ -18,7 +18,6 @@ package org.nebulae2us.stardust.expr.domain;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.exception.IllegalSyntaxException;
 
 /**
@@ -32,13 +31,7 @@ public class PredicateExpression extends Expression {
 	private final static ConcurrentMap<String, PredicateExpression> NEGATED_EXPRESSIONS_CACHE = new ConcurrentHashMap<String, PredicateExpression>();
 	
 	private final boolean negated;
-	
-	public PredicateExpression(Mirror mirror) {
-		super(mirror);
-		
-		this.negated = mirror.toBooleanValue("negated");
-	}
-	
+
 	public PredicateExpression(boolean negated, String expression) {
 		super(expression);
 		
@@ -72,13 +65,26 @@ public class PredicateExpression extends Expression {
 		}
 		
 		result = ComparisonExpression.parse(expression, negated);
-		
 		if (result != null) {
 			PredicateExpression _result = negated ? NEGATED_EXPRESSIONS_CACHE.putIfAbsent(expression, result)
 												  :	EXPRESSIONS_CACHE.putIfAbsent(expression, result);
 			return _result != null ? _result : result;
 		}
 	
+		result = IsNullExpression.parse(expression, negated);
+		if (result != null) {
+			PredicateExpression _result = negated ? NEGATED_EXPRESSIONS_CACHE.putIfAbsent(expression, result)
+												  :	EXPRESSIONS_CACHE.putIfAbsent(expression, result);
+			return _result != null ? _result : result;
+		}
+		
+		result = BetweenExpression.parse(expression, negated);
+		if (result != null) {
+			PredicateExpression _result = negated ? NEGATED_EXPRESSIONS_CACHE.putIfAbsent(expression, result)
+												  :	EXPRESSIONS_CACHE.putIfAbsent(expression, result);
+			return _result != null ? _result : result;
+		}
+		
 		throw new IllegalSyntaxException("Unable to recognize this expression: " + expression);
 	}
 	

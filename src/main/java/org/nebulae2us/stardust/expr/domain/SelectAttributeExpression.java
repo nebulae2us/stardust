@@ -20,7 +20,6 @@ import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
@@ -40,14 +39,6 @@ public class SelectAttributeExpression extends SelectExpression {
 	 * by default, alias should be blank ""
 	 */
 	private final String alias;
-	
-	public SelectAttributeExpression(Mirror mirror) {
-		super(mirror);
-		
-		this.selector = mirror.to(SelectorExpression.class, "selector");
-		this.alias = mirror.toString("alias");
-	}
-
 	
 	public SelectAttributeExpression(String expression, SelectorExpression selector, String alias) {
 		super(expression);

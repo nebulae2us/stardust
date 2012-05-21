@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
 
@@ -40,14 +39,6 @@ public class InListExpression extends PredicateExpression {
 	private final SelectorExpression selectorExpression;
 
 	private final List<SelectorExpression> params;
-	
-	public InListExpression(Mirror mirror) {
-		super(mirror);
-		
-		this.selectorExpression = mirror.to(AttributeExpression.class, "selectorExpression");
-		this.params = mirror.toListOf(SelectorExpression.class, "params");
-		
-	}
 	
 	public InListExpression(boolean negated, String expression, SelectorExpression selectorExpression, List<SelectorExpression> params) {
 		super(negated, expression);

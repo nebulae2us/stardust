@@ -15,18 +15,12 @@
  */
 package org.nebulae2us.stardust.expr.domain;
 
-import org.nebulae2us.electron.Mirror;
-
 /**
  * @author Trung Phan
  *
  */
-public class WildcardExpression extends SelectorExpression {
+public final class WildcardExpression extends SelectorExpression {
 
-	public WildcardExpression(Mirror mirror) {
-		super(mirror);
-	}
-	
 	private WildcardExpression() {
 		super("?");
 	}

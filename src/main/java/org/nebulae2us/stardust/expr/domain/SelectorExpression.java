@@ -18,8 +18,6 @@ package org.nebulae2us.stardust.expr.domain;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.nebulae2us.electron.Mirror;
-
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
@@ -32,10 +30,6 @@ public abstract class SelectorExpression extends Expression {
 	
 	public SelectorExpression(String expression) {
 		super(expression);
-	}
-	
-	public SelectorExpression(Mirror mirror) {
-		super(mirror);
 	}
 	
 	public static SelectorExpression parse(String expression) {

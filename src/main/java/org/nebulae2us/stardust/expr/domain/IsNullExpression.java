@@ -15,62 +15,53 @@
  */
 package org.nebulae2us.stardust.expr.domain;
 
+import static org.nebulae2us.stardust.internal.util.BaseAssert.AssertSyntax;
+
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+import org.nebulae2us.stardust.internal.util.ObjectUtils;
 
 /**
  * @author Trung Phan
  *
  */
-public class OrderExpression extends Expression {
-
-	private final static Pattern PATTERN = Pattern.compile("(\\?|:[a-zA-Z0-9_]+|[a-zA-Z0-9_.() ]+?) *( asc| desc)?");
+public class IsNullExpression extends PredicateExpression {
+	
+	private final static Pattern PATTERN = Pattern.compile("(\\?|:[a-zA-Z0-9_]+|[a-zA-Z0-9_.() ]+?) +is +(not +)?null");
 	
 	private final SelectorExpression selector;
-	
-	private final String direction;
-	
-	public OrderExpression(String expression, SelectorExpression selector, String direction) {
-		super(expression);
-		this.selector = selector;
-		this.direction = direction;
 
-		Assert.notNull(selector, "selector cannot be null");
-		Assert.isTrue(this.direction.equals("asc") || this.direction.equals("desc"), "direction must be either asc or desc.");
+	public IsNullExpression(boolean negated, String expression, SelectorExpression selector) {
+		super(negated, expression);
+
+		this.selector = selector;
 	}
 
-	public SelectorExpression getSelector() {
+	public final SelectorExpression getSelector() {
 		return selector;
 	}
-
-	public String getDirection() {
-		return direction;
-	}
 	
-	public static OrderExpression parse(String expression) {
+	public static IsNullExpression parse(String expression, boolean negated) {
 		Matcher matcher = PATTERN.matcher(expression);
 		if (matcher.matches()) {
+			if ("not".equals(ObjectUtils.nvl(matcher.group(2)).trim())) {
+				negated = !negated;
+			}
 			
-			String direction = matcher.group(2) == null ? "asc" : matcher.group(2).trim();
-
 			SelectorExpression selector = SelectorExpression.parse(matcher.group(1).trim());
-			
-			AssertSyntax.notNull(selector, "Syntax is invalid for expression \"%s\"", expression);
-			
-			return new OrderExpression(expression, selector, direction);
+			AssertSyntax.notNull(selector, "Invalid syntax: %s.", expression);
+
+			return new IsNullExpression(negated, expression, selector);
 		}
 		
 		return null;
 	}
-	
+
 	@Override
 	public Iterator<? extends Expression> expressionIterator() {
 		return new ExpressionIterator(this, Collections.singletonList(selector));
 	}
-	
-	
 }

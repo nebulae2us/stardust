@@ -25,6 +25,7 @@ import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.expr.domain.Expression;
+import org.nebulae2us.stardust.expr.domain.LogicalExpression;
 import org.nebulae2us.stardust.expr.domain.OrderExpression;
 import org.nebulae2us.stardust.expr.domain.PredicateExpression;
 import org.nebulae2us.stardust.expr.domain.QueryExpression;
@@ -222,23 +223,17 @@ public class QueryTranslator implements Translator {
 			return EMPTY_RESULT;
 		}
 		
-		StringBuilder sql = new StringBuilder();
-		List<Object> scalarValues = new ArrayList<Object>();
+		PredicateExpression whereExpression = queryExpression.getFilters().size() == 1 ? queryExpression.getFilters().get(0) :
+			new LogicalExpression(false, "and", queryExpression.getFilters());
 		
-		for (PredicateExpression predicateExpression : queryExpression.getFilters()) {
-			Translator translator = controller.findTranslator(predicateExpression, paramValues);
-			AssertSyntax.notNull(translator, "Unrecognized expression: %s.", predicateExpression.getExpression());
+		if (queryExpression.getFilters().size() == 1) {
 			
-			Pair<String, List<?>> translationResult = translator.translate(context, predicateExpression, paramValues);
-
-			if (sql.length() > 0) {
-				sql.append(" and ");
-			}
-			sql.append(translationResult.getItem1());
-			scalarValues.addAll(translationResult.getItem2());
 		}
 		
-		return new Pair<String, List<?>>(sql.toString(), scalarValues);
+		Translator translator = controller.findTranslator(whereExpression, paramValues);
+		AssertSyntax.notNull(translator, "Unrecognized expression: %s.", whereExpression.getExpression());
+		
+		return translator.translate(context, whereExpression, paramValues);
 	}
 
 	protected Pair<String, List<?>> toOrderClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
@@ -269,6 +264,7 @@ public class QueryTranslator implements Translator {
 		return new Pair<String, List<?>>(sql.toString(), scalarValues);
 	}
 
+	
 	private static class ColumnHolder {
 		private final Column column;
 		private final String tableAlias;

@@ -18,8 +18,6 @@ package org.nebulae2us.stardust.expr.domain;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.nebulae2us.electron.Mirror;
-
 /**
  * @author Trung Phan
  *
@@ -28,11 +26,6 @@ public class SelectExpression extends Expression {
 
 	private static final ConcurrentMap<String, SelectExpression> CACHE = new ConcurrentHashMap<String, SelectExpression>();
 	
-	public SelectExpression(Mirror mirror) {
-		super(mirror);
-
-	}
-
 	public SelectExpression(String expression) {
 		super(expression);
 	}

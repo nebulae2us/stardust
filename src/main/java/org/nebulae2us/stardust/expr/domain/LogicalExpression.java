@@ -29,16 +29,6 @@ public class LogicalExpression extends PredicateExpression{
 	
 	private final String operator;
 
-	public LogicalExpression(Mirror mirror) {
-		super(mirror);
-		mirror.bind(this);
-		
-		this.expressions = mirror.toListOf(PredicateExpression.class, "expressions");
-		this.operator = mirror.toString("operator");
-		
-		assert expressions.size() > 1;
-	}
-	
 	public LogicalExpression(boolean negated, String operator, List<PredicateExpression> expressions) {
 		super(negated, operator);
 		

@@ -40,7 +40,8 @@ public class LogicalTranslator implements Translator {
 		
 		LogicalExpression logicalExpression = (LogicalExpression)expression;
 		
-		StringBuilder sqlBuilder = new StringBuilder("(");
+		StringBuilder sqlBuilder = new StringBuilder();
+		sqlBuilder.append(logicalExpression.isNegated() ? "not (" : "(");
 		List<Object> scalarValues = new ArrayList<Object>();
 		
 		boolean firstExpression = true;

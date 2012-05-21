@@ -29,8 +29,8 @@ public class ComparisonExpressionTest {
 
 	@Test
 	public void wildcard_compare_with_wildcard() {
-		List<String> expressions = Arrays.asList("?=?", "? eq ?", "? = ?", "? != ?", "?!=?", "? ne ?", "?>?", "? gt ?", "?>=?", "? ge ?", "?<?", "? lt ?", "?<=?", "? le ?");
-		List<String> operators = Arrays.asList("=", "=", "=", "!=", "!=", "!=", ">", ">", ">=", ">=", "<", "<", "<=", "<=");
+		List<String> expressions = Arrays.asList("?=?", "? eq ?", "? = ?", "? != ?", "?<>?", "? ne ?", "?>?", "? gt ?", "?>=?", "? ge ?", "?<?", "? lt ?", "?<=?", "? le ?");
+		List<String> operators = Arrays.asList("=", "=", "=", "<>", "<>", "<>", ">", ">", ">=", ">=", "<", "<", "<=", "<=");
 
 		for (int i = 0; i < expressions.size(); i++) {
 			ComparisonExpression expression = ComparisonExpression.parse(expressions.get(i));
