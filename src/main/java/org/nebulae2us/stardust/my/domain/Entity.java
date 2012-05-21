@@ -24,6 +24,12 @@ import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
  */
 public class Entity extends AttributeHolder {
 
+	/**
+	 * List of linkedTables that define this entity. In most case, it's one table. But in inheritance (JOIN type), the child entity
+	 * contains list of joined tables.
+	 * 
+	 * Also if secondary tables are defined for this entity, linkedTableBundle includes more than one table for the entity.
+	 */
 	private final LinkedTableBundle linkedTableBundle;
 	
 	private final EntityIdentifier entityIdentifier;

@@ -17,7 +17,6 @@ package org.nebulae2us.stardust.sql.domain;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.db.domain.JoinType;
-import org.nebulae2us.stardust.internal.util.ObjectUtils;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -69,6 +68,35 @@ public class AliasJoin {
 	public String getSecondSegment() {
 		int idx = this.name.indexOf('.');
 		return idx < 0 ? this.name : this.name.substring(idx + 1, this.name.length());
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		
+		result.append(name).append(" as ").append(alias)
+		      .append(this.joinType == JoinType.DEFAULT_JOIN ? "(?)" : this.joinType == JoinType.LEFT_JOIN ? "(+)" : "");
+		
+		return result.toString();
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || o.getClass() != this.getClass()) {
+			return false;
+		}
+
+		AliasJoin aj = (AliasJoin)o;
+		
+		return this.joinType == aj.joinType && this.alias.equals(aj.alias) && this.name.equals(aj.name);
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.name.hashCode() ^ this.alias.hashCode() ^ this.joinType.hashCode();
 	}
 	
 }

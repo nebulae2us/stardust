@@ -19,6 +19,9 @@ import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.my.domain.Attribute;
 
 /**
+ * 
+ * Attribute mapping is the mapping between entity's attribute to dataReader's columnIndex
+ * 
  * @author Trung Phan
  *
  */

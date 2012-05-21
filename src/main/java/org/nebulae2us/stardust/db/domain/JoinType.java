@@ -21,5 +21,6 @@ package org.nebulae2us.stardust.db.domain;
  */
 public enum JoinType {
 	LEFT_JOIN,
-	INNER_JOIN
+	INNER_JOIN,
+	DEFAULT_JOIN
 }

@@ -76,7 +76,9 @@ public class AttributeHolder {
 
 	/**
 	 * 
-	 * Get ScalarAttributes for a particular Table
+	 * return scalarAttributes or entityAttributes that are related to columns for a particular table.
+	 * This makes one important assumption, that is all the columns for the entityAttribute must be in the same table.
+	 * This is certainly a case for a well-designed database design because foreign keys must be in the same table.
 	 * 
 	 * @param table
 	 * @return
@@ -152,5 +154,57 @@ public class AttributeHolder {
 		
 		return new ImmutableList<EntityAttribute>(result);
 
+	}
+	
+	/**
+	 * 
+	 * Given an expression such as age or address.zipcode or color, it should return the attribute which can be either ScalarAttribute, ValueObjectAttribute or EntityAttribute.
+	 * Return null if it cannot find a matching attribute.
+	 * 
+	 * The expression that contains dot (.) mainly is for value object attribute.
+	 * 
+	 * This method does not go beyond the entity. So this expression rooms.roomType on house should return null even though rooms is a valid entityAttribute; this is because
+	 * rooms.roomType goes beyond the house object and goes into room object.
+	 * 
+	 * The only exception is the identity attribute of the foreign object. So owner.ssn is valid because ssn can be linked back to a column exists in house.
+	 * 
+	 * @param attributeExpression
+	 * @return
+	 * @throws NullPointerException if attributeExpression is null
+	 */
+	public Attribute findAttribute(String attributeExpression) {
+		
+		String firstSegment = attributeExpression;
+		
+		int index = attributeExpression.indexOf('.');
+		if (index > -1) {
+			firstSegment = attributeExpression.substring(0, index);
+		}
+		
+		Attribute attribute = getAttribute(firstSegment);
+		
+		if (attribute == null) {
+			return null;
+		}
+		
+		if (index == -1) {
+			return attribute;
+		}
+		
+		String secondSegment = attributeExpression.substring(index + 1);
+
+		if (attribute instanceof ValueObjectAttribute) {
+			return ((ValueObjectAttribute)attribute).getValueObject().findAttribute(secondSegment);
+		}
+		else if (attribute instanceof EntityAttribute) {
+			
+			EntityAttribute entityAttribute = (EntityAttribute)attribute;
+			if (entityAttribute.isOwningSide()) {
+				return entityAttribute.getEntity().getEntityIdentifier().findAttribute(secondSegment);
+			}
+			
+		}
+		
+		return null;
 	}
 }

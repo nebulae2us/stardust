@@ -15,8 +15,6 @@
  */
 package org.nebulae2us.stardust.my.domain;
 
-import java.util.List;
-
 import org.nebulae2us.electron.Mirror;
 
 /**

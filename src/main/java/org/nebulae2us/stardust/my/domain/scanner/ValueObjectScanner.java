@@ -28,13 +28,11 @@ import javax.persistence.EmbeddedId;
 import javax.persistence.Transient;
 
 import org.nebulae2us.electron.Constants;
-import org.nebulae2us.electron.internal.util.ClassUtils;
 import org.nebulae2us.stardust.Builders;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
 import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
 import org.nebulae2us.stardust.my.domain.ValueObjectAttributeBuilder;
 import org.nebulae2us.stardust.my.domain.ValueObjectBuilder;
-import org.nebulae2us.stardust.my.domain.scanner.*;
 
 /**
  * 

@@ -13,19 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.expr.domain;
+package org.nebulae2us.stardust.api;
+
+import org.nebulae2us.stardust.my.domain.EntityRepository;
+import org.nebulae2us.stardust.translate.domain.TranslatorController;
 
 /**
+ * 
+ * Thread safe. Should be singleton.
+ * 
  * @author Trung Phan
  *
  */
-public enum ComparisonOperator {
+public class Query {
 
-	EQ,
-	NE,
-	LT,
-	LE,
-	GT,
-	GE
+	private final EntityRepository entityRepository;
+	
+	private final TranslatorController controller;
+	
+	public Query(EntityRepository entityRepository, TranslatorController controller) {
+		this.entityRepository = entityRepository;
+		this.controller = controller;
+	}
+	
+	public <T> QueryBuilder<T> entity(Class<T> entityClass) {
+		return new QueryBuilder<T>(this.entityRepository, this.controller, entityClass);
+	}
+	
+	
 	
 }

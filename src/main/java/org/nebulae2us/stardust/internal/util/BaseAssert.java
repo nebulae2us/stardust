@@ -16,9 +16,7 @@
 package org.nebulae2us.stardust.internal.util;
 
 import java.lang.reflect.Constructor;
-import java.util.List;
 
-import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.exception.IllegalSyntaxException;
 
 /**

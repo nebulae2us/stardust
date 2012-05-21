@@ -27,7 +27,6 @@ import org.nebulae2us.electron.util.ImmutableMap;
 import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.electron.util.ObjectEqualityComparator;
 import org.nebulae2us.stardust.db.domain.ColumnBuilder;
-import org.nebulae2us.stardust.db.domain.TableBuilder;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
 

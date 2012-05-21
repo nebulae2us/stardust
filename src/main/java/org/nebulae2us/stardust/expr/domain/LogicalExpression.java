@@ -23,37 +23,35 @@ import org.nebulae2us.electron.Mirror;
  * @author Trung Phan
  *
  */
-public class LogicalExpression extends Expression implements Reducible<LogicalExpression> {
+public class LogicalExpression extends PredicateExpression{
 
-	private final List<Expression> expressions;
+	private final List<PredicateExpression> expressions;
 	
-	private final LogicalOperator operator;
+	private final String operator;
 
 	public LogicalExpression(Mirror mirror) {
 		super(mirror);
 		mirror.bind(this);
 		
-		this.expressions = mirror.toListOf(Expression.class, "expressions");
-		this.operator = mirror.to(LogicalOperator.class, "operator");
+		this.expressions = mirror.toListOf(PredicateExpression.class, "expressions");
+		this.operator = mirror.toString("operator");
 		
 		assert expressions.size() > 1;
 	}
+	
+	public LogicalExpression(boolean negated, String operator, List<PredicateExpression> expressions) {
+		super(negated, operator);
+		
+		this.operator = operator;
+		this.expressions = expressions;
+	}
 
-	public List<Expression> getExpressions() {
+	public List<PredicateExpression> getExpressions() {
 		return expressions;
 	}
 
-	public LogicalOperator getOperator() {
+	public String getOperator() {
 		return operator;
 	}
-
-	public LogicalExpression reduce() {
-
-		
-		
-		return null;
-	}
-	
-	
 
 }

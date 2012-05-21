@@ -17,33 +17,22 @@ package org.nebulae2us.stardust.my.domain.scanner;
 
 import static org.nebulae2us.stardust.Builders.*;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.PrimaryKeyJoinColumns;
 import javax.persistence.SecondaryTable;
 import javax.persistence.SecondaryTables;
 
-import org.nebulae2us.stardust.db.domain.ColumnBuilder;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
 import org.nebulae2us.stardust.db.domain.LinkedTableBundleBuilder;
 import org.nebulae2us.stardust.internal.util.NameUtils;
-import org.nebulae2us.stardust.internal.util.ObjectUtils;
-import org.nebulae2us.stardust.my.domain.AttributeBuilder;
-import org.nebulae2us.stardust.my.domain.EntityAttributeBuilder;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
-import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
-import org.nebulae2us.stardust.my.domain.ValueObjectAttributeBuilder;
-import org.nebulae2us.stardust.my.domain.ValueObjectBuilder;
-
-import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan

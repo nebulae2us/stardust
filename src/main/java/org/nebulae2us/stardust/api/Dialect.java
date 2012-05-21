@@ -13,33 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.expr.domain;
-
-import java.io.File;
-
-import org.nebulae2us.electron.BuilderGenerator;
+package org.nebulae2us.stardust.api;
 
 /**
- * 
  * @author Trung Phan
  *
  */
-public class GenerateExprBuilders {
+public class Dialect {
 
-	public static void main(String ... arguments) {
-		File genFolder = new File("src/main/java");
-		
-		new BuilderGenerator()
-			.baseFolder(genFolder)
-			.buildersClassName("org.nebulae2us.stardust.expr.domain.ExprBuilders")
-			.builderSuffix("Builder")
-			.generate(
-					Expression.class,
-					LogicalExpression.class,
-					InListExpression.class,
-					ComparisonExpression.class
-					);
-		
-	}
-	
 }

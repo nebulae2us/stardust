@@ -15,34 +15,54 @@
  */
 package org.nebulae2us.stardust.expr.domain;
 
-import org.nebulae2us.electron.Converter;
-import org.nebulae2us.electron.DestinationClassResolver;
+import java.util.Collections;
+import java.util.Iterator;
+
 import org.nebulae2us.electron.Mirror;
-import org.nebulae2us.stardust.Builders;
 
 /**
  * @author Trung Phan
  *
  */
 public abstract class Expression {
-
-	private final boolean negated;
 	
+	private final String expression;
+	
+	public Expression(String expression) {
+		this.expression = expression;
+	}
+
 	public Expression(Mirror mirror) {
 		mirror.bind(this);
 		
-		this.negated = mirror.toBooleanValue("negated");
+		this.expression = mirror.toString("expression");
 	}
 
-	public boolean isNegated() {
-		return negated;
+	public String getExpression() {
+		return expression;
 	}
 	
-	public Expression negate() {
-		return new Converter(getDestinationClassResolver(), true).convert(this).to(Expression.class);
+	@SuppressWarnings("unchecked")
+	public Iterator<? extends Expression> expressionIterator() {
+		return new ExpressionIterator(this, Collections.EMPTY_LIST);
 	}
 	
-	protected DestinationClassResolver getDestinationClassResolver() {
-		return null;
+	public Iterable<? extends Expression> nestedExpressions() {
+		return new Iterable<Expression>() {
+			@SuppressWarnings("unchecked")
+			public Iterator<Expression> iterator() {
+				return (Iterator<Expression>)expressionIterator();
+			}
+		};
+	}
+	
+	public int countWildcardExpressions() {
+		int count = 0;
+		for (Expression expr : nestedExpressions()) {
+			if (expr instanceof WildcardExpression) {
+				count++;
+			}
+		}
+		return count;
 	}
 }

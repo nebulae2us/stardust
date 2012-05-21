@@ -16,10 +16,10 @@
 package org.nebulae2us.stardust.sql.domain;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.nebulae2us.electron.util.ImmutableList;
@@ -40,7 +40,7 @@ import static org.nebulae2us.electron.util.Immutables.*;
  * @author Trung Phan
  *
  */
-public class SelectQueryTest {
+public class LinkedTableEntityBundleTest {
 	
 	private EntityRepository entityRepository;
 	
@@ -64,48 +64,44 @@ public class SelectQueryTest {
 
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void select_person() {
 		
-		SelectQuery selectQuery = selectQuery()
-			.entityClass(Person.class)
-			.initialAlias("b")
-			.toSelectQuery();
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(Person.class), "b", Collections.EMPTY_LIST);
 		
-		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
 
-		List<String> columns = extractSelectColumns(parseResult.toString());
+		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 		
 		assertThat(columns, hasItems("b_ssn", "b_date_born", "b_gender", "b_first_name", "b_last_name", "b_version", "b_updated_date"));
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Test
 	public void selectRoom() {
 
 		entityRepository.getEntity(BedRoom.class);
 		entityRepository.getEntity(Kitchen.class);
+
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(Room.class), "", Collections.EMPTY_LIST);
 		
-		SelectQuery selectQuery = selectQuery()
-				.entityClass(Room.class)
-				.toSelectQuery();
-			
-		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
 		
-		List<String> columns = extractSelectColumns(parseResult.toString());
+		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 
 		assertThat(columns, hasItems("house_id", "house_letter", "sequence_number", "room_type", "red", "green", "blue", "door_count"));
 	}
 
 	@Test
 	public void selectHouse() {
-		SelectQuery selectQuery = selectQuery()
-				.entityClass(House.class)
-				.toSelectQuery();
-			
-		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
 		
-		List<String> columns = extractSelectColumns(parseResult.toString());
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(House.class), "", Collections.EMPTY_LIST);
+		
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+		
+		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 		
 		assertThat(columns, hasItems("house_id", "house_letter", "house_type_id"));
 		
@@ -114,19 +110,16 @@ public class SelectQueryTest {
 	
 	@Test
 	public void select_room_with_house() {
+
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(Room.class), "",
+				Arrays.asList(
+						aliasJoin().alias("h").name("house").joinType(JoinType.INNER_JOIN).toAliasJoin())
+				);
 		
-		SelectQuery selectQuery = selectQuery()
-				.entityClass(Room.class)
-				.aliasJoins$addAliasJoin()
-					.alias("h")
-					.name("house")
-					.joinType(JoinType.INNER_JOIN)
-				.end()
-				.toSelectQuery();
 		
-		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
 		
-		List<String> columns = extractSelectColumns(parseResult.toString());
+		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 		
 		assertThat(columns, hasItems("house_id", "house_letter", "sequence_number", "h_house_id", "h_house_letter", "h_house_type_id"));
 		
@@ -135,18 +128,16 @@ public class SelectQueryTest {
 	
 	@Test
 	public void select_house_with_rooms() {
-		SelectQuery selectQuery = selectQuery()
-				.entityClass(House.class)
-				.aliasJoins$addAliasJoin()
-					.alias("r")
-					.name("rooms")
-					.joinType(JoinType.LEFT_JOIN)
-				.end()
-				.toSelectQuery();
 		
-		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(House.class), "",
+				Arrays.asList(
+						aliasJoin().alias("r").name("rooms").joinType(JoinType.LEFT_JOIN).toAliasJoin())
+				);
 		
-		List<String> columns = extractSelectColumns(parseResult.toString());
+		
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+		
+		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 		
 		assertThat(columns, hasItems("house_id", "house_letter", "house_type_id", "r_house_id", "r_house_letter", "r_sequence_number"));
 		
@@ -154,22 +145,16 @@ public class SelectQueryTest {
 	
 	@Test
 	public void select_person_with_houses() {
-		SelectQuery selectQuery = selectQuery()
-				.entityClass(Person.class)
-				.aliasJoins$addAliasJoin()
-					.alias("h")
-					.name("houses")
-					.joinType(JoinType.LEFT_JOIN)
-				.end()
-				.toSelectQuery();
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(Person.class), "",
+				Arrays.asList(
+						aliasJoin().alias("h").name("houses").joinType(JoinType.INNER_JOIN).toAliasJoin())
+				);
 		
-		SelectQueryParseResult parseResult = selectQuery.toSelectSql(entityRepository);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+
+		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 		
-		System.out.println(parseResult.toString());
-		
-		List<String> columns = extractSelectColumns(parseResult.toString());
-		
-//		assertThat(columns, hasItems("house_id", "house_letter", "house_type_id", "r_house_id", "r_house_letter", "r_sequence_number"));
+		assertThat(columns, hasItems("h_house_id", "h_house_letter", "h_house_type_id"));
 		
 	}
 	

@@ -13,39 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.sql.domain;
+package org.nebulae2us.stardust.translate.domain;
 
-import org.nebulae2us.electron.Mirror;
+import java.util.List;
+import java.util.Map;
+
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan
  *
  */
-public class SelectQueryParseResult {
+public class ParamValues {
 
-	private final LinkedTableEntityBundle linkedTableEntityBundle;
+	private int index = 0;
+	private final List<Object> wildcardValues;
+	private final Map<String, Object> namedParamValues;
 	
-	public SelectQueryParseResult(Mirror mirror) {
-		mirror.bind(this);
+	public ParamValues(Map<String, Object> namedParamValues, List<Object> wildcardValues) {
+		this.namedParamValues = namedParamValues;
+		this.wildcardValues = wildcardValues;
+	}
+	
+	public Object getParamValue(String param) {
+		Assert.notEmpty(param, "param cannot be empty");
 		
-		this.linkedTableEntityBundle = mirror.to(LinkedTableEntityBundle.class, "linkedTableEntityBundle");
+		Object value = namedParamValues.get(param);
+		AssertSyntax.notNull(value, "Cannot find values for param '%s'", param);
 		
-		assertInvariant();
-	}
-
-	private void assertInvariant() {
-		Assert.notNull(this.linkedTableEntityBundle, "linkedTableEntityBundle cannot be null");
-	}
-
-	public LinkedTableEntityBundle getLinkedTableEntityBundle() {
-		return linkedTableEntityBundle;
-	}
-
-	@Override
-	public String toString() {
-		return linkedTableEntityBundle.toString();
+		return value;
 	}
 	
-	
+	public Object getNextWildcardValue() {
+		return wildcardValues.get(index++);
+	}
+
 }

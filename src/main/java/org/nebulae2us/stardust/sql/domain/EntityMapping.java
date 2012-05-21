@@ -16,7 +16,6 @@
 package org.nebulae2us.stardust.sql.domain;
 
 import java.util.List;
-import java.util.Map;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.my.domain.Attribute;
@@ -25,6 +24,11 @@ import org.nebulae2us.stardust.my.domain.Entity;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
+ * 
+ * Define the mapping between the entity definition (or metadata) with the corresponding columns in the DataReader.
+ * For example, DataReader has these columns: r_room_type, r_house_id, r_house_letter, r_sequence_number, ...
+ * Then, the discriminatorColumnIndex = 1, identifierAttributeMappings will store column indexes of 2, 3, 4 for the identifier.
+ * 
  * @author Trung Phan
  *
  */

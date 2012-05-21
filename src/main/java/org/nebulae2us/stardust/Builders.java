@@ -31,10 +31,6 @@ import org.nebulae2us.stardust.sql.domain.LinkedTableEntity;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBuilder;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundleBuilder;
-import org.nebulae2us.stardust.sql.domain.SelectQuery;
-import org.nebulae2us.stardust.sql.domain.SelectQueryBuilder;
-import org.nebulae2us.stardust.sql.domain.SelectQueryParseResult;
-import org.nebulae2us.stardust.sql.domain.SelectQueryParseResultBuilder;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
@@ -72,8 +68,6 @@ public class Builders {
 				.put(LinkedEntityBundle.class, LinkedEntityBundleBuilder.class)
 				.put(LinkedTableEntity.class, LinkedTableEntityBuilder.class)
 				.put(LinkedTableEntityBundle.class, LinkedTableEntityBundleBuilder.class)
-				.put(SelectQuery.class, SelectQueryBuilder.class)
-				.put(SelectQueryParseResult.class, SelectQueryParseResultBuilder.class)
 				.put(Entity.class, EntityBuilder.class)
 				.put(EntityAttribute.class, EntityAttributeBuilder.class)
 				.put(EntityIdentifier.class, EntityIdentifierBuilder.class)
@@ -326,40 +320,6 @@ public class Builders {
     
     public static LinkedTableEntityBundleBuilder<?> wrap(LinkedTableEntityBundle linkedTableEntityBundle) {
     	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(linkedTableEntityBundle).to(LinkedTableEntityBundleBuilder.class);
-    }
-
-    public static SelectQueryBuilder<?> selectQuery() {
-        return new SelectQueryBuilder<Object>();
-    }
-
-    public static SelectQueryBuilder<?> selectQuery$restoreFrom(BuilderRepository repo, int builderId) {
-        return (SelectQueryBuilder<?>)repo.get(builderId);
-    }
-
-    public static SelectQueryBuilder<?> selectQuery$copyFrom(SelectQuery selectQuery) {
-    	SelectQueryBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(selectQuery).to(SelectQueryBuilder.class);
-    	return result;
-    }
-    
-    public static SelectQueryBuilder<?> wrap(SelectQuery selectQuery) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(selectQuery).to(SelectQueryBuilder.class);
-    }
-
-    public static SelectQueryParseResultBuilder<?> selectQueryParseResult() {
-        return new SelectQueryParseResultBuilder<Object>();
-    }
-
-    public static SelectQueryParseResultBuilder<?> selectQueryParseResult$restoreFrom(BuilderRepository repo, int builderId) {
-        return (SelectQueryParseResultBuilder<?>)repo.get(builderId);
-    }
-
-    public static SelectQueryParseResultBuilder<?> selectQueryParseResult$copyFrom(SelectQueryParseResult selectQueryParseResult) {
-    	SelectQueryParseResultBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(selectQueryParseResult).to(SelectQueryParseResultBuilder.class);
-    	return result;
-    }
-    
-    public static SelectQueryParseResultBuilder<?> wrap(SelectQueryParseResult selectQueryParseResult) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(selectQueryParseResult).to(SelectQueryParseResultBuilder.class);
     }
 
     public static EntityBuilder<?> entity() {

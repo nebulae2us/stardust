@@ -48,15 +48,35 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  * 
  * EntityMappingRepository is meant be live within method LinkedEntityBundle.readData(); therefore, it's not shared among thread, hence it's not thread safe.
  * 
+ * This repository is needed to read data from DataReader. Objects are temporary cached here so that id can be mapped back to objects. As a temporary cache,
+ * this repository needs to be created for each LinkedEntityBundle.readData() method call.
+ * 
  * @author Trung Phan
  *
  */
 public class EntityMappingRepository {
 
+	/**
+	 * For a given pair (entity, alias), this map can locate the entityMapping between the entity and the columns
+	 */
 	private final Map<Pair<Entity, String>, EntityMapping> entityMappings = new HashMap<Pair<Entity, String>, EntityMapping>();
 	
+	/**
+	 * This is the cache of objects that are read from the DataReader.
+	 * For example, if a person with id 1 is read, the Person object is stored in this cached. If later on, a record is read and the person_id = 1, then
+	 * the person object should be from the cache instead of being created.
+	 * 
+	 * The object is associated with a particular alias.
+	 * 
+	 */
 	private final Map<String, Map<Object, Object>> mainList = new HashMap<String, Map<Object,Object>>();
 	
+	/**
+	 * This is the cache of objects that are read from the DataReader.
+	 * 
+	 * 
+	 * The object is identified by the pair (alias, field) and the id of the object.
+	 */
 	private final Map<Pair<String, Field>, Map<Object, Object>> sideList = new HashMap<Pair<String,Field>, Map<Object,Object>>();
 	
 	public List<?> readData(LinkedEntityBundle bundle, DataReader dataReader) {
@@ -104,7 +124,7 @@ public class EntityMappingRepository {
 								setValue(foreignEntityAttribute.getField(), entityInstance, values);
 							}
 							AssertState.isTrue(values instanceof Collection, "Unknown collection type %s", values.getClass());
-							((Collection)values).add(parentInstance);
+							((Collection<Object>)values).add(parentInstance);
 							
 						}
 						break; }
@@ -115,7 +135,7 @@ public class EntityMappingRepository {
 							setValue(entityAttribute.getField(), parentInstance, values);
 						}
 						AssertState.isTrue(values instanceof Collection, "Unknown collection type %s", values.getClass());
-						((Collection)values).add(entityInstance);
+						((Collection<Object>)values).add(entityInstance);
 						
 						if (ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
 							Attribute foreignAttribute = entityAttribute.getEntity().getAttribute(entityAttribute.getInverseAttributeName());
@@ -141,7 +161,7 @@ public class EntityMappingRepository {
 							setValue(entityAttribute.getField(), parentInstance, values);
 						}
 						AssertState.isTrue(values instanceof Collection, "Unknown collection type %s", values.getClass());
-						((Collection)values).add(entityInstance);
+						((Collection<Object>)values).add(entityInstance);
 						
 						if (ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
 							Attribute foreignAttribute = entityAttribute.getEntity().getAttribute(entityAttribute.getInverseAttributeName());
@@ -153,7 +173,7 @@ public class EntityMappingRepository {
 								setValue(foreignEntityAttribute.getField(), entityInstance, inverseValues);
 							}
 							AssertState.isTrue(inverseValues instanceof Collection, "Unknown collection type %s", inverseValues.getClass());
-							((Collection)inverseValues).add(parentInstance);
+							((Collection<Object>)inverseValues).add(parentInstance);
 							
 						}
 						

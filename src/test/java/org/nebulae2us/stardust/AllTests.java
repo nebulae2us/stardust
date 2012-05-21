@@ -18,8 +18,15 @@ package org.nebulae2us.stardust;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
+import org.nebulae2us.stardust.api.BaseFilterBuilderTest;
+import org.nebulae2us.stardust.api.FilterBuilderTest;
+import org.nebulae2us.stardust.api.QueryTest;
+import org.nebulae2us.stardust.expr.domain.ComparisonExpressionTest;
+import org.nebulae2us.stardust.expr.domain.InListExpressionTest;
+import org.nebulae2us.stardust.expr.domain.SelectorExpressionTest;
 import org.nebulae2us.stardust.my.domain.Group1EntityRepositoryTest;
 import org.nebulae2us.stardust.sql.domain.*;
+import org.nebulae2us.stardust.translate.domain.TranslatorIntegrationTest;
 
 /**
  * @author Trung Phan
@@ -29,10 +36,18 @@ import org.nebulae2us.stardust.sql.domain.*;
 @SuiteClasses({
 	Group1EntityRepositoryTest.class, 
 	LinkedEntityBundleTest.class, 
-	SelectQueryTest.class,
+	LinkedTableEntityBundleTest.class,
 	EntityMappingTest.class,
 	EntityMappingWithJoinsTest.class,
-	LinkedEntityBundleDataReaderTest.class})
+	LinkedEntityBundleDataReaderTest.class,
+	SelectorExpressionTest.class,
+	ComparisonExpressionTest.class,
+	InListExpressionTest.class,
+	BaseFilterBuilderTest.class,
+	FilterBuilderTest.class,
+	QueryTest.class,
+	TranslatorIntegrationTest.class
+	})
 public class AllTests {
 	
 

@@ -38,19 +38,13 @@ public class EntityRepository {
 		
 	}
 	
-	public List<Entity> getEntitiesAndSub(Class<?> entityClass) {
-		
+	public List<Entity> getSubEntities(Entity parentEntity) {
 		List<Entity> result = new ArrayList<Entity>();
-		
-		Entity entity = getEntity(entityClass);
-		result.add(entity);
-		
 		for (Entity e : entities.values()) {
-			if (entity != e && entity.isSuperOf(e)) {
+			if (e != parentEntity && parentEntity.isSuperOf(e)) {
 				result.add(e);
 			}
 		}
-		
 		return result;
 	}
 	

@@ -15,17 +15,30 @@
  */
 package org.nebulae2us.stardust.sql.domain;
 
+import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.Map.Entry;
 
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.electron.Pair;
+import org.nebulae2us.electron.util.ImmutableList;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
+import org.nebulae2us.stardust.db.domain.LinkedTable;
+import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
+import org.nebulae2us.stardust.db.domain.Table;
+import org.nebulae2us.stardust.internal.util.BaseAssert;
 import org.nebulae2us.stardust.my.domain.Attribute;
+import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
+import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 
+import static org.nebulae2us.stardust.Builders.linkedTableEntity;
+import static org.nebulae2us.stardust.Builders.linkedTableEntityBundle;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
@@ -61,6 +74,223 @@ public class LinkedTableEntityBundle {
 		return this.linkedTableEntities.subList(1, this.linkedTableEntities.size());
 	}
 	
+	public Pair<LinkedTableEntity, ScalarAttribute> findAttribute(String alias, String attributeExpression) {
+		for (LinkedTableEntity linkedTableEntity : this.linkedTableEntities) {
+			if (alias.equals(linkedTableEntity.getAlias())) {
+				for (Attribute attribute : linkedTableEntity.getOwningSideAttributes()) {
+					if (attribute instanceof ScalarAttribute && attribute.getFullName().equals(attributeExpression)) {
+						return new Pair<LinkedTableEntity, ScalarAttribute>(linkedTableEntity, (ScalarAttribute)attribute);
+					}
+				}
+			}
+		}
+		return null;
+	}
+	
+	public static LinkedTableEntityBundle newInstance(EntityRepository entityRepository, LinkedEntityBundle linkedEntityBundle) {
+		Set<String> usedAliases = new HashSet<String>(linkedEntityBundle.getAliases().elementToLowerCase());
+
+		IdentityHashMap<LinkedEntity, LinkedTableEntityBuilder<?>> linkedEntity2LinkedTableEntity = new IdentityHashMap<LinkedEntity, LinkedTableEntityBuilder<?>>();
+		
+		LinkedTableEntityBundleBuilder<?> result = null;
+		
+		for (LinkedEntity linkedEntity : linkedEntityBundle.getLinkedEntities()) {
+			LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle = buildLinkedTableEntityBundle(entityRepository, linkedEntity.getEntity().getDeclaringClass());
+			populateAlias(linkedTableEntityBundle, linkedEntity.getAlias(), linkedEntityBundle, usedAliases);
+			
+			LinkedTableEntityBuilder<?> linkedTableEntity = linkedTableEntityBundle.getRoot();
+
+			linkedEntity2LinkedTableEntity.put(linkedEntity, linkedTableEntity);
+			
+			if (result == null) {
+				result = linkedTableEntityBundle;
+			}
+			else if (linkedEntity.getAttribute().getJunctionTable() == null) {
+				linkedTableEntity
+					.parent(linkedEntity2LinkedTableEntity.get(linkedEntity.getParent()))
+					.parentColumns$wrap(linkedEntity.getAttribute().getLeftColumns())
+					.columns$wrap(linkedEntity.getAttribute().getRightColumns())
+					.joinType(linkedEntity.getJoinType())
+					;
+
+				result.linkedTableEntities(linkedTableEntityBundle.getLinkedTableEntities());
+				
+			}
+			else {
+				LinkedTableEntityBuilder<?> junction = linkedTableEntity()
+						.table$wrap(linkedEntity.getAttribute().getJunctionTable())
+						.tableAlias( getNextUnusedAlias(usedAliases, linkedEntity.getAlias()) )
+						.parent(linkedEntity2LinkedTableEntity.get(linkedEntity.getParent()))
+						.parentColumns$wrap(linkedEntity.getAttribute().getLeftColumns())
+						.columns$wrap(linkedEntity.getAttribute().getJunctionLeftColumns())
+						.joinType(linkedEntity.getJoinType())
+						;
+				
+				linkedTableEntity
+						.parent(junction)
+						.parentColumns$wrap(linkedEntity.getAttribute().getJunctionRightColumns())
+						.columns$wrap(linkedEntity.getAttribute().getRightColumns())
+						.joinType(linkedEntity.getJoinType())
+						;
+				result.linkedTableEntities(junction)
+					.linkedTableEntities(linkedTableEntityBundle.getLinkedTableEntities());
+				
+			}
+			
+		}		
+		
+		return result.toLinkedTableEntityBundle();
+	}
+	
+	
+	private static LinkedTableEntityBundleBuilder<?> buildLinkedTableEntityBundle(EntityRepository entityRepository, Class<?> entityClass) {
+
+		Entity entity = entityRepository.getEntity(entityClass);
+		List<Entity> subEntities = entityRepository.getSubEntities(entity);
+
+		LinkedTableBundle linkedTableBundle = entity.getLinkedTableBundle();
+		Table primaryTable = linkedTableBundle.getRoot().getTable();
+		
+		LinkedTableEntityBundleBuilder<?> result = linkedTableEntityBundle()
+				.linkedTableEntities$addLinkedTableEntity()
+					.table$wrap(primaryTable)
+					.entity$wrap(entity)
+					.owningSideAttributes$wrap(entity.getOwningSideAttributes(primaryTable))
+				.end()
+				;
+		
+		IdentityHashMap<LinkedTable, LinkedTableEntityBuilder<?>> linkedTable2LinkedTableEntity = new IdentityHashMap<LinkedTable, LinkedTableEntityBuilder<?>>();
+		linkedTable2LinkedTableEntity.put(linkedTableBundle.getRoot(), result.getRoot());
+		
+		// loop through secondary tables
+		for (LinkedTable linkedTable : linkedTableBundle.getNonRoots()) {
+			
+			Table secondaryTable = linkedTable.getTable();
+			
+			LinkedTableEntityBuilder<?> linkedTableEntity = result.linkedTableEntities$addLinkedTableEntity()
+				.parent(linkedTable2LinkedTableEntity.get(linkedTable.getParent()))
+				.table$wrap(secondaryTable)
+				.entity$wrap(entity)
+				.owningSideAttributes$wrap(entity.getOwningSideAttributes(secondaryTable))
+				.columns$wrap(linkedTable.getColumns())
+				.parentColumns$wrap(linkedTable.getParentColumns())
+				.joinType(linkedTable.getJoinType())
+				;
+			
+			linkedTable2LinkedTableEntity.put(linkedTable, linkedTableEntity);
+			
+		}
+		
+		// loop through subEntities
+		for (Entity subEntity : subEntities) {
+			
+			for (LinkedTable subLinkedTable : subEntity.getLinkedTableBundle().getLinkedTables()) {
+				ImmutableList<Attribute> subOwningSideAttributes = subEntity.getOwningSideAttributes(subLinkedTable.getTable());
+				ImmutableList<Attribute> owningSideAttributes = entity.getOwningSideAttributes(subLinkedTable.getTable());
+				if (subOwningSideAttributes.size() > 0) {
+					if (owningSideAttributes.size() == 0) {
+						result.linkedTableEntities$addLinkedTableEntity()
+							.table$wrap(subLinkedTable.getTable())
+							.entity$wrap(subEntity)
+							.parent(result.getRoot())
+							.owningSideAttributes$wrap(subOwningSideAttributes)
+							.columns$wrap(subLinkedTable.getColumns())
+							.parentColumns$wrap(subLinkedTable.getParentColumns())
+							.joinType(subLinkedTable.getJoinType())
+						.end();
+					}
+					else {
+						subOwningSideAttributes = subOwningSideAttributes
+								.changeComparator(Attribute.COMPARATOR_BY_NAME).minus(owningSideAttributes);
+						
+						if (subOwningSideAttributes.size() > 0) {
+							for (Entry<LinkedTable, LinkedTableEntityBuilder<?>> entry : linkedTable2LinkedTableEntity.entrySet()) {
+								LinkedTable linkedTable = entry.getKey();
+								if (linkedTable.getTable().equals(subLinkedTable.getTable())) {
+									LinkedTableEntityBuilder<?> linkedTableEntity = entry.getValue();
+									linkedTableEntity.owningSideAttributes$wrap(subOwningSideAttributes);
+								}
+							}
+						}
+						
+					}
+				}
+			}
+
+		}
+		
+		return result;
+	}	
+	
+	/**
+	 * @param linkedTableEntityBundle
+	 * @param alias
+	 * @param recommendedDefaultAlias
+	 */
+	private static void populateAlias(LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle, String alias, LinkedEntityBundle linkedEntityBundle, Set<String> usedAliases) {
+
+		String tableAlias = alias;
+		if (tableAlias.length() == 0) {
+			tableAlias = getDefaultAlias(usedAliases);
+		}
+		
+		linkedTableEntityBundle.getRoot().alias(alias).tableAlias(tableAlias);
+		
+		for (LinkedTableEntityBuilder<?> linkedTableEntity : linkedTableEntityBundle.getNonRoots()) {
+			linkedTableEntity.alias(alias).tableAlias(getNextUnusedAlias(usedAliases, tableAlias));
+		}
+		
+	}
+	
+	private static String getNextUnusedAlias(Set<String> usedAliases, String baseAlias) {
+		int i = 1;
+		while (true) {
+			String nextUnusedAlias = baseAlias + i++;
+			if (!usedAliases.contains(nextUnusedAlias)) {
+				usedAliases.add(nextUnusedAlias);
+				return nextUnusedAlias;
+			}
+		}
+	}
+
+	private static String getDefaultAlias(Set<String> usedAliases) {
+		String result = null;
+		
+		if (!usedAliases.contains("b")) {
+			result = "b";
+		}
+
+		if (result == null) {
+			for (char c = 'a'; c  <= 'z'; c++) {
+				if (!usedAliases.contains(c)) {
+					result = String.valueOf(c);
+					break;
+				}
+			}
+		}
+
+		if (result == null) {
+			for (char c = 'a'; c  <= 'z'; c++) {
+				for (char c2 = 'a'; c2 <= 'z'; c2++) {
+					String newAlias = "" + c + c2;
+					if (!usedAliases.contains(newAlias)) {
+						result = newAlias;
+						break;
+					}
+				}
+			}
+		}
+
+		BaseAssert.AssertState.notNull(result, "Cannot find unused alias");
+		
+		usedAliases.add(result);
+		return result;
+	}	
+	
+	
+	/**
+	 * This method should print the select and from (join) clause (without where clause) for this query
+	 */
 	@Override
 	public String toString() {
 		StringBuilder result = new StringBuilder();

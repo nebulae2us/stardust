@@ -18,6 +18,10 @@ package org.nebulae2us.stardust.sql.domain;
 import org.nebulae2us.electron.Mirror;
 
 /**
+ * 
+ * ScalarAttributeMapping cache the columnIndex from the DataReader. For example, to read data for an attribute age (alias p), the column name should be p_age.
+ * The columnIndex for this column p_age is stored here.
+ * 
  * @author Trung Phan
  *
  */

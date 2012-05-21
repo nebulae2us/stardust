@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
-import org.nebulae2us.stardust.my.domain.ValueObjectAttribute;
 
 /**
  * @author Trung Phan

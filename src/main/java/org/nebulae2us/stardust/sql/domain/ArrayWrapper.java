@@ -18,6 +18,9 @@ package org.nebulae2us.stardust.sql.domain;
 import java.util.Arrays;
 
 /**
+ * 
+ * ArrayWrapper is for equal comparison.
+ * 
  * @author Trung Phan
  *
  */
@@ -26,7 +29,7 @@ public class ArrayWrapper {
 	private final Object[] object;
 	private final int hashCode;
 	
-	public ArrayWrapper(Object[] object) {
+	public ArrayWrapper(Object ... object) {
 		this.object = object;
 		this.hashCode = Arrays.hashCode(object);
 	}
@@ -45,7 +48,7 @@ public class ArrayWrapper {
 	
 	@Override
 	public int hashCode() {
-		return Arrays.hashCode(this.object);
+		return hashCode;
 	}
 	
 }

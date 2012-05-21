@@ -29,6 +29,15 @@ import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
+ * 
+ * LinkedTableEntity is a detailed expansion of LinkedEntity. LinkedEntity tells us how entities are linked (or joined) to each other. LinkedTableEntity tells us
+ * how tables (or these entities) are joined to each other. In simple case, each entity is mapped to one table, so there is map of 1-1 between LinkedEntity to LinkedTableEntity.
+ * But in completed case like inheritance, or secondary table, or junction tables, one entity may need more tables to represent; so the number of LinkedTableEntity is more
+ * than that of LinkedEntity. Please note that this class does not contain LinkedEntity but alias, because linkedEntity can be inferred through LinkedEntityBundle.getLinkedEntity(alias).
+ * 
+ * This entity is immutable. LinkedTableEntity objects are linked together in the LinkedTableEntityBundle.
+ * 
+ * 
  * @author Trung Phan
  *
  */
@@ -42,12 +51,22 @@ public class LinkedTableEntity {
 	
 	private final String alias;
 	
-	private final String tableAlias; // in most case, alias == tableAlias, only when there is joined inheritance or secondary table, then they are different
+	private final String tableAlias; // in most case, alias == tableAlias, only when there is joined inheritance or secondary table or existance of junction tables, then they are different
 	
+	/**
+	 * These attributes (scalarAttribute and entityAttributes) are related to columns that reside in this table.
+	 * @see Entity#getOwningSideAttributes(Table)
+	 */
 	private final List<Attribute> owningSideAttributes;
-	
+
+	/**
+	 * parentColumns are columns in the parent's table used to join with this table's columns
+	 */
 	private final List<Column> parentColumns;
 	
+	/**
+	 * columns in the table used to join with the parent's parentColumns.
+	 */
 	private final List<Column> columns;
 	
 	private final JoinType joinType;
@@ -74,6 +93,11 @@ public class LinkedTableEntity {
 		Assert.notEmpty(this.tableAlias, "tableAlias cannot be null");
 		Assert.notNull(this.owningSideAttributes, "attributes cannot be null");
 		
+		// alias will be null for junction table
+		if (this.alias == null) {
+			Assert.empty(this.owningSideAttributes, "owningSideAttributes must be empty for junction tables");
+		}
+		
 		// entity is null when this table is a junction table, which is only for join purpose
 		Assert.isTrue((this.entity != null && this.alias != null)
 				|| (this.entity == null && this.alias == null && this.owningSideAttributes.size() == 0), "Invalid alias");
@@ -89,6 +113,7 @@ public class LinkedTableEntity {
 			Assert.notEmpty(this.parentColumns, "parentColumns cannot be empty");
 			Assert.notEmpty(this.columns, "columns cannot be empty");
 			Assert.notNull(this.joinType, "joinType cannot be null");
+			Assert.isTrue(this.joinType != JoinType.DEFAULT_JOIN, "joinType cannot be DEFAULT_JOIN");
 			
 			Assert.isTrue(this.parentColumns.size() == this.columns.size(), "columns size mismatch");
 
@@ -109,6 +134,9 @@ public class LinkedTableEntity {
 			else if (owningSideAttribute instanceof EntityAttribute) {
 				EntityAttribute entityAttribute = (EntityAttribute)owningSideAttribute;
 				Assert.isTrue(entityAttribute.isOwningSide(), "invalide entity Attribute");
+			}
+			else {
+				throw new IllegalArgumentException("owningSideAttributes cannot include ValueObjectAttribute");
 			}
 		}
 		
