@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.MappedSuperclass;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.PrimaryKeyJoinColumns;
 import javax.persistence.SecondaryTable;
@@ -31,14 +32,77 @@ import javax.persistence.SecondaryTables;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
 import org.nebulae2us.stardust.db.domain.LinkedTableBundleBuilder;
+import org.nebulae2us.stardust.db.domain.TableBuilder;
+import org.nebulae2us.stardust.internal.util.ClassToRootClassIterable;
 import org.nebulae2us.stardust.internal.util.NameUtils;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
+
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan
  *
  */
 public class ScannerUtils {
+	
+	
+	/**
+	 * 
+	 * Try to determine the default table for this classInQuestion. The classInQuestion is a super class of entityClass.
+	 * In a simple case (inheritance = SINGLE_TABLE), the default class is the primary table for rootEntityClass.
+	 * But in a JOINED inheritance case, the default class depends on the class the field belong to because the primary table for entityClass is different
+	 * from the primary table of rootEntityClass, and also different from an entity class sitting in the middle of entityClass and rootEntityClass.
+	 * If the classInQuestion = entityClass, then the default table is the primary table for entityClass. If the classInQuestion = rootClass, then
+	 * the default table is the primary table of rootEntityClass. If the classInQuestion is a middle entity, then the default class is the
+	 * primary table of that middle entity class.
+	 * 
+	 * If the classInQuestion is not an entity, but a class with MappedSuperClass defined, then it inherits the value of the entity before it.
+	 * 
+	 * @param entityClass
+	 * @param rootEntityClass
+	 * @param inheritanceType
+	 * @param field
+	 * @return
+	 */
+	public static TableBuilder<?> getDefaultTable(Class<?> entityClass, Class<?> rootEntityClass, InheritanceType inheritanceType, Class<?> classInQuestion) {
+		Assert.notNull(inheritanceType, "inheritanceType cannot be null");
+		
+		if (classInQuestion != entityClass) {
+			Assert.isTrue(classInQuestion.getAnnotation(Entity.class) != null || classInQuestion.getAnnotation(MappedSuperclass.class) != null, "field must belong to an entity");
+			Assert.isTrue(classInQuestion.isAssignableFrom(entityClass), "field must belong to a super class of entityClass");
+		}
+		
+		Class<?> entityClassThatDefinePrimaryTable = rootEntityClass;
+		if (inheritanceType == InheritanceType.JOINED) {
+			if (classInQuestion == entityClass || classInQuestion.getAnnotation(Entity.class) != null) {
+				entityClassThatDefinePrimaryTable = classInQuestion;
+			}
+			else {
+				for (Class<?> clazz : new ClassToRootClassIterable(entityClass)) {
+					if (clazz == entityClass || clazz.getAnnotation(Entity.class) != null) {
+						entityClassThatDefinePrimaryTable = clazz;
+					}
+					if (classInQuestion == clazz) {
+						break;
+					}
+				}
+			}
+		}
+		
+		javax.persistence.Table table = entityClassThatDefinePrimaryTable.getAnnotation(javax.persistence.Table.class);
+		
+		if (table != null) {
+			return table()
+						.name(table.name())
+						.schemaName(table.schema())
+						.catalogName(table.catalog());
+		}
+		else {
+			return table()
+					.name(NameUtils.camelCaseToUpperCase(entityClassThatDefinePrimaryTable.getSimpleName()));
+		}
+	}
+	
 	
 	private static LinkedTableBundleBuilder<?> _extractTableInfo(Class<?> entityClass) {
 		

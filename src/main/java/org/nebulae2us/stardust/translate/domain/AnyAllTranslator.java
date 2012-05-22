@@ -15,33 +15,34 @@
  */
 package org.nebulae2us.stardust.translate.domain;
 
+import static org.nebulae2us.stardust.internal.util.BaseAssert.AssertSyntax;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.api.Query;
+import org.nebulae2us.stardust.expr.domain.AnyAllExpression;
 import org.nebulae2us.stardust.expr.domain.Expression;
-import org.nebulae2us.stardust.expr.domain.InListExpression;
 import org.nebulae2us.stardust.expr.domain.NamedParamExpression;
+import org.nebulae2us.stardust.expr.domain.SelectorExpression;
 import org.nebulae2us.stardust.expr.domain.WildcardExpression;
 import org.nebulae2us.stardust.internal.util.ScalarValueIterator;
-
-import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan
  *
  */
-public class InListTranslator implements Translator {
+public class AnyAllTranslator implements Translator {
 
 	public boolean accept(Expression expression, ParamValues paramValues) {
-		return expression instanceof InListExpression;
+		return expression instanceof AnyAllExpression;
 	}
 
 	public Pair<String, List<?>> translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
-
-		InListExpression inListExpression = (InListExpression)expression;
+		
+		AnyAllExpression anyAllExpression = (AnyAllExpression)expression;
 		
 		List<Object> scalarValues = new ArrayList<Object>();
 		int count  = 0;
@@ -51,14 +52,15 @@ public class InListTranslator implements Translator {
 		StringBuilder result = new StringBuilder();
 
 		TranslatorController controller = context.getTranslatorController();
-		Translator translator = controller.findTranslator(inListExpression.getSelectorExpression(), paramValues);
-		Pair<String, List<?>> selectorResult = translator.translate(context, inListExpression.getSelectorExpression(), paramValues);
+		Translator translator = controller.findTranslator(anyAllExpression.getLeftOperand(), paramValues);
+		Pair<String, List<?>> selectorResult = translator.translate(context, anyAllExpression.getLeftOperand(), paramValues);
 		
 		scalarValues.addAll(selectorResult.getItem2());
-		result.append(selectorResult.getItem1())
-			.append(inListExpression.isNegated() ? " not in (" : " in (");
+		result.append(selectorResult.getItem1()).append(' ')
+			.append(anyAllExpression.getOperator()).append(' ')
+			.append(anyAllExpression.getQuantifier()).append(" (");
 		
-		for (Expression param : inListExpression.getParams()) {
+		for (Expression param : anyAllExpression.getParams()) {
 			Object value = null;
 			
 			if (param instanceof WildcardExpression) {
@@ -80,9 +82,9 @@ public class InListTranslator implements Translator {
 				else {
 					count = 1;
 					result.replace(result.length() - 1,  result.length(), ")");
-					result.append(inListExpression.isNegated() ? " and " : " or ")
+					result.append("all".equals(anyAllExpression.getQuantifier()) ? " and " : " or ")
 						.append(selectorResult.getItem1())
-						.append(' ').append(inListExpression.isNegated() ? "not in" : "in").append(" (");
+						.append(' ').append(anyAllExpression.getOperator()).append(' ').append(anyAllExpression.getQuantifier()).append(" (");
 					
 					result.append(paramTranslationResult.getItem1()).append(',');
 					
@@ -95,7 +97,7 @@ public class InListTranslator implements Translator {
 			
 			if (value instanceof Query) {
 				Pair<String, List<?>> subQueryTranslationResult = ((Query)value).translate();
-				AssertSyntax.isTrue(inListExpression.getParams().size() == 1, "Invalid in-list expression that has sub-query: %s", expression);
+				AssertSyntax.isTrue(anyAllExpression.getParams().size() == 1, "Invalid in-list expression that has sub-query: %s", expression);
 				count++;
 				result.append(subQueryTranslationResult.getItem1()).append(',');
 				scalarValues.addAll(subQueryTranslationResult.getItem2());
@@ -111,9 +113,9 @@ public class InListTranslator implements Translator {
 				else {
 					count = 1;
 					result.replace(result.length() - 1,  result.length(), ")");
-					result.append(inListExpression.isNegated() ? " and " : " or ")
+					result.append("all".equals(anyAllExpression.getQuantifier()) ? " and " : " or ")
 						.append(selectorResult.getItem1())
-						.append(' ').append(inListExpression.isNegated() ? "not in" : "in").append(" (?,");
+						.append(' ').append(anyAllExpression.getOperator()).append(' ').append(anyAllExpression.getQuantifier()).append(" (?,");
 					extended = true;
 					scalarValues.addAll(selectorResult.getItem2());
 				}
@@ -121,7 +123,7 @@ public class InListTranslator implements Translator {
 			}
 		}
 
-		AssertSyntax.isTrue(count > 0, "No values are supplied for the in-list expression '%s'.", inListExpression.getExpression());
+		AssertSyntax.isTrue(count > 0, "No values are supplied for the in-list expression '%s'.", anyAllExpression.getExpression());
 		
 		result.replace(result.length() - 1, result.length(), ")");
 		
@@ -130,6 +132,12 @@ public class InListTranslator implements Translator {
 			result.append(')');
 		}
 		
-		return new Pair<String, List<?>>(result.toString(), scalarValues);
+		if (anyAllExpression.isNegated()) {
+			result.insert(0, "not (").append(')');
+		}
+		
+		return new Pair<String, List<?>>(result.toString(), scalarValues);		
+
 	}
+
 }

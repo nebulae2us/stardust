@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
+import org.nebulae2us.stardust.internal.util.StringUtils;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -32,10 +33,8 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  */
 public class InListExpression extends PredicateExpression {
 
-	private final static Pattern PATTERN = Pattern.compile("(\\?|:[a-zA-Z0-9_]+|[a-zA-Z0-9_.() ]+?) +(not )? *in +\\( *(\\?|:[a-zA-Z0-9_]+)([a-zA-Z0-9:_?, ]*)\\)");
-	
-	private final static Pattern PATTERN_PARAM = Pattern.compile("(\\?|:[a-zA-Z0-9_]+)");
-	
+	private final static Pattern PATTERN = Pattern.compile("(\\?|:[a-zA-Z0-9_]+|[a-zA-Z0-9_.() ]+?) +(not )? *in +\\(([a-zA-Z0-9:_?, ]+)\\)");
+
 	private final SelectorExpression selectorExpression;
 
 	private final List<SelectorExpression> params;
@@ -44,10 +43,6 @@ public class InListExpression extends PredicateExpression {
 		super(negated, expression);
 		this.selectorExpression = selectorExpression;
 		this.params = Immutables.$(params);
-	}
-	
-	public static InListExpression parse(String expression) {
-		return parse(expression, false);
 	}
 	
 	public static InListExpression parse(String expression, boolean negated) {
@@ -63,21 +58,13 @@ public class InListExpression extends PredicateExpression {
 			}
 			
 			List<SelectorExpression> params = new ArrayList<SelectorExpression>();
-			params.add(SelectorExpression.parse(matcher.group(3)));
-			
-			String lastGroup = matcher.group(4).trim();
-			if (lastGroup.length() > 0) {
+
+			List<String> paramStrings = StringUtils.splitFunctionInput(matcher.group(3).trim());
+			for (String paramString : paramStrings) {
+				SelectorExpression param = SelectorExpression.parse(paramString);
+				AssertSyntax.notNull(param, "Syntax is invalid for %s in expression %s.", paramString, expression);
 				
-				AssertSyntax.isTrue(lastGroup.charAt(0) == ',' || lastGroup.charAt(lastGroup.length() - 1) != ',', "Syntax is invalid for in-list expression: %.", expression);
-				
-				String[] otherParams = lastGroup.substring(1).split(",");
-				for (String otherParam : otherParams) {
-					Matcher paramMatcher = PATTERN_PARAM.matcher(otherParam.trim());
-					if (!paramMatcher.matches()) {
-						AssertSyntax.isTrue(lastGroup.charAt(0) == ',' || lastGroup.charAt(lastGroup.length() - 1) != ',', "Syntax is invalid for in-list expression: %.", expression);
-					}
-					params.add(SelectorExpression.parse(paramMatcher.group(1)));
-				}
+				params.add(param);
 			}
 			
 			return new InListExpression(negated, expression, selectorExpr, params);

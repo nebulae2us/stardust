@@ -15,31 +15,37 @@
  */
 package org.nebulae2us.stardust.api;
 
-import org.nebulae2us.stardust.my.domain.EntityRepository;
+import java.util.List;
+
+import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.expr.domain.QueryExpression;
+import org.nebulae2us.stardust.translate.domain.ParamValues;
+import org.nebulae2us.stardust.translate.domain.Translator;
+import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 import org.nebulae2us.stardust.translate.domain.TranslatorController;
 
 /**
- * 
- * Thread safe. Should be singleton.
- * 
  * @author Trung Phan
  *
  */
 public class Query {
 
-	private final EntityRepository entityRepository;
+	private final QueryExpression queryExpression;
 	
-	private final TranslatorController controller;
+	private final TranslatorContext translatorContext;
 	
-	public Query(EntityRepository entityRepository, TranslatorController controller) {
-		this.entityRepository = entityRepository;
-		this.controller = controller;
+	private final ParamValues paramValues;
+	
+	public Query(TranslatorContext translatorContext, QueryExpression queryExpression, ParamValues paramValues) {
+		this.translatorContext = translatorContext;
+		this.queryExpression = queryExpression;
+		this.paramValues = paramValues;
 	}
-	
-	public <T> QueryBuilder<T> entity(Class<T> entityClass) {
-		return new QueryBuilder<T>(this.entityRepository, this.controller, entityClass);
+
+	public Pair<String, List<?>> translate() {
+		TranslatorController controller = translatorContext.getTranslatorController();
+		Translator translator = controller.findTranslator(this.queryExpression, this.paramValues);
+		return translator.translate(this.translatorContext, this.queryExpression, this.paramValues);
 	}
-	
-	
 	
 }

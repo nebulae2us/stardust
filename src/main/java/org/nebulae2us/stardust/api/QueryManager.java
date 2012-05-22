@@ -13,23 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.expr.domain;
+package org.nebulae2us.stardust.api;
+
+import org.nebulae2us.stardust.my.domain.EntityRepository;
+import org.nebulae2us.stardust.translate.domain.TranslatorController;
 
 /**
+ * 
+ * Thread safe. Should be singleton.
+ * 
  * @author Trung Phan
  *
  */
-public final class WildcardExpression extends SelectorExpression {
+public class QueryManager {
 
-	private WildcardExpression() {
-		super("?");
+	private final EntityRepository entityRepository;
+	
+	private final TranslatorController controller;
+	
+	public QueryManager(EntityRepository entityRepository, TranslatorController controller) {
+		this.entityRepository = entityRepository;
+		this.controller = controller;
 	}
 	
-	private static final WildcardExpression instance = new WildcardExpression();
-	
-	
-	public static final WildcardExpression getInstance() {
-		return instance;
+	public <T> QueryBuilder<T> newQuery(Class<T> entityClass) {
+		return new QueryBuilder<T>(this.entityRepository, this.controller, entityClass);
 	}
+	
+	
 	
 }

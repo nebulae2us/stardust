@@ -15,7 +15,7 @@
  */
 package org.nebulae2us.stardust.expr.domain;
 
-import static org.nebulae2us.stardust.internal.util.BaseAssert.AssertSyntax;
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 import java.util.Collections;
 import java.util.Iterator;
@@ -38,6 +38,7 @@ public class IsNullExpression extends PredicateExpression {
 		super(negated, expression);
 
 		this.selector = selector;
+		Assert.notNull(selector, "selector cannot be null");
 	}
 
 	public final SelectorExpression getSelector() {

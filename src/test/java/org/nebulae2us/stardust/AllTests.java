@@ -26,6 +26,10 @@ import org.nebulae2us.stardust.expr.domain.InListExpressionTest;
 import org.nebulae2us.stardust.expr.domain.SelectorExpressionTest;
 import org.nebulae2us.stardust.my.domain.Group1EntityRepositoryTest;
 import org.nebulae2us.stardust.sql.domain.*;
+import org.nebulae2us.stardust.translate.domain.AnyAllTranslatorTest;
+import org.nebulae2us.stardust.translate.domain.InListTranslatorTest;
+import org.nebulae2us.stardust.translate.domain.IsNullTranslatorTest;
+import org.nebulae2us.stardust.translate.domain.LikeTranslatorTest;
 import org.nebulae2us.stardust.translate.domain.TranslatorIntegrationTest;
 
 /**
@@ -46,7 +50,11 @@ import org.nebulae2us.stardust.translate.domain.TranslatorIntegrationTest;
 	BaseFilterBuilderTest.class,
 	FilterBuilderTest.class,
 	QueryTest.class,
-	TranslatorIntegrationTest.class
+	TranslatorIntegrationTest.class,
+	AnyAllTranslatorTest.class,
+	InListTranslatorTest.class,
+	IsNullTranslatorTest.class,
+	LikeTranslatorTest.class
 	})
 public class AllTests {
 	

@@ -42,10 +42,6 @@ public class PredicateExpression extends Expression {
 		return negated;
 	}
 	
-	public static PredicateExpression parse(String expression) {
-		return parse(expression, false);
-	}
-	
 	public static PredicateExpression parse(String expression, boolean negated) {
 		expression = expression.trim();
 		if (expression.length() == 0) {
@@ -85,6 +81,20 @@ public class PredicateExpression extends Expression {
 			return _result != null ? _result : result;
 		}
 		
+		result = AnyAllExpression.parse(expression, negated);
+		if (result != null) {
+			PredicateExpression _result = negated ? NEGATED_EXPRESSIONS_CACHE.putIfAbsent(expression, result)
+												  :	EXPRESSIONS_CACHE.putIfAbsent(expression, result);
+			return _result != null ? _result : result;
+		}
+		
+		result = LikeExpression.parse(expression, negated);
+		if (result != null) {
+			PredicateExpression _result = negated ? NEGATED_EXPRESSIONS_CACHE.putIfAbsent(expression, result)
+												  :	EXPRESSIONS_CACHE.putIfAbsent(expression, result);
+			return _result != null ? _result : result;
+		}
+
 		throw new IllegalSyntaxException("Unable to recognize this expression: " + expression);
 	}
 	

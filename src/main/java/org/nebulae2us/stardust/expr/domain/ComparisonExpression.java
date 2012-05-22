@@ -15,7 +15,6 @@
  */
 package org.nebulae2us.stardust.expr.domain;
 
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +32,19 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  */
 public class ComparisonExpression extends PredicateExpression {
 
-	private final static Pattern PATTERN = Pattern.compile("(\\?|:[a-zA-Z0-9_]+|[a-zA-Z0-9_.() ]+?) *(=|!=|<>|>|<|>=|<=| eq | ne | lt | le | gt | ge ) *(\\?|:[a-zA-Z0-9_]+|[a-zA-Z0-9_.() ]+?)");
+	private final static Pattern PATTERN = Pattern.compile("(\\?|:[a-zA-Z0-9_]+|[a-zA-Z0-9_.() ]+?) *(=|!=|<>|>|!>|<|!<|>=|<=| eq | ne | lt | le | gt | ge ) *(\\?|:[a-zA-Z0-9_]+|[a-zA-Z0-9_.() ]+?)");
 	
-	private final static List<String> OPERATORS1 = Arrays.asList("=", "<>", ">", "<", ">=", "<=");
-	private final static List<String> OPERATORS2 = Arrays.asList("eq", "ne", "gt", "lt", "ge", "le");
+	private final static List<String> VALID_OPERATORS = new ListBuilder<String>().add("=", "<>", ">", "<", ">=", "<=").toList();
+	
+	private final static Map<String, String> OPERATORS = new MapBuilder<String, String>()
+			.put("=", "=").put("eq", "=")
+			.put("<>", "<>").put("!=", "<>").put("ne", "<>")
+			.put(">", ">").put("gt", ">")
+			.put("<", "<").put("lt", "<")
+			.put(">=", ">=").put("ge", ">=").put("!<", ">=")
+			.put("<=", "<=").put("le", "<=").put("!>", "<=")
+			.toMap();
+
 	private final static Map<String, String> NEGATED_OPERATORS = new MapBuilder<String, String>()
 			.put("=", "<>").put("<>", "=").put("!=", "=")
 			.put(">", "<=").put("<=", "<")
@@ -49,13 +57,13 @@ public class ComparisonExpression extends PredicateExpression {
 	
 	private final SelectorExpression rightOperandExpression;
 
-	public ComparisonExpression(boolean negated, String expression, String operator, SelectorExpression leftOperandExpression, SelectorExpression rightOperandExpression) {
-		super(negated, expression);
+	public ComparisonExpression(String expression, String operator, SelectorExpression leftOperandExpression, SelectorExpression rightOperandExpression) {
+		super(false, expression);
 		this.operator = operator;
 		this.leftOperandExpression = leftOperandExpression;
 		this.rightOperandExpression = rightOperandExpression;
 		
-		AssertSyntax.isTrue(OPERATORS1.contains(operator), "Unrecognized operator %s.", operator);
+		AssertSyntax.isTrue(VALID_OPERATORS.contains(operator), "Unrecognized operator %s.", operator);
 		AssertSyntax.notNull(leftOperandExpression, "leftOperandExpression cannot be null.");
 		AssertSyntax.notNull(rightOperandExpression, "rightOperandExpression cannot be null.");
 	}
@@ -77,28 +85,21 @@ public class ComparisonExpression extends PredicateExpression {
 		return new ExpressionIterator(this, new ListBuilder<Expression>().add(leftOperandExpression).add(rightOperandExpression).toList());
 	}
 	
-	public static ComparisonExpression parse(String expression) {
-		return parse(expression, false);
-	}
-	
 	public static ComparisonExpression parse(String expression, boolean negated) {
 		Matcher matcher = PATTERN.matcher(expression);
 		if (matcher.matches()) {
 			SelectorExpression param1 = SelectorExpression.parse(matcher.group(1).trim());
+			AssertSyntax.notNull(param1, "Invalid syntax: %s", expression);
+			
 			SelectorExpression param2 = SelectorExpression.parse(matcher.group(3).trim());
+			AssertSyntax.notNull(param2, "Invalid syntax: %s", expression);
 			
 			String operator = matcher.group(2).trim();
-			int index = OPERATORS2.indexOf(operator);
-			if (index > -1) {
-				operator = OPERATORS1.get(index);
-			}
-			if (operator.equals("!=")) {
-				operator = "<>";
-			}
+			operator = OPERATORS.get(operator);
 			if (negated) {
 				operator = NEGATED_OPERATORS.get(operator);
 			}
-			return new ComparisonExpression(false, expression, operator, param1, param2);
+			return new ComparisonExpression(expression, operator, param1, param2);
 		}
 		
 		return null;

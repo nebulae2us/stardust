@@ -38,8 +38,8 @@ public class ParamValues {
 	public Object getParamValue(String param) {
 		Assert.notEmpty(param, "param cannot be empty");
 		
+		AssertSyntax.isTrue(namedParamValues.containsKey(param), "Cannot find values for param '%s'", param);
 		Object value = namedParamValues.get(param);
-		AssertSyntax.notNull(value, "Cannot find values for param '%s'", param);
 		
 		return value;
 	}

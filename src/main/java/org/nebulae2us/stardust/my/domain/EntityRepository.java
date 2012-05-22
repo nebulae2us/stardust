@@ -38,6 +38,12 @@ public class EntityRepository {
 		
 	}
 	
+	public List<Entity> getAllEntities() {
+		List<Entity> result = new ArrayList<Entity>();
+		result.addAll(entities.values());
+		return result;
+	}
+	
 	public List<Entity> getSubEntities(Entity parentEntity) {
 		List<Entity> result = new ArrayList<Entity>();
 		for (Entity e : entities.values()) {

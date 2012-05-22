@@ -29,6 +29,7 @@ import javax.persistence.Transient;
 
 import org.nebulae2us.electron.Constants;
 import org.nebulae2us.stardust.Builders;
+import org.nebulae2us.stardust.db.domain.TableBuilder;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
 import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
 import org.nebulae2us.stardust.my.domain.ValueObjectAttributeBuilder;
@@ -51,8 +52,14 @@ public class ValueObjectScanner {
 	
 	private final String owningFieldFullName;
 	
-	public ValueObjectScanner(EntityBuilder<?> owningEntity, Class<?> valueObjectClass, String owningFieldFullName, AttributeOverrideScanner attributeOverrideScanner) {
+	/**
+	 * DefaultTable is used to determine table for scalarAttribute that does not define table in the annotation. It's mainly used to pass into ScalarAttributeScanner.
+	 */
+	private final TableBuilder<?> defaultTable;
+	
+	public ValueObjectScanner(EntityBuilder<?> owningEntity, TableBuilder<?> defaultTable, Class<?> valueObjectClass, String owningFieldFullName, AttributeOverrideScanner attributeOverrideScanner) {
 		this.owningEntity = owningEntity;
+		this.defaultTable = defaultTable;
 		this.valueObjectClass = valueObjectClass;
 		this.attributeOverrideScanner = attributeOverrideScanner;
 		this.owningFieldFullName = owningFieldFullName;
@@ -86,7 +93,7 @@ public class ValueObjectScanner {
 				
 				if (Constants.SCALAR_TYPES.contains(fieldClass) || fieldClass.isEnum()) {
 					
-					ScalarAttributeBuilder<?> attributeBuilder = new ScalarAttributeScanner(this.owningEntity, field, this.owningFieldFullName).produce() ;
+					ScalarAttributeBuilder<?> attributeBuilder = new ScalarAttributeScanner(this.owningEntity, this.defaultTable, field, this.owningFieldFullName).produce() ;
 					
 					if (this.attributeOverrideScanner.getColumns().containsKey(field.getName())) {
 						attributeBuilder.column(this.attributeOverrideScanner .getColumns().get(field.getName()));
@@ -96,7 +103,7 @@ public class ValueObjectScanner {
 				}
 				else if (field.getAnnotation(Embedded.class) != null || field.getAnnotation(EmbeddedId.class) != null || fieldClass.getAnnotation(Embeddable.class) != null) {
 					String fullName = this.owningFieldFullName + "." + field.getName();
-					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(this.owningEntity, fieldClass, fullName, this.attributeOverrideScanner.sub(field.getName())).produce();
+					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(this.owningEntity, this.defaultTable, fieldClass, fullName, this.attributeOverrideScanner.sub(field.getName())).produce();
 					
 					ValueObjectAttributeBuilder<?> attributeBuilder = valueObjectAttribute()
 							.fullName(fullName)

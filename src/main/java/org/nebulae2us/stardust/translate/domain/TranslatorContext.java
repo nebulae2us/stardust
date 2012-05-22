@@ -26,6 +26,8 @@ public class TranslatorContext {
 
 	private final TranslatorController translatorController;
 	
+	private final int maxInListSize = 1000;
+	
 	private final boolean externalSql;
 	
 	private final LinkedTableEntityBundle linkedTableEntityBundle;
@@ -53,6 +55,10 @@ public class TranslatorContext {
 	
 	public TranslatorController getTranslatorController() {
 		return translatorController;
+	}
+
+	public int getMaxInListSize() {
+		return maxInListSize;
 	}
 	
 }

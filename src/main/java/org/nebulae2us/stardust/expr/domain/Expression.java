@@ -18,6 +18,8 @@ package org.nebulae2us.stardust.expr.domain;
 import java.util.Collections;
 import java.util.Iterator;
 
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+
 /**
  * @author Trung Phan
  *
@@ -27,6 +29,8 @@ public abstract class Expression {
 	private final String expression;
 	
 	public Expression(String expression) {
+		Assert.notEmpty(expression, "expression cannot be empty");
+		
 		this.expression = expression;
 	}
 

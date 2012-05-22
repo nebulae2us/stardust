@@ -180,6 +180,24 @@ public class Group1EntityRepositoryTest {
 	}
 	
 	@Test
+	public void bungalow_attributes_should_belong_to_table_BUNGALOW_by_default() {
+		Entity bungalow = entityRepository.getEntity(Bungalow.class);
+		
+		ScalarAttribute attribute = (ScalarAttribute)bungalow.getAttribute("bungalowStyle");
+		assertEquals("BUNGALOW", attribute.getColumn().getTable().getName());
+		
+	}
+	
+	@Test
+	public void bungalow_house_attributes_should_belong_to_table_HOUSE_by_default() {
+		Entity bungalow = entityRepository.getEntity(Bungalow.class);
+		
+		ScalarAttribute attribute = (ScalarAttribute)bungalow.getAttribute("version");
+		assertEquals("HOUSE", attribute.getColumn().getTable().getName());
+		
+	}
+	
+	@Test
 	public void passport_version_override() {
 		Entity passport = entityRepository.getEntity(Passport.class);
 		ScalarAttribute attribute = (ScalarAttribute)passport.getAttribute("version");

@@ -17,8 +17,6 @@ package org.nebulae2us.stardust.expr.domain;
 
 import java.util.List;
 
-import org.nebulae2us.electron.Mirror;
-
 /**
  * @author Trung Phan
  *

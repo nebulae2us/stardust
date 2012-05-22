@@ -25,7 +25,6 @@ import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.Procedure;
 import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.stardust.db.domain.JoinType;
-import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.OrderExpression;
 import org.nebulae2us.stardust.expr.domain.PredicateExpression;
 import org.nebulae2us.stardust.expr.domain.QueryExpression;
@@ -35,7 +34,6 @@ import org.nebulae2us.stardust.sql.domain.AliasJoin;
 import org.nebulae2us.stardust.sql.domain.LinkedEntityBundle;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
 import org.nebulae2us.stardust.translate.domain.ParamValues;
-import org.nebulae2us.stardust.translate.domain.Translator;
 import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 import org.nebulae2us.stardust.translate.domain.TranslatorController;
 
@@ -172,18 +170,12 @@ public class QueryBuilder<T> {
 		return this;
 	}
 	
-	private Pair<String, List<?>> translate(TranslatorContext context, Expression expression, ParamValues paramValues) {
-		Translator translator = controller.findTranslator(expression, paramValues);
-		return translator.translate(context, expression, paramValues);
-	}
-	
-	public List<T> list() {
-		
-		List<T> result = new ArrayList<T>();
-		
+	public Query toQuery() {
 		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(this.entityClass), "", this.aliasJoins);
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+
+		TranslatorContext context = new TranslatorContext(controller, linkedTableEntityBundle, linkedEntityBundle, false);
 
 		QueryExpression queryExpression = new QueryExpression("query", 
 				this.selectorExpressions, this.predicateExpressions, this.orderExpressions, 
@@ -191,11 +183,18 @@ public class QueryBuilder<T> {
 				false);
 		
 		ParamValues paramValues = new ParamValues(namedParamValues, 
-				new ListBuilder<Object>().add(selectWildcardValues).add(filterWildcardValues).add(orderExpressions).toMutableList());
+				new ListBuilder<Object>().add(selectWildcardValues).add(filterWildcardValues).add(orderExpressions).toList());
+
+		return new Query(context, queryExpression, paramValues);
+	}
+	
+	public List<T> list() {
 		
-		TranslatorContext context = new TranslatorContext(controller, linkedTableEntityBundle, linkedEntityBundle, false);
+		List<T> result = new ArrayList<T>();
+
+		Query query = toQuery();
 		
-		Pair<String, List<?>> queryResult = translate(context, queryExpression, paramValues);
+		Pair<String, List<?>> queryResult = query.translate();
 		
 		System.out.println(queryResult.getItem1());
 		System.out.println(queryResult.getItem2());

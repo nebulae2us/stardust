@@ -46,7 +46,7 @@ public class QueryTest {
 	
 	private TranslatorController controller;
 	
-	private Query query;
+	private QueryManager queryManager;
 	
 	@Before
 	public void setup() {
@@ -64,20 +64,20 @@ public class QueryTest {
 		translators.add(new QueryTranslator());
 
 		this.controller = new TranslatorController(translators);
-		this.query = new Query(entityRepository, controller);
+		this.queryManager = new QueryManager(entityRepository, controller);
 	}
 	
 	@Test
 	public void createQuery() {
 
-		query.entity(House.class)
+		queryManager.newQuery(House.class)
 		.list();
 		
 	}
 	
 	@Test
 	public void filter_equal() {
-		query.entity(House.class)
+		queryManager.newQuery(House.class)
 		.distinct()
 		.select("houseId.houseId")
 		.filterBy()

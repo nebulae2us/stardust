@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.nebulae2us.electron.util.Immutables;
+import org.nebulae2us.stardust.internal.util.StringUtils;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -104,35 +105,7 @@ public class FunctionExpression extends SelectorExpression {
 		this.functionName = functionName;
 		this.params = Immutables.$(params);
 	}
-	
-	private static List<String> splitFunctionInput(String functionInput) {
-		List<String> result = new ArrayList<String>();
 
-		int nestedQuotes = 0;
-		
-		int startIndex = 0;
-		int runIndex = startIndex;
-		while (runIndex < functionInput.length()) {
-			char c = functionInput.charAt(runIndex);
-			if (c == '(') {
-				nestedQuotes++;
-			}
-			else if (c == ')') {
-				AssertSyntax.isTrue(nestedQuotes > 0, "Syntax is invalid for %s.", functionInput);
-				nestedQuotes--;
-			}
-			else if (c == ',' && nestedQuotes == 0) {
-				result.add(functionInput.substring(startIndex, runIndex).trim());
-				startIndex = runIndex + 1;
-				runIndex = startIndex;
-				continue;
-			}
-			runIndex++;
-		}
-		result.add(functionInput.substring(startIndex).trim());
-		
-		return result;
-	}
 	
 	public static FunctionExpression parse(String expression) {
 		Matcher matcher = PATTERN.matcher(expression.trim());
@@ -155,7 +128,7 @@ public class FunctionExpression extends SelectorExpression {
 			else if (TWO_INPUT_SCALAR_FUNCTIONS.contains(functionName) || VARIABLE_INPUT_SCALAR_FUNCTIONS.contains(functionName)) {
 				AssertSyntax.notEmpty(functionInput, "Syntax is invalid for function %s in expression %s.", functionName, expression);
 				
-				List<String> paramStrings = splitFunctionInput(functionInput);
+				List<String> paramStrings = StringUtils.splitFunctionInput(functionInput);
 				if (TWO_INPUT_SCALAR_FUNCTIONS.contains(functionName)) {
 					AssertSyntax.isTrue(paramStrings.size() == 2, "Syntax is invalid for function %s in expression %s.", functionName, expression);
 				}

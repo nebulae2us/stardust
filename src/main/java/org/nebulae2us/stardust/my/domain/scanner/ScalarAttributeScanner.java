@@ -15,8 +15,7 @@
  */
 package org.nebulae2us.stardust.my.domain.scanner;
 
-import static org.nebulae2us.stardust.Builders.column;
-import static org.nebulae2us.stardust.Builders.scalarAttribute;
+import static org.nebulae2us.stardust.Builders.*;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.Assert;
 
 import java.lang.reflect.Field;
@@ -25,9 +24,12 @@ import javax.persistence.JoinColumn;
 
 import org.nebulae2us.stardust.db.domain.ColumnBuilder;
 import org.nebulae2us.stardust.db.domain.LinkedTableBundleBuilder;
+import org.nebulae2us.stardust.db.domain.Table;
+import org.nebulae2us.stardust.db.domain.TableBuilder;
 import org.nebulae2us.stardust.internal.util.NameUtils;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
+import org.nebulae2us.stardust.my.domain.InheritanceType;
 import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
 
 /**
@@ -42,25 +44,42 @@ public class ScalarAttributeScanner {
 	
 	private final String parentPath;
 	
-	public ScalarAttributeScanner(EntityBuilder<?> owningEntity, Field field, String parentPath) {
+	/**
+	 * DefaultTable is used to determine the table if it's not defined in the annotation of a field.
+	 * @see ScannerUtils#getDefaultTable(Class, Class, InheritanceType, Class)
+	 */
+	private final TableBuilder<?> defaultTable;
+	
+	public ScalarAttributeScanner(EntityBuilder<?> owningEntity, TableBuilder<?> defaultTable, Field field, String parentPath) {
 		this.owningEntity = owningEntity;
 		this.field = field;
 		this.parentPath = parentPath;
+		this.defaultTable = defaultTable;
 	}
 	
 	public ScalarAttributeBuilder<?> produce() {
+		
 		ScalarAttributeBuilder<?> attributeBuilder = scalarAttribute()
 				.fullName(parentPath.length() > 0 ? parentPath + "." + field.getName() : field.getName())
 				.field(field)
 				.scalarType(field.getType())
 				.owningEntity(this.owningEntity)
-				.column(extractColumnInfo(this.field, this.owningEntity.getLinkedTableBundle()))
+				.column(extractColumnInfo(this.field, defaultTable))
 				;
 		
 		return attributeBuilder;
 	}
 	
-	private ColumnBuilder<?> extractColumnInfo(Field field, LinkedTableBundleBuilder<?> linkedTableBundle) {
+	/**
+	 * Extract column info from annotation. If table is not defined in the annotation, use defaultTable.
+	 * 
+	 * DefaultTable depends on what class the field belongs to.
+	 * 
+	 * @param field
+	 * @param defaultTable
+	 * @return
+	 */
+	private static ColumnBuilder<?> extractColumnInfo(Field field, TableBuilder<?> defaultTable) {
 		
 		ColumnBuilder<?> result = column();
 		
@@ -84,8 +103,9 @@ public class ScalarAttributeScanner {
 		}
 		
 		if (result.getTable() == null || ObjectUtils.isEmpty(result.getTable().getName())) {
-			Assert.notNull(linkedTableBundle.getRoot().getTable(), "table cannot be null.");
-			result.table(linkedTableBundle.getRoot().getTable());
+//			Assert.notNull(linkedTableBundle.getRoot().getTable(), "table cannot be null.");
+//			result.table(linkedTableBundle.getRoot().getTable());
+			result.table(defaultTable);
 		}
 		
 		return result;

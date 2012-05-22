@@ -88,7 +88,7 @@ public class TranslatorIntegrationTest {
 	private Pair<String, List<?>> filter(String expression, Object ... values) {
 		ParamValues paramValues = new ParamValues(new HashMap<String, Object>(), Arrays.asList(values));
 		
-		PredicateExpression expr = PredicateExpression.parse(expression);
+		PredicateExpression expr = PredicateExpression.parse(expression, false);
 		
 		Translator translator = context.getTranslatorController().findTranslator(expr, paramValues);
 		
