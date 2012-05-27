@@ -16,13 +16,13 @@
 package org.nebulae2us.stardust.sql.domain;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.nebulae2us.electron.util.ImmutableList;
+import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.jpa.group1.BedRoom;
 import org.nebulae2us.stardust.jpa.group1.House;
@@ -64,13 +64,12 @@ public class LinkedTableEntityBundleTest {
 
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void select_person() {
 		
-		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(Person.class), "b", Collections.EMPTY_LIST);
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(Person.class), "b", Immutables.emptyList(AliasJoin.class));
 		
-		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 
 		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 		
@@ -78,16 +77,15 @@ public class LinkedTableEntityBundleTest {
 		
 	}
 	
-	@SuppressWarnings("unchecked")
 	@Test
 	public void selectRoom() {
 
 		entityRepository.getEntity(BedRoom.class);
 		entityRepository.getEntity(Kitchen.class);
 
-		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(Room.class), "", Collections.EMPTY_LIST);
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(Room.class), "", Immutables.emptyList(AliasJoin.class));
 		
-		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 		
 		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 
@@ -97,9 +95,9 @@ public class LinkedTableEntityBundleTest {
 	@Test
 	public void selectHouse() {
 		
-		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(House.class), "", Collections.EMPTY_LIST);
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(House.class), "", Immutables.emptyList(AliasJoin.class));
 		
-		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 		
 		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 		
@@ -117,7 +115,7 @@ public class LinkedTableEntityBundleTest {
 				);
 		
 		
-		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 		
 		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 		
@@ -135,7 +133,7 @@ public class LinkedTableEntityBundleTest {
 				);
 		
 		
-		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 		
 		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 		
@@ -150,7 +148,7 @@ public class LinkedTableEntityBundleTest {
 						aliasJoin().alias("h").name("houses").joinType(JoinType.INNER_JOIN).toAliasJoin())
 				);
 		
-		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 
 		List<String> columns = extractSelectColumns(linkedTableEntityBundle.toString());
 		

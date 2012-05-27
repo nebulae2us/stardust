@@ -28,7 +28,6 @@ import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.exception.IllegalSyntaxException;
-import org.nebulae2us.stardust.expr.domain.InListExpression;
 import org.nebulae2us.stardust.expr.domain.PredicateExpression;
 import org.nebulae2us.stardust.jpa.group1.Person;
 import org.nebulae2us.stardust.my.domain.Entity;
@@ -77,7 +76,7 @@ public class TranslatorIntegrationTest {
 		
 		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(person, "", aliasJoins);
 		
-		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 		
 		context = new TranslatorContext(translatorController, linkedTableEntityBundle, linkedEntityBundle, false);
 	

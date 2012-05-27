@@ -16,6 +16,9 @@
 package org.nebulae2us.stardust.sql.domain;
 
 /**
+ * 
+ * Not thread safe due to the nature of ResultSet, and the state for next();
+ * 
  * @author Trung Phan
  *
  */
@@ -24,7 +27,18 @@ public abstract class DataReader {
 	public abstract int findColumn(String columnName);
 	
 	public abstract <T> T readObject(Class<T> expectedClass, int columnIndex);
+
+	public abstract <T> T readObject(Class<T> expectedClass, String columnName);
 	
 	public abstract boolean next();
+	
+	/**
+	 * Get the current row number. If next() has not been called, rowNumber = -1.
+	 * If next() = false, rowNumber is undefined.
+	 * 
+	 * @return
+	 */
+	public abstract int getRowNumber();
 
+	public abstract void close();
 }

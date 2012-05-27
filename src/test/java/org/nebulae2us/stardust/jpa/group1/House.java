@@ -21,6 +21,8 @@ import javax.persistence.AttributeOverride;
 import javax.persistence.AttributeOverrides;
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
+import javax.persistence.DiscriminatorType;
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
@@ -38,7 +40,8 @@ import javax.persistence.Table;
  *
  */
 @Entity
-@DiscriminatorColumn(name="HOUSE_TYPE_ID")
+@DiscriminatorColumn(name="HOUSE_TYPE_ID", discriminatorType=DiscriminatorType.INTEGER)
+@DiscriminatorValue("0")
 @Table(name="HOUSE")
 @SecondaryTables({
 	@SecondaryTable(name="HOUSE_INTERIOR_DETAIL", pkJoinColumns={
@@ -49,10 +52,19 @@ import javax.persistence.Table;
 @Inheritance(strategy=InheritanceType.JOINED)
 public class House extends AbstractEntity {
 
+	public House() {
+	}
+	
+	public House(int houseId, String houseLetter) {
+		this.houseId = new HouseId();
+		this.houseId.setHouseId(houseId);
+		this.houseId.setHouseLetter(houseLetter);
+	}
+	
 	@EmbeddedId
 	private HouseId houseId;
 	
-	@Column(name="HOUSE_TYPE_ID")
+	@Column(name="HOUSE_TYPE_ID", insertable = false, updatable = false)
 	private Long houseTypeId;
 
 	/**

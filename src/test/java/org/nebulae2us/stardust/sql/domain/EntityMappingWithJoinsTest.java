@@ -41,7 +41,7 @@ public class EntityMappingWithJoinsTest {
 	@Before
 	public void setup() {
 		this.entityRepository = new EntityRepository();
-		this.entityMappingRepository = new EntityMappingRepository();
+		this.entityMappingRepository = new EntityMappingRepository(this.entityRepository);
 	}
 	
 	@Test
@@ -55,12 +55,12 @@ public class EntityMappingWithJoinsTest {
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
 				Arrays.asList(aliasJoin().alias("h").name("house").joinType(JoinType.INNER_JOIN).toAliasJoin()));
 		
-		EntityMapping roomEntityMapping = this.entityMappingRepository.getEntityMapping(bundle, "", dataReader);
+		EntityMapping roomEntityMapping = this.entityMappingRepository.getEntityMapping(bundle, "", bundle.getLinkedEntity("").getEntity(), dataReader);
 		assertEquals(1, roomEntityMapping.getIdentifierAttributeMappings().get(0).getColumnIndex());
 		assertEquals(2, roomEntityMapping.getIdentifierAttributeMappings().get(1).getColumnIndex());
 		assertEquals(3, roomEntityMapping.getIdentifierAttributeMappings().get(2).getColumnIndex());
 		
-		EntityMapping houseEntityMapping = this.entityMappingRepository.getEntityMapping(bundle, "h", dataReader);
+		EntityMapping houseEntityMapping = this.entityMappingRepository.getEntityMapping(bundle, "h", bundle.getLinkedEntity("h").getEntity(), dataReader);
 		
 		assertEquals(4, houseEntityMapping.getIdentifierAttributeMappings().get(0).getColumnIndex());
 		assertEquals(5, houseEntityMapping.getIdentifierAttributeMappings().get(1).getColumnIndex());
@@ -78,7 +78,7 @@ public class EntityMappingWithJoinsTest {
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
 				Arrays.asList(aliasJoin().alias("h").name("house").joinType(JoinType.INNER_JOIN).toAliasJoin()));
 		
-		EntityMapping houseEntityMapping = this.entityMappingRepository.getEntityMapping(bundle, "h", dataReader);
+		EntityMapping houseEntityMapping = this.entityMappingRepository.getEntityMapping(bundle, "h", bundle.getLinkedEntity("h").getEntity(), dataReader);
 
 		assertEquals(2, houseEntityMapping.getIdentifierAttributeMappings().get(1).getColumnIndex());
 		// this assertion means that instead of using column H_HOUSE_LETTER for the id of house entity, it use the column HOUSE_LETTER
@@ -95,7 +95,7 @@ public class EntityMappingWithJoinsTest {
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
 				Arrays.asList(aliasJoin().alias("h").name("house").joinType(JoinType.INNER_JOIN).toAliasJoin()));
 		
-		EntityMapping roomEntityMapping = this.entityMappingRepository.getEntityMapping(bundle, "", dataReader);
+		EntityMapping roomEntityMapping = this.entityMappingRepository.getEntityMapping(bundle, "", bundle.getLinkedEntity("").getEntity(), dataReader);
 
 		assertNull(roomEntityMapping.getAttributeMapping("house"));
 		// this should be null because it's redundant. The alias h should already define the house entity for room.
@@ -111,7 +111,7 @@ public class EntityMappingWithJoinsTest {
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
 				Arrays.asList(aliasJoin().alias("r").name("rooms").joinType(JoinType.LEFT_JOIN).toAliasJoin()));
 		
-		EntityMapping roomEntityMapping = this.entityMappingRepository.getEntityMapping(bundle, "r", dataReader);
+		EntityMapping roomEntityMapping = this.entityMappingRepository.getEntityMapping(bundle, "r", bundle.getLinkedEntity("r").getEntity(), dataReader);
 
 		assertNull(roomEntityMapping.getAttributeMapping("house"));
 		// this should be null because it's redundant.

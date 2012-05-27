@@ -160,6 +160,72 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 		return result;
 	}
 
+	private boolean insertable;
+	
+	public boolean getInsertable() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.insertable, boolean.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "insertable");
+			this.insertable = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(boolean.class);
+		}
+
+		return insertable;
+	}
+
+	public void setInsertable(boolean insertable) {
+		verifyMutable();
+		this.insertable = insertable;
+	}
+
+	public AttributeBuilder<P> insertable(boolean insertable) {
+		verifyMutable();
+		this.insertable = insertable;
+		return this;
+	}
+
+	private boolean updatable;
+	
+	public boolean getUpdatable() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.updatable, boolean.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "updatable");
+			this.updatable = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(boolean.class);
+		}
+
+		return updatable;
+	}
+
+	public void setUpdatable(boolean updatable) {
+		verifyMutable();
+		this.updatable = updatable;
+	}
+
+	public AttributeBuilder<P> updatable(boolean updatable) {
+		verifyMutable();
+		this.updatable = updatable;
+		return this;
+	}
+
+	private boolean nullable;
+	
+	public boolean getNullable() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.nullable, boolean.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "nullable");
+			this.nullable = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(boolean.class);
+		}
+
+		return nullable;
+	}
+
+	public void setNullable(boolean nullable) {
+		verifyMutable();
+		this.nullable = nullable;
+	}
+
+	public AttributeBuilder<P> nullable(boolean nullable) {
+		verifyMutable();
+		this.nullable = nullable;
+		return this;
+	}
+
     /* CUSTOM CODE *********************************
      * 
      * Put your own custom code below. These codes won't be discarded during generation.

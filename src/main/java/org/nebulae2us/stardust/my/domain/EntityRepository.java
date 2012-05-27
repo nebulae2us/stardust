@@ -16,15 +16,18 @@
 package org.nebulae2us.stardust.my.domain;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.nebulae2us.electron.Converter;
 import org.nebulae2us.stardust.Builders;
 import org.nebulae2us.stardust.my.domain.scanner.EntityScanner;
-
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan
@@ -36,6 +39,12 @@ public class EntityRepository {
 	
 	public EntityRepository() {
 		
+	}
+	
+	public void scanEntities(Class<?> ... entityClasses) {
+		for (Class<?> entityClass : entityClasses) {
+			getEntity(entityClass);
+		}
 	}
 	
 	public List<Entity> getAllEntities() {
@@ -84,8 +93,14 @@ public class EntityRepository {
 			}
 			
 			entity = this.entities.get(entityClass);
-			if (entity == null) {
-				throw new IllegalStateException();
+			AssertState.notNull(entity, "Failed to retrieve Entity for class %s.", entityClass);
+
+			Set<Object> discriminatorValues = new HashSet<Object>();
+			if (entity.getEntityDiscriminator() != null) {
+				discriminatorValues.add(entity.getRootEntity().getEntityDiscriminator().getValue());
+				for (Entity subEntity : getSubEntities(entity.getRootEntity())) {
+					AssertState.isTrue(!discriminatorValues.contains(subEntity.getEntityDiscriminator().getValue()), "Duplicate discriminator value detected for %s.", subEntity.getDeclaringClass().getSimpleName());
+				}
 			}
 			
 			return entity;
@@ -97,7 +112,22 @@ public class EntityRepository {
 	}
 	
 	
-	
-	
+	public Map<Object, Entity> getDiscriminatorValues(Entity entity) {
+		Assert.notNull(entity, "entity cannot be null");
+		Map<Object, Entity> result = new HashMap<Object, Entity>();
+		
+		Entity rootEntity = entity.getRootEntity();
+		
+		AssertState.notNull(rootEntity.getEntityDiscriminator(), "This entity does not have inheritance defined: %s", entity.getDeclaringClass().getSimpleName());
+		
+		result.put(rootEntity.getEntityDiscriminator().getValue(), rootEntity);
+
+		List<Entity> subEntities = getSubEntities(rootEntity);
+		for (Entity subEntity : subEntities) {
+			result.put(subEntity.getEntityDiscriminator().getValue(), subEntity);
+		}
+		
+		return result;
+	}
 	
 }

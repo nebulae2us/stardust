@@ -36,6 +36,14 @@ import javax.persistence.TemporalType;
 @Entity
 public class Person extends AbstractEntity {
 
+	public Person() {
+	}
+	
+	public Person(String ssn, Date dateBorn) {
+		this.ssn = ssn;
+		this.dateBorn = dateBorn;
+	}
+	
 	/**
 	 * Note: SSN may not uniquely identify a person as SSN is reused.
 	 */
@@ -118,5 +126,14 @@ public class Person extends AbstractEntity {
 		this.passport = passport;
 	}
 	
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		result.append("Person(")
+			.append(ssn)
+			.append(')');
+		
+		return result.toString();
+	}
 	
 }

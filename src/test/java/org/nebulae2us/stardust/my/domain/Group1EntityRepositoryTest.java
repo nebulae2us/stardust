@@ -24,7 +24,6 @@ import org.nebulae2us.electron.ElementContext;
 import org.nebulae2us.electron.Function1;
 import org.nebulae2us.stardust.db.domain.*;
 import org.nebulae2us.stardust.jpa.group1.*;
-import org.nebulae2us.stardust.my.domain.*;
 
 import static org.junit.Assert.*;
 
@@ -326,4 +325,14 @@ public class Group1EntityRepositoryTest {
 		assertEquals(0, attribute.getJunctionRightColumns().size());
 	}
 
+	@Test
+	public void castle_association_on_right_table() {
+		
+		Entity entity = entityRepository.getEntity(Castle.class);
+		
+		EntityAttribute entityAttribute = (EntityAttribute)entity.getAttribute("castleAssociation");
+		assertEquals("CASTLE", entityAttribute.getLeftColumns().get(0).getTable().getName());
+		assertEquals("CASTLE_ASSOCIATION_ID", entityAttribute.getLeftColumns().get(0).getName());
+		
+	}
 }

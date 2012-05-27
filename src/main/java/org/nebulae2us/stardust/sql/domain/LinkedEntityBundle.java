@@ -28,6 +28,7 @@ import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
+import org.nebulae2us.stardust.my.domain.EntityRepository;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -165,8 +166,8 @@ public class LinkedEntityBundle {
 		
 	}
 
-	public List<?> readData(DataReader dataReader) {
-		EntityMappingRepository repository = new EntityMappingRepository();
+	public List<?> readData(EntityRepository entityRepository, DataReader dataReader) {
+		EntityMappingRepository repository = new EntityMappingRepository(entityRepository);
 		return repository.readData(this, dataReader);
 	}
 

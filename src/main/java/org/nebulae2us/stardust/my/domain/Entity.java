@@ -18,6 +18,8 @@ package org.nebulae2us.stardust.my.domain;
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
 
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+
 /**
  * @author Trung Phan
  *
@@ -52,6 +54,20 @@ public class Entity extends AttributeHolder {
 		this.inheritanceType = mirror.to(InheritanceType.class, "inheritanceType");
 		this.entityDiscriminator = mirror.to(EntityDiscriminator.class, "entityDiscriminator");
 		this.version = mirror.to(ScalarAttribute.class, "version");
+		
+		assertInvariant();
+	}
+
+	private void assertInvariant() {
+		Assert.notNull(this.rootEntity, "rootEntity cannot be null");
+		Assert.notNull(inheritanceType, "inheritanceType cannot be null");
+		Assert.notNull(this.linkedTableBundle, "linkedTableBundle cannot be null");
+		
+		if (rootEntity.getEntityDiscriminator() != null) {
+			AssertState.notNull(this.entityDiscriminator, "Sub entity %s must also have discriminator value defined.", this.declaringClass.getSimpleName());
+			Assert.isTrue(this.entityDiscriminator.getColumn().equals(rootEntity.entityDiscriminator.getColumn()), "discriminator column mismatch between %s and %s", this.declaringClass.getSimpleName(), this.rootEntity.declaringClass.getSimpleName());
+		}
+		
 	}
 
 	public EntityIdentifier getEntityIdentifier() {
@@ -98,7 +114,5 @@ public class Entity extends AttributeHolder {
 	public ScalarAttribute getVersion() {
 		return version;
 	}
-
-	
 	
 }

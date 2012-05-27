@@ -178,5 +178,44 @@ public class LinkedTableEntity {
 		return joinType;
 	}
 	
+	public boolean isRoot() {
+		return parent == null;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuilder result = new StringBuilder();
+		
+		if (!isRoot()) {
+			result
+				.append(parent.table).append(' ').append(parent.tableAlias).append(' ')
+				.append(joinType == JoinType.INNER_JOIN ? "inner join " : "left outer join ")
+				.append(table).append(' ')
+				.append(tableAlias).append("\n               on (")
+			;
+			
+			for (int i = 0; i < getColumns().size(); i++) {
+				Column parentColumn = parentColumns.get(i);
+				Column column = columns.get(i);
+				
+				result.append(parent.tableAlias)
+					.append('.').append(parentColumn.getName())
+					.append(" = ")
+					.append(tableAlias)
+					.append('.')
+					.append(column.getName())
+					.append("\n               and ");
+				
+			}
+		
+			result.delete(result.length() - 20, result.length());
+			result.append(")");		
+		}
+		else {
+			result.append(table).append(' ').append(tableAlias);
+		}
+			
+		return result.toString();
+	}
 	
 }

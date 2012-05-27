@@ -96,4 +96,8 @@ public class LinkedEntity {
 		return attribute.getEntity();
 	}
 	
+	public boolean isRoot() {
+		return this.parent == null;
+	}
+	
 }

@@ -35,9 +35,18 @@ import javax.persistence.Table;
 })
 public class Castle extends House {
 
+	public Castle(int houseId, String houseLetter) {
+		super(houseId, houseLetter);
+	}
+	
+	public Castle() {
+	}
+	
 	@Column(name="CASTLE_STYLE")
 	private String castleStyle;
 
+	private CastleAssociation castleAssociation;
+	
 	public String getCastleStyle() {
 		return castleStyle;
 	}
@@ -45,5 +54,15 @@ public class Castle extends House {
 	public void setCastleStyle(String castleStyle) {
 		this.castleStyle = castleStyle;
 	}
+
+	public CastleAssociation getCastleAssociation() {
+		return castleAssociation;
+	}
+
+	public void setCastleAssociation(CastleAssociation castleAssociation) {
+		this.castleAssociation = castleAssociation;
+	}
 	
+	
+
 }

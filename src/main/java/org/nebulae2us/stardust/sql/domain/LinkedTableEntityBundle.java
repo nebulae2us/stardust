@@ -25,12 +25,12 @@ import java.util.Map.Entry;
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.ImmutableList;
+import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
 import org.nebulae2us.stardust.db.domain.Table;
-import org.nebulae2us.stardust.internal.util.BaseAssert;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
@@ -87,7 +87,20 @@ public class LinkedTableEntityBundle {
 		return null;
 	}
 	
-	public static LinkedTableEntityBundle newInstance(EntityRepository entityRepository, LinkedEntityBundle linkedEntityBundle) {
+	/**
+	 * 
+	 * Based on the linkedEntityBundle, this method will expand to build the linkedTableEntityBundle. The flag includeSubEntities is for the root entity.
+	 * If includeSubEntities is true, not only the root tables involved in the entity is considered, but also the tables in the sub entities.
+	 * For example, room entity involves table ROOM, but with includeSubEntities, it also involves table KITCHEN and BEDROOM. Normally, for select query,
+	 * the includeSubEntities = true because we don't know yet what the discriminator for the object is, but for insert or update, the 
+	 * includeSubEntities = false because we already know the object type, hence the discriminator.
+	 * 
+	 * @param entityRepository
+	 * @param linkedEntityBundle
+	 * @param includeSubEntities
+	 * @return
+	 */
+	public static LinkedTableEntityBundle newInstance(EntityRepository entityRepository, LinkedEntityBundle linkedEntityBundle, boolean includeSubEntities) {
 		Set<String> usedAliases = new HashSet<String>(linkedEntityBundle.getAliases().elementToLowerCase());
 
 		IdentityHashMap<LinkedEntity, LinkedTableEntityBuilder<?>> linkedEntity2LinkedTableEntity = new IdentityHashMap<LinkedEntity, LinkedTableEntityBuilder<?>>();
@@ -95,7 +108,7 @@ public class LinkedTableEntityBundle {
 		LinkedTableEntityBundleBuilder<?> result = null;
 		
 		for (LinkedEntity linkedEntity : linkedEntityBundle.getLinkedEntities()) {
-			LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle = buildLinkedTableEntityBundle(entityRepository, linkedEntity.getEntity().getDeclaringClass());
+			LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle = buildLinkedTableEntityBundle(entityRepository, linkedEntity.getEntity().getDeclaringClass(), linkedEntity.isRoot() ? includeSubEntities : true);
 			populateAlias(linkedTableEntityBundle, linkedEntity.getAlias(), linkedEntityBundle, usedAliases);
 			
 			LinkedTableEntityBuilder<?> linkedTableEntity = linkedTableEntityBundle.getRoot();
@@ -142,11 +155,9 @@ public class LinkedTableEntityBundle {
 		return result.toLinkedTableEntityBundle();
 	}
 	
-	
-	private static LinkedTableEntityBundleBuilder<?> buildLinkedTableEntityBundle(EntityRepository entityRepository, Class<?> entityClass) {
+	private static LinkedTableEntityBundleBuilder<?> buildLinkedTableEntityBundle(EntityRepository entityRepository, Class<?> entityClass, boolean includeSubEntities) {
 
 		Entity entity = entityRepository.getEntity(entityClass);
-		List<Entity> subEntities = entityRepository.getSubEntities(entity);
 
 		LinkedTableBundle linkedTableBundle = entity.getLinkedTableBundle();
 		Table primaryTable = linkedTableBundle.getRoot().getTable();
@@ -181,42 +192,47 @@ public class LinkedTableEntityBundle {
 			
 		}
 		
-		// loop through subEntities
-		for (Entity subEntity : subEntities) {
+
+		if (includeSubEntities) {
 			
-			for (LinkedTable subLinkedTable : subEntity.getLinkedTableBundle().getLinkedTables()) {
-				ImmutableList<Attribute> subOwningSideAttributes = subEntity.getOwningSideAttributes(subLinkedTable.getTable());
-				ImmutableList<Attribute> owningSideAttributes = entity.getOwningSideAttributes(subLinkedTable.getTable());
-				if (subOwningSideAttributes.size() > 0) {
-					if (owningSideAttributes.size() == 0) {
-						result.linkedTableEntities$addLinkedTableEntity()
-							.table$wrap(subLinkedTable.getTable())
-							.entity$wrap(subEntity)
-							.parent(result.getRoot())
-							.owningSideAttributes$wrap(subOwningSideAttributes)
-							.columns$wrap(subLinkedTable.getColumns())
-							.parentColumns$wrap(subLinkedTable.getParentColumns())
-							.joinType(subLinkedTable.getJoinType())
-						.end();
-					}
-					else {
-						subOwningSideAttributes = subOwningSideAttributes
-								.changeComparator(Attribute.COMPARATOR_BY_NAME).minus(owningSideAttributes);
-						
-						if (subOwningSideAttributes.size() > 0) {
-							for (Entry<LinkedTable, LinkedTableEntityBuilder<?>> entry : linkedTable2LinkedTableEntity.entrySet()) {
-								LinkedTable linkedTable = entry.getKey();
-								if (linkedTable.getTable().equals(subLinkedTable.getTable())) {
-									LinkedTableEntityBuilder<?> linkedTableEntity = entry.getValue();
-									linkedTableEntity.owningSideAttributes$wrap(subOwningSideAttributes);
+			List<Entity> subEntities = entityRepository.getSubEntities(entity);
+			
+			for (Entity subEntity : subEntities) {
+				
+				for (LinkedTable subLinkedTable : subEntity.getLinkedTableBundle().getLinkedTables()) {
+					ImmutableList<Attribute> subOwningSideAttributes = subEntity.getOwningSideAttributes(subLinkedTable.getTable());
+					ImmutableList<Attribute> owningSideAttributes = entity.getOwningSideAttributes(subLinkedTable.getTable());
+					if (subOwningSideAttributes.size() > 0) {
+						if (owningSideAttributes.size() == 0) {
+							result.linkedTableEntities$addLinkedTableEntity()
+								.table$wrap(subLinkedTable.getTable())
+								.entity$wrap(subEntity)
+								.parent(result.getRoot())
+								.owningSideAttributes$wrap(subOwningSideAttributes)
+								.columns$wrap(subLinkedTable.getColumns())
+								.parentColumns$wrap(subLinkedTable.getParentColumns())
+								.joinType(subLinkedTable.getJoinType())
+							.end();
+						}
+						else {
+							subOwningSideAttributes = subOwningSideAttributes
+									.changeComparator(Attribute.COMPARATOR_BY_NAME).minus(owningSideAttributes);
+							
+							if (subOwningSideAttributes.size() > 0) {
+								for (Entry<LinkedTable, LinkedTableEntityBuilder<?>> entry : linkedTable2LinkedTableEntity.entrySet()) {
+									LinkedTable linkedTable = entry.getKey();
+									if (linkedTable.getTable().equals(subLinkedTable.getTable())) {
+										LinkedTableEntityBuilder<?> linkedTableEntity = entry.getValue();
+										linkedTableEntity.owningSideAttributes$wrap(subOwningSideAttributes);
+									}
 								}
 							}
+							
 						}
-						
 					}
 				}
+	
 			}
-
 		}
 		
 		return result;
@@ -253,6 +269,8 @@ public class LinkedTableEntityBundle {
 		}
 	}
 
+	private static final List<String> RESERVE_KEYWORDS = new ListBuilder<String>().add("as").toList();
+	
 	private static String getDefaultAlias(Set<String> usedAliases) {
 		String result = null;
 		
@@ -273,7 +291,7 @@ public class LinkedTableEntityBundle {
 			for (char c = 'a'; c  <= 'z'; c++) {
 				for (char c2 = 'a'; c2 <= 'z'; c2++) {
 					String newAlias = "" + c + c2;
-					if (!usedAliases.contains(newAlias)) {
+					if (!RESERVE_KEYWORDS.contains(newAlias) && !usedAliases.contains(newAlias)) {
 						result = newAlias;
 						break;
 					}
@@ -281,7 +299,7 @@ public class LinkedTableEntityBundle {
 			}
 		}
 
-		BaseAssert.AssertState.notNull(result, "Cannot find unused alias");
+		AssertState.notNull(result, "Cannot find unused alias");
 		
 		usedAliases.add(result);
 		return result;
@@ -369,5 +387,14 @@ public class LinkedTableEntityBundle {
 		}
 		
 		return result.toString();
+	}
+
+	public LinkedTableEntity findLinkedTableEntity(Table table) {
+		for (LinkedTableEntity linkedTableEntity : this.linkedTableEntities) {
+			if (linkedTableEntity.getTable().equals(table)) {
+				return linkedTableEntity;
+			}
+		}
+		return null;
 	}
 }

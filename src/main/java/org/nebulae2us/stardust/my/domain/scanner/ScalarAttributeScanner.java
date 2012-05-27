@@ -16,20 +16,15 @@
 package org.nebulae2us.stardust.my.domain.scanner;
 
 import static org.nebulae2us.stardust.Builders.*;
-import static org.nebulae2us.stardust.internal.util.BaseAssert.Assert;
 
 import java.lang.reflect.Field;
 
 import javax.persistence.JoinColumn;
 
-import org.nebulae2us.stardust.db.domain.ColumnBuilder;
-import org.nebulae2us.stardust.db.domain.LinkedTableBundleBuilder;
-import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.db.domain.TableBuilder;
 import org.nebulae2us.stardust.internal.util.NameUtils;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
-import org.nebulae2us.stardust.my.domain.InheritanceType;
 import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
 
 /**
@@ -46,66 +41,75 @@ public class ScalarAttributeScanner {
 	
 	/**
 	 * DefaultTable is used to determine the table if it's not defined in the annotation of a field.
-	 * @see ScannerUtils#getDefaultTable(Class, Class, InheritanceType, Class)
+	 * @see ScannerUtils#getDefaultTable(Class, String)
 	 */
 	private final TableBuilder<?> defaultTable;
 	
-	public ScalarAttributeScanner(EntityBuilder<?> owningEntity, TableBuilder<?> defaultTable, Field field, String parentPath) {
+	public ScalarAttributeScanner(EntityBuilder<?> owningEntity, Field field, String parentPath) {
 		this.owningEntity = owningEntity;
 		this.field = field;
 		this.parentPath = parentPath;
-		this.defaultTable = defaultTable;
+		
+		String firstAttributeName = ObjectUtils.isEmpty(parentPath) ? field.getName() : parentPath.split("\\.")[0];
+		
+		this.defaultTable = ScannerUtils.getDefaultTable(owningEntity.getDeclaringClass(), firstAttributeName);
 	}
 	
 	public ScalarAttributeBuilder<?> produce() {
+		
+		ColumnInfo columnInfo = extractColumnInfo2(field);
+		
+		TableBuilder<?> table = ObjectUtils.isEmpty(columnInfo.tableName) ? defaultTable :
+			table().name(columnInfo.tableName);
 		
 		ScalarAttributeBuilder<?> attributeBuilder = scalarAttribute()
 				.fullName(parentPath.length() > 0 ? parentPath + "." + field.getName() : field.getName())
 				.field(field)
 				.scalarType(field.getType())
 				.owningEntity(this.owningEntity)
-				.column(extractColumnInfo(this.field, defaultTable))
+				.column$begin()
+					.name(columnInfo.columnName)
+					.table(table)
+				.end()
+				.insertable(columnInfo.insertable)
+				.updatable(columnInfo.updatable)
+				.nullable(columnInfo.nullable)
 				;
 		
 		return attributeBuilder;
 	}
 	
-	/**
-	 * Extract column info from annotation. If table is not defined in the annotation, use defaultTable.
-	 * 
-	 * DefaultTable depends on what class the field belongs to.
-	 * 
-	 * @param field
-	 * @param defaultTable
-	 * @return
-	 */
-	private static ColumnBuilder<?> extractColumnInfo(Field field, TableBuilder<?> defaultTable) {
+	private static class ColumnInfo {
+		String columnName;
+		String tableName = "";
+		boolean insertable = true;
+		boolean updatable = true;
+		boolean nullable = true;
+	}
+	
+	private static ColumnInfo extractColumnInfo2(Field field) {
 		
-		ColumnBuilder<?> result = column();
+		ColumnInfo result = new ColumnInfo();
 		
 		if (field.getAnnotation(javax.persistence.Column.class) != null) {
 			javax.persistence.Column column = field.getAnnotation(javax.persistence.Column.class);
-			result.name(column.name().trim().toUpperCase())
-				.table$begin()
-					.name(column.table().trim().toUpperCase())
-				.end();
-			
+			result.columnName = column.name().trim().toUpperCase();
+			result.tableName = column.table().trim().toUpperCase();
+			result.insertable = column.insertable();
+			result.updatable = column.updatable();
+			result.nullable = column.nullable();
 		}
 		else if (field.getAnnotation(JoinColumn.class) != null) {
 			JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
-			result.name(joinColumn.name().toUpperCase().trim())
-				.table$begin()
-					.name(joinColumn.table().trim().toUpperCase())
-				.end();
-		}
-		else {
-			result.name(NameUtils.camelCaseToUpperCase(field.getName()));
+			result.columnName = joinColumn.name().trim().toUpperCase();
+			result.tableName = joinColumn.table().trim().toUpperCase();
+			result.insertable = joinColumn.insertable();
+			result.updatable = joinColumn.updatable();
+			result.nullable = joinColumn.nullable();
 		}
 		
-		if (result.getTable() == null || ObjectUtils.isEmpty(result.getTable().getName())) {
-//			Assert.notNull(linkedTableBundle.getRoot().getTable(), "table cannot be null.");
-//			result.table(linkedTableBundle.getRoot().getTable());
-			result.table(defaultTable);
+		if (ObjectUtils.isEmpty(result.columnName)) {
+			result.columnName = NameUtils.camelCaseToUpperCase(field.getName());
 		}
 		
 		return result;

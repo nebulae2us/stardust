@@ -158,6 +158,21 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 		return (EntityBuilder<? extends ScalarAttributeBuilder<P>>)super.owningEntity$begin();
 	}
 
+	@Override
+	public ScalarAttributeBuilder<P> insertable(boolean insertable) {
+		return (ScalarAttributeBuilder<P>)super.insertable(insertable);
+	}
+
+	@Override
+	public ScalarAttributeBuilder<P> updatable(boolean updatable) {
+		return (ScalarAttributeBuilder<P>)super.updatable(updatable);
+	}
+
+	@Override
+	public ScalarAttributeBuilder<P> nullable(boolean nullable) {
+		return (ScalarAttributeBuilder<P>)super.nullable(nullable);
+	}
+
     /* CUSTOM CODE *********************************
      * 
      * Put your own custom code below. These codes won't be discarded during generation.

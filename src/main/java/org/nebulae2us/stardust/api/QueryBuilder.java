@@ -49,8 +49,9 @@ public class QueryBuilder<T> {
 
 //	private final SelectQueryBuilder<?> selectQueryBuilder;
 //	
-	private final EntityRepository entityRepository;
-	private final TranslatorController controller;
+	private final QueryManager queryManager;
+//	private final EntityRepository entityRepository;
+//	private final TranslatorController controller;
 	
 	private final Class<?> entityClass;
 	private final List<AliasJoin> aliasJoins = new ArrayList<AliasJoin>();
@@ -69,13 +70,14 @@ public class QueryBuilder<T> {
 	private final List<Object> orderWildcardValues = new ArrayList<Object>();
 	
 	
-	public QueryBuilder(EntityRepository entityRepository, TranslatorController controller, Class<T> entityClass) {
+	public QueryBuilder(QueryManager queryManager, Class<T> entityClass) {
 		
 		AssertSyntax.notNull(entityClass, "Entity Class cannot be null");
 		
-		this.entityRepository = entityRepository;
+		this.queryManager = queryManager;
+//		this.entityRepository = entityRepository;
 		this.entityClass = entityClass;
-		this.controller = controller;
+//		this.controller = controller;
 	}
 
 	public QueryBuilder<T> join(String target, String alias) {
@@ -170,10 +172,14 @@ public class QueryBuilder<T> {
 		return this;
 	}
 	
-	public Query toQuery() {
+	public Query<T> toQuery() {
+		
+		EntityRepository entityRepository = queryManager.getEntityRepository();
+		TranslatorController controller = queryManager.getController();
+		
 		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(this.entityClass), "", this.aliasJoins);
 		
-		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle);
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 
 		TranslatorContext context = new TranslatorContext(controller, linkedTableEntityBundle, linkedEntityBundle, false);
 
@@ -185,21 +191,21 @@ public class QueryBuilder<T> {
 		ParamValues paramValues = new ParamValues(namedParamValues, 
 				new ListBuilder<Object>().add(selectWildcardValues).add(filterWildcardValues).add(orderExpressions).toList());
 
-		return new Query(context, queryExpression, paramValues);
+		return new Query<T>(context, queryExpression, paramValues);
 	}
 	
 	public List<T> list() {
-		
-		List<T> result = new ArrayList<T>();
+		Query<T> query = toQuery();
+		return queryManager.query(query);
+	}
 
-		Query query = toQuery();
+	public T uniqueValue() {
+		Query<T> query = toQuery();
+		List<T> result = queryManager.query(query);
 		
-		Pair<String, List<?>> queryResult = query.translate();
+		AssertState.isTrue(result.size() == 1, "Expected one row result.");
 		
-		System.out.println(queryResult.getItem1());
-		System.out.println(queryResult.getItem2());
-		
-		return result;
+		return result.get(0);
 	}
 	
 }

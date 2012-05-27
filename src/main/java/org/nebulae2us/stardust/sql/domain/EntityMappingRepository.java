@@ -37,12 +37,15 @@ import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
+import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 import org.nebulae2us.stardust.my.domain.ValueObjectAttribute;
 
 import static org.nebulae2us.stardust.Builders.*;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+
+import static org.nebulae2us.stardust.internal.util.ReflectionUtils.*;
 
 /**
  * 
@@ -56,6 +59,8 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  */
 public class EntityMappingRepository {
 
+	private final EntityRepository entityRepository;
+	
 	/**
 	 * For a given pair (entity, alias), this map can locate the entityMapping between the entity and the columns
 	 */
@@ -79,13 +84,19 @@ public class EntityMappingRepository {
 	 */
 	private final Map<Pair<String, Field>, Map<Object, Object>> sideList = new HashMap<Pair<String,Field>, Map<Object,Object>>();
 	
+	private final Map<Entity, Map<Object, Entity>> cachedDiscriminatorValues = new HashMap<Entity, Map<Object,Entity>>();
+	
+	public EntityMappingRepository(EntityRepository entityRepository) {
+		this.entityRepository = entityRepository;
+	}
+	
 	public List<?> readData(LinkedEntityBundle bundle, DataReader dataReader) {
 		
 		LinkedEntity rootLinkedEntity = bundle.getRoot();
 		
 		List<Object> result = new ArrayList<Object>();
 		
-		EntityMapping rootEntityMapping = getEntityMapping(bundle, rootLinkedEntity.getAlias(), dataReader);
+		EntityMapping rootEntityMapping = getEntityMapping(bundle, rootLinkedEntity.getAlias(), rootLinkedEntity.getEntity(), dataReader);
 		Map<Object, Object> rootCache = getMainCache(rootLinkedEntity.getAlias());
 
 		Map<String, Object> alias2Instance = new HashMap<String, Object>();
@@ -95,7 +106,7 @@ public class EntityMappingRepository {
 			
 			int sizeBefore = rootCache.size();
 			
-			Object rootEntityInstance = readObject(rootLinkedEntity.getAlias(), rootEntityMapping, dataReader);
+			Object rootEntityInstance = readObject(bundle, rootLinkedEntity.getAlias(), rootEntityMapping, dataReader);
 			alias2Instance.put(rootLinkedEntity.getAlias(), rootEntityInstance);
 			
 			int sizeAfter = rootCache.size();
@@ -106,8 +117,8 @@ public class EntityMappingRepository {
 			for (LinkedEntity linkedEntity : bundle.getNonRoots()) {
 				Object parentInstance = alias2Instance.get(linkedEntity.getParent().getAlias());
 				if (parentInstance != null) {
-					EntityMapping entityMapping = getEntityMapping(bundle, linkedEntity.getAlias(), dataReader);
-					Object entityInstance = readObject(linkedEntity.getAlias(), entityMapping, dataReader);
+					EntityMapping entityMapping = getEntityMapping(bundle, linkedEntity.getAlias(), linkedEntity.getEntity(), dataReader);
+					Object entityInstance = readObject(bundle, linkedEntity.getAlias(), entityMapping, dataReader);
 					alias2Instance.put(linkedEntity.getAlias(), entityInstance);
 					
 					EntityAttribute entityAttribute = linkedEntity.getAttribute();
@@ -255,7 +266,7 @@ public class EntityMappingRepository {
 		return null;
 	}
 	
-	private Object readObject(String alias, EntityMapping entityMapping, DataReader dataReader) {
+	private Object readObject(LinkedEntityBundle linkedEntityBundle, String alias, EntityMapping entityMapping, DataReader dataReader) {
 		
 		Map<Object, Object> mainCache = getMainCache(alias);
 		
@@ -266,7 +277,19 @@ public class EntityMappingRepository {
 			return result;
 		}
 		
-		result = readObject(alias, entityMapping.getEntity().getDeclaringClass(), entityMapping.getAttributeMappings(), dataReader);
+		Entity expectedEntityByDiscriminator = readDiscriminatorEntity(entityMapping, dataReader);
+		
+		Class<?> expectedClass = entityMapping.getEntity().getDeclaringClass();
+		
+		EntityMapping expectedEntityMapping = entityMapping;
+		
+		if (expectedEntityByDiscriminator != null && expectedEntityByDiscriminator != entityMapping.getEntity()) {
+			
+			expectedClass = expectedEntityByDiscriminator.getDeclaringClass();
+			expectedEntityMapping = getEntityMapping(linkedEntityBundle, alias, expectedEntityByDiscriminator, dataReader);
+		}
+		
+		result = readObject(alias, expectedClass, expectedEntityMapping.getAttributeMappings(), dataReader);
 		if (key != null) {
 			mainCache.put(key, result);
 		}
@@ -274,24 +297,35 @@ public class EntityMappingRepository {
 		
 	}
 	
-	private void setValue(Field field, Object object, Object value) {
-		try {
-			field.set(object, value);
-		} catch (IllegalArgumentException e) {
-			throw new IllegalStateException(e);
-		} catch (IllegalAccessException e) {
-			throw new IllegalStateException(e);
-		}
-	}
+	
+	private Entity readDiscriminatorEntity(EntityMapping entityMapping, DataReader dataReader) {
+		
+		if (entityMapping.getDiscriminatorColumnIndex() > 0) {
+			Entity entity = entityMapping.getEntity();
+			AssertState.notNull(entity.getEntityDiscriminator(), "entity %s does not have inheritance defined", entity.getDeclaringClass().getSimpleName());
+			
+			Map<Object, Entity> discriminatorValues = cachedDiscriminatorValues.get(entity.getRootEntity());
+			if (discriminatorValues == null) {
+				discriminatorValues = entityRepository.getDiscriminatorValues(entity);
+				cachedDiscriminatorValues.put(entity.getRootEntity(), discriminatorValues);
+			}
+			
+			Class<?> discriminatorType = entity.getRootEntity().getEntityDiscriminator().getValue().getClass();
 
-	private Object getValue(Field field, Object object) {
-		try {
-			return field.get(object);
-		} catch (IllegalArgumentException e) {
-			throw new IllegalStateException(e);
-		} catch (IllegalAccessException e) {
-			throw new IllegalStateException(e);
+			Object discriminatorValue = dataReader.readObject(discriminatorType, entityMapping.getDiscriminatorColumnIndex());
+			
+			AssertState.notNull(discriminatorValue, "Discriminator value read from the database is null for row number %d.", dataReader.getRowNumber());
+			AssertState.isTrue(discriminatorValues.containsKey(discriminatorValue), "Discriminiator value of %s cannot be mapped to any entity", discriminatorValue.toString());
+			
+
+			Entity entityByDiscriminatorValue = discriminatorValues.get(discriminatorValue);
+			
+			AssertState.isTrue(entityByDiscriminatorValue.isSupOf(entity), "Discriminator value of %s from row number %d cannot be mapped into entity %s", discriminatorValue.toString(), dataReader.getRowNumber(), entity.getDeclaringClass().getSimpleName());
+			
+			return entityByDiscriminatorValue;
 		}
+		
+		return null;
 	}
 	
 	private Object readObject(String alias, Class<?> expectedClass, List<AttributeMapping> attributeMappings, DataReader dataReader) {
@@ -341,10 +375,19 @@ public class EntityMappingRepository {
 		}
 	}
 	
-	public EntityMapping getEntityMapping(LinkedEntityBundle linkedEntityBundle, String alias, DataReader dataReader) {
+	/**
+	 * Normally, entity is linkedEntityBundle.getLinkedEntity(alias).getEntity(). However, entity is passed in so that it can be used to map sub entity.
+	 * @param linkedEntityBundle
+	 * @param alias
+	 * @param entity
+	 * @param dataReader
+	 * @return
+	 */
+	public EntityMapping getEntityMapping(LinkedEntityBundle linkedEntityBundle, String alias, Entity entity, DataReader dataReader) {
 		
 		LinkedEntity linkedEntity = linkedEntityBundle.getLinkedEntity(alias);
-		Entity entity = linkedEntity.getEntity();
+		
+		Assert.isTrue(entity.isSupOf(linkedEntity.getEntity()), "Entity % s is not a sub entity of %s", entity.getDeclaringClass().getSimpleName(), linkedEntity.getEntity().getDeclaringClass().getSimpleName());
 		
 		EntityMapping result = entityMappings.get(new Pair<Entity, String>(entity, alias));
 		
@@ -357,6 +400,12 @@ public class EntityMappingRepository {
 		EntityMappingBuilder<?> resultBuilder = entityMapping()
 				.entity$wrap(entity)
 				;
+		
+		if (entity.getEntityDiscriminator() != null) {
+			int discriminatorColumnIndex = dataReader.findColumn(prefix + entity.getEntityDiscriminator().getColumn().getName());
+			resultBuilder.discriminatorColumnIndex(discriminatorColumnIndex);
+		}
+		
 		
 		List<ScalarAttribute> identifierAttributes = entity.getEntityIdentifier().getScalarAttributes();
 		

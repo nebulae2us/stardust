@@ -28,7 +28,7 @@ import org.nebulae2us.stardust.translate.domain.TranslatorController;
  * @author Trung Phan
  *
  */
-public class Query {
+public class Query<T> {
 
 	private final QueryExpression queryExpression;
 	
@@ -46,6 +46,10 @@ public class Query {
 		TranslatorController controller = translatorContext.getTranslatorController();
 		Translator translator = controller.findTranslator(this.queryExpression, this.paramValues);
 		return translator.translate(this.translatorContext, this.queryExpression, this.paramValues);
+	}
+
+	public TranslatorContext getTranslatorContext() {
+		return translatorContext;
 	}
 	
 }

@@ -31,6 +31,13 @@ import javax.persistence.OneToOne;
 @AttributeOverride(name="version", column=@Column(name="PASSPORT_VERSION"))
 public class Passport extends AbstractEntity {
 
+	public Passport() {
+	}
+
+	public Passport(int passportNumber) {
+		this.passportNumber = passportNumber;
+	}
+	
 	@Id
 	private int passportNumber;
 	

@@ -135,6 +135,21 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
 		return (EntityBuilder<? extends ValueObjectAttributeBuilder<P>>)super.owningEntity$begin();
 	}
 
+	@Override
+	public ValueObjectAttributeBuilder<P> insertable(boolean insertable) {
+		return (ValueObjectAttributeBuilder<P>)super.insertable(insertable);
+	}
+
+	@Override
+	public ValueObjectAttributeBuilder<P> updatable(boolean updatable) {
+		return (ValueObjectAttributeBuilder<P>)super.updatable(updatable);
+	}
+
+	@Override
+	public ValueObjectAttributeBuilder<P> nullable(boolean nullable) {
+		return (ValueObjectAttributeBuilder<P>)super.nullable(nullable);
+	}
+
     /* CUSTOM CODE *********************************
      * 
      * Put your own custom code below. These codes won't be discarded during generation.

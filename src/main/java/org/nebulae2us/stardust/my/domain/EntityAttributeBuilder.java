@@ -816,6 +816,21 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		return (EntityBuilder<? extends EntityAttributeBuilder<P>>)super.owningEntity$begin();
 	}
 
+	@Override
+	public EntityAttributeBuilder<P> insertable(boolean insertable) {
+		return (EntityAttributeBuilder<P>)super.insertable(insertable);
+	}
+
+	@Override
+	public EntityAttributeBuilder<P> updatable(boolean updatable) {
+		return (EntityAttributeBuilder<P>)super.updatable(updatable);
+	}
+
+	@Override
+	public EntityAttributeBuilder<P> nullable(boolean nullable) {
+		return (EntityAttributeBuilder<P>)super.nullable(nullable);
+	}
+
     /* CUSTOM CODE *********************************
      * 
      * Put your own custom code below. These codes won't be discarded during generation.

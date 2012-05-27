@@ -19,6 +19,7 @@ import java.lang.reflect.Field;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.electron.util.EqualityComparator;
+import org.nebulae2us.stardust.internal.util.ReflectionUtils;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -43,12 +44,24 @@ public abstract class Attribute {
 	
 	private final Entity owningEntity;
 	
+	/**
+	 * These are mainly used for ScalarAttribute and EntityAttribute. Not yet applicable for ValueObjectAttribute
+	 */
+	private final boolean insertable;
+	
+	private final boolean updatable;
+	
+	private final boolean nullable;
+	
 	public Attribute(Mirror mirror) {
 		mirror.bind(this);
 		
 		this.field = mirror.to(Field.class, "field");
 		this.owningEntity = mirror.to(Entity.class, "owningEntity");
 		this.fullName = mirror.toString("fullName");
+		this.insertable = mirror.toBooleanValue("insertable");
+		this.updatable = mirror.toBooleanValue("updatable");
+		this.nullable = mirror.toBooleanValue("nullable");
 		
 		this.field.setAccessible(true);
 		
@@ -75,6 +88,60 @@ public abstract class Attribute {
 
 	public String getFullName() {
 		return fullName;
+	}
+	
+	public boolean isInsertable() {
+		return insertable;
+	}
+
+	public boolean isUpdatable() {
+		return updatable;
+	}
+
+	public boolean isNullable() {
+		return nullable;
+	}
+
+	/**
+	 * Given an entity object, this object will retrieve the value of the attribute. For example, given person object, the attribute basicName.firstName will
+	 * retrieve the first name of this person object.
+	 * 
+	 * @param object
+	 * @return
+	 */
+	public Object extractAttributeValue(Object object) {
+		
+		Assert.notNull(object, "object cannot be null");
+		
+		Entity entity = this.owningEntity;
+		Assert.isTrue(entity.getDeclaringClass().isInstance(object), "object \"%s\" is not an instanceof %s", object.toString(), entity.getDeclaringClass());
+		
+		
+		String[] segments = this.fullName.split("\\.");
+		
+		Object result = object;
+		AttributeHolder holder = entity;
+		
+		for (String segment : segments) {
+			AssertState.notNull(holder, "null holder");
+			
+			Attribute attribute = holder.getAttribute(segment);
+			Assert.notNull(segment, "segment %s cannot be found.", segment);
+			
+			if (attribute instanceof ValueObjectAttribute) {
+				holder = ((ValueObjectAttribute)attribute).getValueObject();
+			}
+			else {
+				holder = null;
+			}
+			
+			result = ReflectionUtils.getValue(attribute.getField(), result);
+			if (result == null) {
+				return null;
+			}
+		}
+		
+		return result;
 	}
 	
 	@Override

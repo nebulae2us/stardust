@@ -34,7 +34,6 @@ import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Id;
-import javax.persistence.Inheritance;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Transient;
 import javax.persistence.Version;
@@ -45,7 +44,6 @@ import org.nebulae2us.electron.internal.util.ClassUtils;
 import org.nebulae2us.stardust.Builders;
 import org.nebulae2us.stardust.db.domain.ColumnBuilder;
 import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
-import org.nebulae2us.stardust.db.domain.TableBuilder;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttributeBuilder;
@@ -58,6 +56,7 @@ import org.nebulae2us.stardust.my.domain.ValueObjectAttributeBuilder;
 import org.nebulae2us.stardust.my.domain.ValueObjectBuilder;
 
 import static org.nebulae2us.stardust.Builders.*;
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan
@@ -88,9 +87,8 @@ public class EntityScanner {
 	}
 	
 	private EntityScanner(Class<?> entityClass, Map<Class<?>, EntityBuilder<?>> scannedEntityBuilders, Map<Class<?>, Entity> scannedEntities) {
-		if (entityClass == null) {
-			throw new NullPointerException();
-		}
+		Assert.notNull(entityClass, "entityClass cannot be null");
+
 		this.entityClass = entityClass;
 		
 		this.scannedEntityBuilders = scannedEntityBuilders;
@@ -194,7 +192,7 @@ public class EntityScanner {
 		
 		List<Class<?>> relatedClasses = extractRelatedClasses();
 
-		populateTableInheritance(result, relatedClasses);
+		populateTableInheritance(result);
 		
 		populateIdentifier(result, relatedClasses);
 		
@@ -210,28 +208,22 @@ public class EntityScanner {
 	 * @param result
 	 * @param relatedClasses
 	 */
-	private void populateTableInheritance(EntityBuilder<?> result, List<Class<?>> relatedClasses) {
+	private void populateTableInheritance(EntityBuilder<?> result) {
+
+		Class<?> rootEntityClass = ScannerUtils.getRootEntityClass(entityClass);
+		EntityBuilder<?> rootEntity = rootEntityClass == entityClass ? result : new EntityScanner(rootEntityClass, scannedEntityBuilders, scannedEntities).produceRaw();
 		
-		EntityBuilder<?> rootEntity = null;
-		for (Class<?> relatedClass : relatedClasses) {
-			if (relatedClass != entityClass && relatedClass.getAnnotation(javax.persistence.Entity.class) != null) {
-				rootEntity = new EntityScanner(relatedClass, scannedEntityBuilders, scannedEntities).produceRaw();
-			}
+		for (Class<?> superEntityClass : ScannerUtils.getSuperEntityClasses(entityClass)) {
+			new EntityScanner(superEntityClass, scannedEntityBuilders, scannedEntities).produceRaw();
 		}
 		
-		Class<?> rootEntityClass = rootEntity != null ? rootEntity.getDeclaringClass() : entityClass;
-		InheritanceType inheritanceType = determineInheritanceType(rootEntityClass);
+		InheritanceType inheritanceType = ScannerUtils.determineInheritanceType(rootEntityClass);
 		
 		result
 			.linkedTableBundle(ScannerUtils.extractTableInfo(entityClass, rootEntityClass, inheritanceType))
 			.inheritanceType(inheritanceType)
 			.rootEntity(rootEntity)
 			;
-		
-		if (rootEntity == null) {
-			rootEntity = result;
-			result.setRootEntity(rootEntity);
-		}
 		
 		if (inheritanceType == InheritanceType.JOINED) {
 			
@@ -281,8 +273,6 @@ public class EntityScanner {
 			
 			for (Field field : relatedClass.getDeclaredFields()) {
 				
-				TableBuilder<?> defaultTable = ScannerUtils.getDefaultTable(result.getDeclaringClass(), result.getRootEntity().getDeclaringClass(), result.getInheritanceType(), relatedClass);
-				
 				if ((field.getModifiers() & Modifier.TRANSIENT) != 0 || field.getAnnotation(Transient.class) != null) {
 					continue;
 				}
@@ -294,7 +284,7 @@ public class EntityScanner {
 						continue;
 					}
 					
-					ScalarAttributeBuilder<?> scalarAttribute = new ScalarAttributeScanner(result, defaultTable, field, "").produce();
+					ScalarAttributeBuilder<?> scalarAttribute = new ScalarAttributeScanner(result, field, "").produce();
 					
 					if (globalAttributeOverrideScanner.getColumns().containsKey(scalarAttribute.getName())) {
 						ColumnBuilder<?> column = globalAttributeOverrideScanner.getColumns().get(scalarAttribute.getName());
@@ -314,7 +304,7 @@ public class EntityScanner {
 					}
 					
 					AttributeOverrideScanner attributeOverrideScanner = globalAttributeOverrideScanner.sub(field.getName()).combine(result.getLinkedTableBundle().getRoot().getTable().getName(), field.getAnnotation(AttributeOverride.class), field.getAnnotation(AttributeOverrides.class), true);
-					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, defaultTable, fieldClass, field.getName(), attributeOverrideScanner).produce();
+					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass, field.getName(), attributeOverrideScanner).produce();
 					
 					ValueObjectAttributeBuilder<?> attributeBuilder = valueObjectAttribute()
 							.fullName(field.getName())
@@ -359,8 +349,6 @@ public class EntityScanner {
 		
 		for (Class<?> relatedClass : relatedClasses) {
 			
-			TableBuilder<?> defaultTable = ScannerUtils.getDefaultTable(result.getDeclaringClass(), result.getRootEntity().getDeclaringClass(), result.getInheritanceType(), relatedClass);
-			
 			EntityIdentifierBuilder<?> entityIdentifierBuilder = null;
 			
 			for (Field field : relatedClass.getDeclaredFields()) {
@@ -378,7 +366,7 @@ public class EntityScanner {
 								entityIdentifierBuilder = Builders.entityIdentifier();
 							}
 							
-							ScalarAttributeBuilder<?> attributeBuilder = new ScalarAttributeScanner(result, defaultTable, field, "").produce();
+							ScalarAttributeBuilder<?> attributeBuilder = new ScalarAttributeScanner(result, field, "").produce();
 							result.attributes(attributeBuilder);
 							entityIdentifierBuilder.attributes(attributeBuilder);
 						}
@@ -393,7 +381,7 @@ public class EntityScanner {
 
 							AttributeOverrideScanner attributeOverrideScanner = new AttributeOverrideScanner(result, field.getAnnotation(AttributeOverride.class), field.getAnnotation(AttributeOverrides.class));
 
-							ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, defaultTable, fieldClass, field.getName(), attributeOverrideScanner).produce();
+							ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass, field.getName(), attributeOverrideScanner).produce();
 							
 							ValueObjectAttributeBuilder<?> attributeBuilder = valueObjectAttribute()
 									.fullName(field.getName())
@@ -420,26 +408,6 @@ public class EntityScanner {
 				.attributes(Collections.EMPTY_LIST)
 			.end();
 		}
-	}
-
-	private InheritanceType determineInheritanceType(final Class<?> rootEntityClass) {
-		
-		if (rootEntityClass.getAnnotation(Inheritance.class) != null) {
-			Inheritance inheritance = rootEntityClass.getAnnotation(Inheritance.class);
-			if (inheritance.strategy() != null) {
-				switch (inheritance.strategy()) {
-				case JOINED:
-					return InheritanceType.JOINED;
-				case SINGLE_TABLE:
-					return InheritanceType.SINGLE_TABLE;
-				case TABLE_PER_CLASS:
-					throw new IllegalStateException("Inheritance type TABLE_PER_CLASS is not supported.");
-				}
-				
-			}
-		}
-		
-		return InheritanceType.SINGLE_TABLE;
 	}
 
 	private List<Class<?>> extractRelatedClasses() {

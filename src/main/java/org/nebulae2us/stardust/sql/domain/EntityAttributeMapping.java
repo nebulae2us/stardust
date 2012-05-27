@@ -18,6 +18,7 @@ package org.nebulae2us.stardust.sql.domain;
 import java.util.List;
 
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
 
 /**
@@ -51,5 +52,25 @@ public class EntityAttributeMapping extends AttributeMapping {
 		return attributeMappings;
 	}
 
+	public AttributeMapping getAttributeMapping(String attributeName) {
+		Attribute attribute = getAttribute().getEntity().getAttribute(attributeName);
+		
+		if (attribute == null) {
+			return null;
+		}
+		for (AttributeMapping attributeMapping : this.attributeMappings) {
+			if (attributeMapping.getAttribute() == attribute) {
+				return attributeMapping;
+			}
+		}
+		return null;
+	}
+	
+	public ScalarAttributeMapping getScalarAttributeMapping(String attributeName) {
+		AttributeMapping attributeMapping = getAttributeMapping(attributeName);
+		return attributeMapping instanceof ScalarAttributeMapping ? (ScalarAttributeMapping)attributeMapping : null;
+		
+	}
+	
 	
 }

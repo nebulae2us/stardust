@@ -16,7 +16,10 @@
 package org.nebulae2us.stardust.sql.domain;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import static org.nebulae2us.electron.util.Immutables.*;
 
 /**
@@ -31,9 +34,16 @@ public class MockedDataReader extends DataReader {
 	
 	private int currentPos = -1;
 	
+	private final Map<String, Integer> columnNameIndexes;
+	
 	public MockedDataReader(List<String> columnNames, List<Object[]> data) {
 		this.columnNames = $(columnNames).elementToUpperCase();
 		this.data = data;
+		
+		columnNameIndexes = new HashMap<String, Integer>();
+		for (int i = columnNames.size() - 1; i >= 0; i--) {
+			columnNameIndexes.put(columnNames.get(i).toLowerCase(), i);
+		}
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -56,6 +66,21 @@ public class MockedDataReader extends DataReader {
 	@Override
 	public boolean next() {
 		return ++this.currentPos < this.data.size();
+	}
+
+	@Override
+	public <T> T readObject(Class<T> expectedClass, String columnName) {
+		int index = columnNameIndexes.get(columnName);
+		return readObject(expectedClass, index + 1);
+	}
+
+	@Override
+	public void close() {
+	}
+
+	@Override
+	public int getRowNumber() {
+		return this.currentPos;
 	}
 
 }

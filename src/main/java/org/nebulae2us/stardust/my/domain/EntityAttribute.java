@@ -72,7 +72,7 @@ public class EntityAttribute extends Attribute {
 	private final ImmutableList<Column> junctionRightColumns;
 	
 	/**
-	 * Nullable
+	 * Nullable. Defined by "mappedBy" value.
 	 */
 	private final String inverseAttributeName;
 

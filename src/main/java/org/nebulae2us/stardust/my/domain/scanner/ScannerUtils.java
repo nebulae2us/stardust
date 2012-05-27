@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.Inheritance;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.PrimaryKeyJoinColumns;
 import javax.persistence.SecondaryTable;
@@ -45,44 +45,121 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  */
 public class ScannerUtils {
 	
+	/**
+	 * Get list of strictly super class that has @Entity
+	 * 
+	 * @param entityClass
+	 * @return
+	 */
+	public static List<Class<?>> getSuperEntityClasses(Class<?> entityClass) {
+		Assert.notNull(entityClass, "entityClass cannot be null");
+
+		List<Class<?>> result = new ArrayList<Class<?>>();
+
+		Class<?> c = entityClass;
+		while ((c = c.getSuperclass()) != null) {
+			if (c.getAnnotation(Entity.class) != null) {
+				result.add(0, c);
+			}
+		}
+		
+		return result;
+	}
 	
 	/**
 	 * 
-	 * Try to determine the default table for this classInQuestion. The classInQuestion is a super class of entityClass.
-	 * In a simple case (inheritance = SINGLE_TABLE), the default class is the primary table for rootEntityClass.
-	 * But in a JOINED inheritance case, the default class depends on the class the field belong to because the primary table for entityClass is different
-	 * from the primary table of rootEntityClass, and also different from an entity class sitting in the middle of entityClass and rootEntityClass.
-	 * If the classInQuestion = entityClass, then the default table is the primary table for entityClass. If the classInQuestion = rootClass, then
-	 * the default table is the primary table of rootEntityClass. If the classInQuestion is a middle entity, then the default class is the
-	 * primary table of that middle entity class.
-	 * 
-	 * If the classInQuestion is not an entity, but a class with MappedSuperClass defined, then it inherits the value of the entity before it.
+	 * RootEntityClass is a super class with @Entity. If no super class has @Entity, then rootEntityClass = entityClass. Note that entityClass may not have @Entity
 	 * 
 	 * @param entityClass
-	 * @param rootEntityClass
-	 * @param inheritanceType
-	 * @param field
 	 * @return
 	 */
-	public static TableBuilder<?> getDefaultTable(Class<?> entityClass, Class<?> rootEntityClass, InheritanceType inheritanceType, Class<?> classInQuestion) {
-		Assert.notNull(inheritanceType, "inheritanceType cannot be null");
+	public static Class<?> getRootEntityClass(Class<?> entityClass) {
+		Assert.notNull(entityClass, "entityClass cannot be null");
 		
-		if (classInQuestion != entityClass) {
-			Assert.isTrue(classInQuestion.getAnnotation(Entity.class) != null || classInQuestion.getAnnotation(MappedSuperclass.class) != null, "field must belong to an entity");
-			Assert.isTrue(classInQuestion.isAssignableFrom(entityClass), "field must belong to a super class of entityClass");
+		Class<?> rootEntityClass = entityClass;
+		Class<?> c = entityClass;
+		while ( (c = c.getSuperclass()) != null) {
+			if (c.getAnnotation(Entity.class) != null) {
+				rootEntityClass = c;
+			}
 		}
+
+		return rootEntityClass;
+	}
+	
+	/**
+	 * InheritanceType is based on the @Inheritance of the rootEntityClass. If none found, the default value is SINGLE_TABLE.
+	 * 
+	 * @param rootEntityClass
+	 * @return
+	 */
+	public static InheritanceType determineInheritanceType(final Class<?> rootEntityClass) {
+		
+		if (rootEntityClass.getAnnotation(Inheritance.class) != null) {
+			Inheritance inheritance = rootEntityClass.getAnnotation(Inheritance.class);
+			if (inheritance.strategy() != null) {
+				switch (inheritance.strategy()) {
+				case JOINED:
+					return InheritanceType.JOINED;
+				case SINGLE_TABLE:
+					return InheritanceType.SINGLE_TABLE;
+				case TABLE_PER_CLASS:
+					throw new IllegalStateException("Inheritance type TABLE_PER_CLASS is not supported.");
+				}
+				
+			}
+		}
+		
+		return InheritanceType.SINGLE_TABLE;
+	}
+
+	
+	
+	/**
+	 * Try to determine the default table for this attribute. The classDeclaringAttribute is a super class of entityClass.
+	 * In a simple case (inheritance = SINGLE_TABLE), the default class is the primary table for rootEntityClass.
+	 * But in a JOINED inheritance case, the default class depends classDeclaringAttribute because the primary table for entityClass is different
+	 * from the primary table of rootEntityClass, and also different from an entity class sitting in the middle of entityClass and rootEntityClass.
+	 * If the classDeclaringAttribute = entityClass, then the default table is the primary table for entityClass. If the classDeclaringAttribute = rootClass, then
+	 * the default table is the primary table of rootEntityClass. If the classDeclaringAttribute is a middle entity, then the default class is the
+	 * primary table of that middle entity class.
+	 * 
+	 * If the classDeclaringAttribute is not an entity, but a class with MappedSuperClass defined, then it inherits the value of the entity before it.
+	 * 
+	 * @param entityClass
+	 * @param attributeName
+	 * @return
+	 */
+	public static TableBuilder<?> getDefaultTable(Class<?> entityClass, String attributeName) {
+		
+		Class<?> classDeclaringAttribute = entityClass;
+		while (classDeclaringAttribute != null) {
+			try {
+				classDeclaringAttribute.getDeclaredField(attributeName);
+				break;
+			} catch (SecurityException e) {
+				throw new RuntimeException("Fatal error.", e);
+			} catch (NoSuchFieldException e) {
+				classDeclaringAttribute = classDeclaringAttribute.getSuperclass();
+			}
+		}
+		
+		AssertState.notNull(classDeclaringAttribute, "attribute %s does not belong to this entity %s", attributeName, entityClass);
+		
+		Class<?> rootEntityClass = getRootEntityClass(entityClass);
+		InheritanceType inheritanceType = determineInheritanceType(rootEntityClass);
 		
 		Class<?> entityClassThatDefinePrimaryTable = rootEntityClass;
 		if (inheritanceType == InheritanceType.JOINED) {
-			if (classInQuestion == entityClass || classInQuestion.getAnnotation(Entity.class) != null) {
-				entityClassThatDefinePrimaryTable = classInQuestion;
+			if (classDeclaringAttribute == entityClass || classDeclaringAttribute.getAnnotation(Entity.class) != null) {
+				entityClassThatDefinePrimaryTable = classDeclaringAttribute;
 			}
 			else {
 				for (Class<?> clazz : new ClassToRootClassIterable(entityClass)) {
 					if (clazz == entityClass || clazz.getAnnotation(Entity.class) != null) {
 						entityClassThatDefinePrimaryTable = clazz;
 					}
-					if (classInQuestion == clazz) {
+					if (classDeclaringAttribute == clazz) {
 						break;
 					}
 				}
@@ -104,6 +181,59 @@ public class ScannerUtils {
 	}
 	
 	
+
+	public static LinkedTableBundleBuilder<?> extractTableInfo(Class<?> entityClass, Class<?> rootEntityClass, InheritanceType inheritanceType) {
+		
+		LinkedTableBundleBuilder<?> result = _extractTableInfo(rootEntityClass);
+		
+		if (entityClass == rootEntityClass || inheritanceType == InheritanceType.SINGLE_TABLE) {
+			return result;
+		}
+		
+		List<Class<?>> subEntityClasses = new ArrayList<Class<?>>();
+		Class<?> c = entityClass;
+		while (c != null && c != rootEntityClass) {
+			if (c.getAnnotation(Entity.class) != null) {
+				subEntityClasses.add(c);
+			}
+			c = c.getSuperclass();
+		}
+		
+		Collections.reverse(subEntityClasses);
+		
+		for (Class<?> subEntityClass : subEntityClasses) {
+			LinkedTableBundleBuilder<?> linkedTableBundle = _extractTableInfo(subEntityClass);
+			
+			LinkedTableBuilder<?> subEntityRootLinkedTable = linkedTableBundle.getRoot();
+			subEntityRootLinkedTable.parent(result.getRoot())
+				.joinType(JoinType.LEFT_JOIN);
+			
+			
+			List<PrimaryKeyJoinColumn> pkColumns = new ArrayList<PrimaryKeyJoinColumn>();
+			if (subEntityClass.getAnnotation(PrimaryKeyJoinColumn.class) != null) {
+				pkColumns.add(subEntityClass.getAnnotation(PrimaryKeyJoinColumn.class));
+			}
+			else if (subEntityClass.getAnnotation(PrimaryKeyJoinColumns.class) != null) {
+				pkColumns.addAll(Arrays.asList(subEntityClass.getAnnotation(PrimaryKeyJoinColumns.class).value()));
+			}
+			
+			for (PrimaryKeyJoinColumn pkColumn : pkColumns) {
+				subEntityRootLinkedTable
+					.columns$addColumn()
+						.name(pkColumn.name())
+						.table(subEntityRootLinkedTable.getTable())
+					.end();
+			}
+			
+			result.linkedTables(linkedTableBundle.getLinkedTables());
+		}
+		
+		
+		
+		return result;
+
+	}
+
 	private static LinkedTableBundleBuilder<?> _extractTableInfo(Class<?> entityClass) {
 		
 
@@ -175,58 +305,5 @@ public class ScannerUtils {
 		return result;
 	}
 	
-	
-	
-	public static LinkedTableBundleBuilder<?> extractTableInfo(Class<?> entityClass, Class<?> rootEntityClass, InheritanceType inheritanceType) {
 		
-		LinkedTableBundleBuilder<?> result = _extractTableInfo(rootEntityClass);
-		
-		if (entityClass == rootEntityClass || inheritanceType == InheritanceType.SINGLE_TABLE) {
-			return result;
-		}
-		
-		List<Class<?>> subEntityClasses = new ArrayList<Class<?>>();
-		Class<?> c = entityClass;
-		while (c != null && c != rootEntityClass) {
-			if (c.getAnnotation(Entity.class) != null) {
-				subEntityClasses.add(c);
-			}
-			c = c.getSuperclass();
-		}
-		
-		Collections.reverse(subEntityClasses);
-		
-		for (Class<?> subEntityClass : subEntityClasses) {
-			LinkedTableBundleBuilder<?> linkedTableBundle = _extractTableInfo(subEntityClass);
-			
-			LinkedTableBuilder<?> subEntityRootLinkedTable = linkedTableBundle.getRoot();
-			subEntityRootLinkedTable.parent(result.getRoot())
-				.joinType(JoinType.LEFT_JOIN);
-			
-			
-			List<PrimaryKeyJoinColumn> pkColumns = new ArrayList<PrimaryKeyJoinColumn>();
-			if (subEntityClass.getAnnotation(PrimaryKeyJoinColumn.class) != null) {
-				pkColumns.add(subEntityClass.getAnnotation(PrimaryKeyJoinColumn.class));
-			}
-			else if (subEntityClass.getAnnotation(PrimaryKeyJoinColumns.class) != null) {
-				pkColumns.addAll(Arrays.asList(subEntityClass.getAnnotation(PrimaryKeyJoinColumns.class).value()));
-			}
-			
-			for (PrimaryKeyJoinColumn pkColumn : pkColumns) {
-				subEntityRootLinkedTable
-					.columns$addColumn()
-						.name(pkColumn.name())
-						.table(subEntityRootLinkedTable.getTable())
-					.end();
-			}
-			
-			result.linkedTables(linkedTableBundle.getLinkedTables());
-		}
-		
-		
-		
-		return result;
-
-	}
-
 }

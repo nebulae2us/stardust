@@ -18,6 +18,8 @@ package org.nebulae2us.stardust.translate.domain;
 import java.util.List;
 import java.util.Map;
 
+import org.nebulae2us.electron.util.Immutables;
+
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
@@ -27,10 +29,16 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 public class ParamValues {
 
 	private int index = 0;
-	private final List<Object> wildcardValues;
-	private final Map<String, Object> namedParamValues;
+	private final List<?> wildcardValues;
+	private final Map<String, ?> namedParamValues;
 	
-	public ParamValues(Map<String, Object> namedParamValues, List<Object> wildcardValues) {
+	private static final ParamValues _emptyParamValues = new ParamValues(Immutables.emptyStringMap(), Immutables.emptyList());
+	
+	public static ParamValues emptyParamValues() {
+		return _emptyParamValues;
+	}
+	
+	public ParamValues(Map<String, ?> namedParamValues, List<?> wildcardValues) {
 		this.namedParamValues = namedParamValues;
 		this.wildcardValues = wildcardValues;
 	}

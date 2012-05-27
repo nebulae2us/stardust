@@ -19,8 +19,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import mockit.Mocked;
+
 import org.junit.Before;
 import org.junit.Test;
+import org.nebulae2us.stardust.dao.domain.JdbcOperation;
 import org.nebulae2us.stardust.jpa.group1.House;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.translate.domain.AttributeTranslator;
@@ -48,6 +51,8 @@ public class QueryTest {
 	
 	private QueryManager queryManager;
 	
+	@Mocked JdbcOperation jdbcOperation;
+	
 	@Before
 	public void setup() {
 		this.entityRepository = new EntityRepository();
@@ -64,14 +69,14 @@ public class QueryTest {
 		translators.add(new QueryTranslator());
 
 		this.controller = new TranslatorController(translators);
-		this.queryManager = new QueryManager(entityRepository, controller);
+		this.queryManager = new QueryManager(jdbcOperation, entityRepository, controller);
 	}
 	
 	@Test
 	public void createQuery() {
 
 		queryManager.newQuery(House.class)
-		.list();
+		.toQuery();
 		
 	}
 	
@@ -94,7 +99,7 @@ public class QueryTest {
 		.orderBy("doorColor.opacity")
 		.firstResult(10)
 		.maxResults(100)
-		.list();
+		.toQuery();
 	}
 	
 }

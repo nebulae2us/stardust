@@ -52,7 +52,7 @@ public class LinkedEntityBundleDataReaderTest {
 		Entity entity = entityRepository.getEntity(Person.class);
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
 
-		assertEquals(0, bundle.readData(dataReader).size());
+		assertEquals(0, bundle.readData(this.entityRepository, dataReader).size());
 		
 	}
 	
@@ -68,7 +68,7 @@ public class LinkedEntityBundleDataReaderTest {
 		Entity entity = entityRepository.getEntity(Person.class);
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
 
-		List<Person> persons = (List<Person>)bundle.readData(dataReader);
+		List<Person> persons = (List<Person>)bundle.readData(this.entityRepository, dataReader);
 		assertEquals(1, persons.size());
 		
 		assertEquals("123-12-1234", persons.get(0).getSsn());
@@ -88,7 +88,7 @@ public class LinkedEntityBundleDataReaderTest {
 		Entity entity = entityRepository.getEntity(Person.class);
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
 
-		List<Person> persons = (List<Person>)bundle.readData(dataReader);
+		List<Person> persons = (List<Person>)bundle.readData(this.entityRepository, dataReader);
 		assertEquals(2, persons.size());
 		
 		assertEquals("123-12-0001", persons.get(0).getSsn());
@@ -110,7 +110,7 @@ public class LinkedEntityBundleDataReaderTest {
 		Entity entity = entityRepository.getEntity(Person.class);
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
 
-		List<Person> persons = (List<Person>)bundle.readData(dataReader);
+		List<Person> persons = (List<Person>)bundle.readData(this.entityRepository, dataReader);
 		assertEquals(1, persons.size());
 		
 		assertEquals("123-12-0001", persons.get(0).getSsn());
@@ -130,7 +130,7 @@ public class LinkedEntityBundleDataReaderTest {
 		Entity entity = entityRepository.getEntity(Person.class);
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
 		
-		List<Person> persons = (List<Person>)bundle.readData(dataReader);
+		List<Person> persons = (List<Person>)bundle.readData(this.entityRepository, dataReader);
 		
 		assertEquals(1, persons.size());
 		
@@ -155,7 +155,7 @@ public class LinkedEntityBundleDataReaderTest {
 		Entity entity = entityRepository.getEntity(Room.class);
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
 		
-		List<Room> rooms = (List<Room>)bundle.readData(dataReader);
+		List<Room> rooms = (List<Room>)bundle.readData(this.entityRepository, dataReader);
 		
 		assertEquals(1, rooms.size());
 		Room room = rooms.get(0);
@@ -184,7 +184,7 @@ public class LinkedEntityBundleDataReaderTest {
 		Entity entity = entityRepository.getEntity(Room.class);
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
 		
-		List<Room> rooms = (List<Room>)bundle.readData(dataReader);
+		List<Room> rooms = (List<Room>)bundle.readData(this.entityRepository, dataReader);
 		
 		assertEquals(3, rooms.size());
 		assertEquals(2, rooms.get(1).getRoomSequence());
@@ -205,7 +205,7 @@ public class LinkedEntityBundleDataReaderTest {
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
 				Arrays.asList(aliasJoin().alias("h").joinType(JoinType.INNER_JOIN).name("house").toAliasJoin()));
 		
-		List<Room> rooms = (List<Room>)bundle.readData(dataReader);
+		List<Room> rooms = (List<Room>)bundle.readData(this.entityRepository, dataReader);
 		
 		assertEquals(1, rooms.size());
 		Room room = rooms.get(0);
@@ -231,7 +231,7 @@ public class LinkedEntityBundleDataReaderTest {
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
 				Arrays.asList(aliasJoin().alias("h").joinType(JoinType.INNER_JOIN).name("house").toAliasJoin()));
 		
-		List<Room> rooms = (List<Room>)bundle.readData(dataReader);
+		List<Room> rooms = (List<Room>)bundle.readData(this.entityRepository, dataReader);
 		
 		assertEquals(3, rooms.size());
 		Room room = rooms.get(0);
@@ -261,7 +261,7 @@ public class LinkedEntityBundleDataReaderTest {
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
 				Arrays.asList(aliasJoin().alias("r").joinType(JoinType.INNER_JOIN).name("rooms").toAliasJoin()));
 		
-		List<House> houses = (List<House>)bundle.readData(dataReader);
+		List<House> houses = (List<House>)bundle.readData(this.entityRepository, dataReader);
 		
 		assertEquals(1, houses.size());
 		
@@ -291,7 +291,7 @@ public class LinkedEntityBundleDataReaderTest {
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
 				Arrays.asList(aliasJoin().alias("pp").name("passport").joinType(JoinType.INNER_JOIN).toAliasJoin()));
 		
-		List<Person> people = (List<Person>)bundle.readData(dataReader);
+		List<Person> people = (List<Person>)bundle.readData(this.entityRepository, dataReader);
 		
 		assertEquals(1, people.size());
 		Person person = people.get(0);
@@ -314,7 +314,7 @@ public class LinkedEntityBundleDataReaderTest {
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
 				Arrays.asList(aliasJoin().alias("o").name("owner").joinType(JoinType.INNER_JOIN).toAliasJoin()));
 		
-		List<Passport> passports = (List<Passport>)bundle.readData(dataReader);
+		List<Passport> passports = (List<Passport>)bundle.readData(this.entityRepository, dataReader);
 		
 		assertEquals(1, passports.size());
 		Passport passport = passports.get(0);
@@ -337,7 +337,7 @@ public class LinkedEntityBundleDataReaderTest {
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
 				Arrays.asList(aliasJoin().alias("h").name("houses").joinType(JoinType.INNER_JOIN).toAliasJoin()));
 		
-		List<Person> people = (List<Person>)bundle.readData(dataReader);
+		List<Person> people = (List<Person>)bundle.readData(this.entityRepository, dataReader);
 
 		assertEquals(1, people.size());
 		
@@ -367,7 +367,7 @@ public class LinkedEntityBundleDataReaderTest {
 		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", 
 				Arrays.asList(aliasJoin().alias("h").name("houses").joinType(JoinType.INNER_JOIN).toAliasJoin()));
 		
-		List<Person> people = (List<Person>)bundle.readData(dataReader);
+		List<Person> people = (List<Person>)bundle.readData(this.entityRepository, dataReader);
 
 		assertEquals(2, people.size());
 		assertEquals(2, people.get(0).getHouses().get(0).getOwners().size());

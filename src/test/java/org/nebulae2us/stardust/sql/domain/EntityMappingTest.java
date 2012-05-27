@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.jpa.group1.*;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
@@ -61,7 +62,7 @@ public class EntityMappingTest {
 	@Before
 	public void setup() {
 		entityRepository = new EntityRepository();
-		mappingRepository = new EntityMappingRepository();
+		mappingRepository = new EntityMappingRepository(this.entityRepository);
 		
 	}
 	
@@ -75,8 +76,8 @@ public class EntityMappingTest {
 		}};
 
 		Entity person = entityRepository.getEntity(Person.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(person, alias, Collections.EMPTY_LIST);
-		EntityMapping personMapping = mappingRepository.getEntityMapping(bundle, alias, dataReader);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(person, alias, Immutables.emptyList(AliasJoin.class));
+		EntityMapping personMapping = mappingRepository.getEntityMapping(bundle, alias, person, dataReader);
 
 		
 		assertNotNull(personMapping);
@@ -88,15 +89,15 @@ public class EntityMappingTest {
 	}
 	
 	@Test
-	public void map_person_identifier_2() {
+	public void map_person_identifier_with_missing_column() {
 		new Expectations() {{
 			dataReader.findColumn(prefix + "SSN"); result = 1;
 			dataReader.findColumn(anyString); result = -1;
 		}};
 
 		Entity person = entityRepository.getEntity(Person.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(person, alias, Collections.EMPTY_LIST);
-		EntityMapping personMapping = mappingRepository.getEntityMapping(bundle, alias, dataReader);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(person, alias, Immutables.emptyList(AliasJoin.class));
+		EntityMapping personMapping = mappingRepository.getEntityMapping(bundle, alias, person, dataReader);
 
 		assertNotNull(personMapping);
 		assertEquals(0, personMapping.getIdentifierAttributeMappings().size());
@@ -112,8 +113,8 @@ public class EntityMappingTest {
 		}};
 		
 		Entity person = entityRepository.getEntity(Person.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(person, alias, Collections.EMPTY_LIST);
-		EntityMapping personMapping = mappingRepository.getEntityMapping(bundle, alias, dataReader);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(person, alias, Immutables.emptyList(AliasJoin.class));
+		EntityMapping personMapping = mappingRepository.getEntityMapping(bundle, alias, person, dataReader);
 		
 		assertEquals(1, personMapping.getAttributeMappings().size());
 		assertEquals(1, personMapping.getScalarAttributeMapping("gender").getColumnIndex());
@@ -127,12 +128,37 @@ public class EntityMappingTest {
 		}};
 		
 		Entity person = entityRepository.getEntity(Person.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(person, alias, Collections.EMPTY_LIST);
-		EntityMapping personMapping = mappingRepository.getEntityMapping(bundle, alias, dataReader);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(person, alias, Immutables.emptyList(AliasJoin.class));
+		EntityMapping personMapping = mappingRepository.getEntityMapping(bundle, alias, person, dataReader);
 		
 		assertEquals(1, personMapping.getAttributeMappings().size());
 		assertEquals(1, personMapping.getValueObjectAttributeMapping("name").getAttributeMappings().size());
 		assertEquals(1, personMapping.getValueObjectAttributeMapping("name").getScalarAttributeMapping("firstName").getColumnIndex());
+	}
+	
+	@Test
+	public void map_sub_class_of_house() {
+		new Expectations() {{
+			dataReader.findColumn(prefix + "HOUSE_ID"); result = 1;
+			dataReader.findColumn(prefix + "HOUSE_LETTER"); result = 2;
+			dataReader.findColumn(prefix + "CASTLE_ASSOCIATION_ID"); result = 3;
+			dataReader.findColumn(anyString); result = -1;
+		}};
+		
+		Entity house = entityRepository.getEntity(House.class);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(house, alias, Immutables.emptyList(AliasJoin.class));
+		
+		Entity castle = entityRepository.getEntity(Castle.class);
+		EntityMapping castleMapping = mappingRepository.getEntityMapping(bundle, alias, castle, dataReader);
+		
+		ValueObjectAttributeMapping houseIdMapping = castleMapping.getValueObjectAttributeMapping("houseId");
+		assertNotNull(houseIdMapping);
+		assertEquals(1, houseIdMapping.getScalarAttributeMapping("houseId").getColumnIndex());
+		assertEquals(2, houseIdMapping.getScalarAttributeMapping("houseLetter").getColumnIndex());
+
+		EntityAttributeMapping castleAssociationMapping = castleMapping.getEntityAttributeMapping("castleAssociation");
+		assertNotNull(castleAssociationMapping);
+		assertEquals(3, castleAssociationMapping.getScalarAttributeMapping("id").getColumnIndex());
 	}
 	
 	@Test
@@ -144,8 +170,8 @@ public class EntityMappingTest {
 		}};
 		
 		Entity room = entityRepository.getEntity(Room.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(room, alias, Collections.EMPTY_LIST);
-		EntityMapping roomMapping = mappingRepository.getEntityMapping(bundle, alias, dataReader);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(room, alias, Immutables.emptyList(AliasJoin.class));
+		EntityMapping roomMapping = mappingRepository.getEntityMapping(bundle, alias, room, dataReader);
 
 		EntityAttributeMapping houseAttributeMapping = roomMapping.getEntityAttributeMapping("house");
 		assertNotNull(houseAttributeMapping);
@@ -163,8 +189,8 @@ public class EntityMappingTest {
 		}};
 		
 		Entity passport = entityRepository.getEntity(Passport.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(passport, alias, Collections.EMPTY_LIST);
-		EntityMapping passportMapping = mappingRepository.getEntityMapping(bundle, alias, dataReader);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(passport, alias, Immutables.emptyList(AliasJoin.class));
+		EntityMapping passportMapping = mappingRepository.getEntityMapping(bundle, alias, passport, dataReader);
 
 		EntityAttributeMapping personAttributeMapping = passportMapping.getEntityAttributeMapping("owner");
 		assertNotNull(personAttributeMapping);
