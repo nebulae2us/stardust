@@ -19,12 +19,15 @@ import static org.nebulae2us.stardust.Builders.*;
 
 import java.lang.reflect.Field;
 
-import javax.persistence.JoinColumn;
+import javax.persistence.Basic;
 
+import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.TableBuilder;
+import org.nebulae2us.stardust.def.domain.AttributeHolderDefinition;
 import org.nebulae2us.stardust.internal.util.NameUtils;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
+import org.nebulae2us.stardust.my.domain.FetchType;
 import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
 
 /**
@@ -34,6 +37,8 @@ import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
 public class ScalarAttributeScanner {
 
 	private final EntityBuilder<?> owningEntity;
+	
+	private final AttributeHolderDefinition attributeHolderDefinition;
 	
 	private final Field field;
 	
@@ -45,8 +50,9 @@ public class ScalarAttributeScanner {
 	 */
 	private final TableBuilder<?> defaultTable;
 	
-	public ScalarAttributeScanner(EntityBuilder<?> owningEntity, Field field, String parentPath) {
+	public ScalarAttributeScanner(EntityBuilder<?> owningEntity, Field field, String parentPath, AttributeHolderDefinition attributeHolderDefinition) {
 		this.owningEntity = owningEntity;
+		this.attributeHolderDefinition = attributeHolderDefinition;
 		this.field = field;
 		this.parentPath = parentPath;
 		
@@ -57,62 +63,30 @@ public class ScalarAttributeScanner {
 	
 	public ScalarAttributeBuilder<?> produce() {
 		
-		ColumnInfo columnInfo = extractColumnInfo2(field);
+		String columnName = attributeHolderDefinition.getScalarAttributeColumnNames().get(field.getName());
+		if (columnName == null) {
+			columnName = NameUtils.camelCaseToUpperCase(field.getName());
+		}
+		Column column = Column.parse(columnName, defaultTable.toTable());
 		
-		TableBuilder<?> table = ObjectUtils.isEmpty(columnInfo.tableName) ? defaultTable :
-			table().name(columnInfo.tableName);
+		FetchType fetchType = FetchType.EAGER;
+		if (field.getAnnotation(Basic.class) != null) {
+			fetchType = field.getAnnotation(Basic.class).fetch() == javax.persistence.FetchType.EAGER ? FetchType.EAGER : FetchType.LAZY;
+		}
 		
 		ScalarAttributeBuilder<?> attributeBuilder = scalarAttribute()
 				.fullName(parentPath.length() > 0 ? parentPath + "." + field.getName() : field.getName())
 				.field(field)
 				.scalarType(field.getType())
 				.owningEntity(this.owningEntity)
-				.column$begin()
-					.name(columnInfo.columnName)
-					.table(table)
-				.end()
-				.insertable(columnInfo.insertable)
-				.updatable(columnInfo.updatable)
-				.nullable(columnInfo.nullable)
+				.column$wrap(column)
+				.insertable( !this.attributeHolderDefinition.getNotInsertableAttributes().contains(field.getName()) )
+				.updatable( !this.attributeHolderDefinition.getNotUpdatableAttributes().contains(field.getName()))
+				.nullable( !this.attributeHolderDefinition.getNotNullableAttributes().contains(field.getName()))
+				.fetchType(fetchType)
 				;
 		
 		return attributeBuilder;
-	}
-	
-	private static class ColumnInfo {
-		String columnName;
-		String tableName = "";
-		boolean insertable = true;
-		boolean updatable = true;
-		boolean nullable = true;
-	}
-	
-	private static ColumnInfo extractColumnInfo2(Field field) {
-		
-		ColumnInfo result = new ColumnInfo();
-		
-		if (field.getAnnotation(javax.persistence.Column.class) != null) {
-			javax.persistence.Column column = field.getAnnotation(javax.persistence.Column.class);
-			result.columnName = column.name().trim().toUpperCase();
-			result.tableName = column.table().trim().toUpperCase();
-			result.insertable = column.insertable();
-			result.updatable = column.updatable();
-			result.nullable = column.nullable();
-		}
-		else if (field.getAnnotation(JoinColumn.class) != null) {
-			JoinColumn joinColumn = field.getAnnotation(JoinColumn.class);
-			result.columnName = joinColumn.name().trim().toUpperCase();
-			result.tableName = joinColumn.table().trim().toUpperCase();
-			result.insertable = joinColumn.insertable();
-			result.updatable = joinColumn.updatable();
-			result.nullable = joinColumn.nullable();
-		}
-		
-		if (ObjectUtils.isEmpty(result.columnName)) {
-			result.columnName = NameUtils.camelCaseToUpperCase(field.getName());
-		}
-		
-		return result;
 	}
 	
 }

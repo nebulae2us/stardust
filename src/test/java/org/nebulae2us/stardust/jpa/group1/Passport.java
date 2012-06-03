@@ -15,6 +15,8 @@
  */
 package org.nebulae2us.stardust.jpa.group1;
 
+import java.util.Date;
+
 import javax.persistence.AttributeOverride;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -41,6 +43,8 @@ public class Passport extends AbstractEntity {
 	@Id
 	private int passportNumber;
 	
+	private Date expiredDate;
+	
 	@OneToOne
 	@JoinColumns({
 		@JoinColumn(name="OWNER_SSN", nullable=false),
@@ -62,6 +66,14 @@ public class Passport extends AbstractEntity {
 
 	public void setOwner(Person owner) {
 		this.owner = owner;
+	}
+
+	public Date getExpiredDate() {
+		return expiredDate;
+	}
+
+	public void setExpiredDate(Date expiredDate) {
+		this.expiredDate = expiredDate;
 	}
 	
 	

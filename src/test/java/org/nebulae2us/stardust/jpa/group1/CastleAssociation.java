@@ -17,8 +17,10 @@ package org.nebulae2us.stardust.jpa.group1;
 
 import java.util.List;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 
@@ -41,9 +43,12 @@ public class CastleAssociation extends AbstractEntity {
 	private Long id;
 	
 	private String name;
-
+	
 	@OneToMany(mappedBy="castleAssociation")
 	private List<Castle> castles;
+
+	@Basic(fetch=FetchType.LAZY)
+	private byte[] brochure;
 
 	public Long getId() {
 		return id;
@@ -68,5 +73,13 @@ public class CastleAssociation extends AbstractEntity {
 	public void setCastles(List<Castle> castles) {
 		this.castles = castles;
 	}
-	
+
+	public byte[] getBrochure() {
+		return brochure;
+	}
+
+	public void setBrochure(byte[] brochure) {
+		this.brochure = brochure;
+	}
+
 }

@@ -173,6 +173,11 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 		return (ScalarAttributeBuilder<P>)super.nullable(nullable);
 	}
 
+	@Override
+	public ScalarAttributeBuilder<P> fetchType(FetchType fetchType) {
+		return (ScalarAttributeBuilder<P>)super.fetchType(fetchType);
+	}
+
     /* CUSTOM CODE *********************************
      * 
      * Put your own custom code below. These codes won't be discarded during generation.

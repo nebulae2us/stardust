@@ -53,29 +53,36 @@ public class Group1EntityRepositoryTest {
 	}
 	
 	@Test
-	public void scan_entities() {
+	public void entityRepository_should_not_contain_value_objects() {
 		entityRepository.getEntity(Bungalow.class);
 		
 		List<Class<?>> unexpectedEntityClasses = Arrays.asList(new Class<?>[] {BasicName.class, Color.class, Gender.class, HouseId.class, RoomType.class, TranslucentColor.class});
 
-		for (Entity entity : entityRepository.entities.values()) {
+		for (Entity entity : entityRepository.getAllEntities()) {
 			assertFalse(unexpectedEntityClasses.contains(entity.getDeclaringClass()));
 		}
 	}
 	
-	
+
+	/**
+	 * @see House
+	 */
 	@Test
-	public void house_entity_has_identifer() {
+	public void house_entity_should_have_identifier_of_one_valueObjectAttribute() {
 		
 		Entity house = entityRepository.getEntity(House.class);
 		
 		assertNotNull(house.getEntityIdentifier());
 		assertEquals(1, house.getEntityIdentifier().getAttributes().size());
+		assertTrue(house.getEntityIdentifier().getAttributes().get(0) instanceof ValueObjectAttribute);
 
 	}
-	
+
+	/**
+	 * @see Person
+	 */
 	@Test
-	public void person_entity_has_identifier() {
+	public void person_entity_should_have_identifier_of_two_scalarAttributes() {
 		Entity person = entityRepository.getEntity(Person.class);
 		
 		assertNotNull(person.getEntityIdentifier());

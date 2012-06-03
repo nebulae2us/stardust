@@ -154,4 +154,26 @@ public class QueryManager_H2_IT extends BaseIntegrationTest {
 		assertEquals(Long.valueOf(20), castle.getCastleAssociation().getId());
 	}
 	
+	@Test
+	public void update_person() {
+		
+		Person person = new Person("123-12-1234", new Date(0));
+		
+		queryManager.save(person);
+
+		person.setName(new BasicName());
+		person.getName().setFirstName("test first name");
+
+		queryManager.update(person);
+		
+		List<Person> people = queryManager.newQuery(Person.class).list();
+
+		assertEquals(1, people.size());
+		
+		assertEquals("123-12-1234", people.get(0).getSsn());
+		assertEquals("test first name", people.get(0).getName().getFirstName());
+		assertNull(people.get(0).getName().getLastName());
+	}
+	
+	
 }

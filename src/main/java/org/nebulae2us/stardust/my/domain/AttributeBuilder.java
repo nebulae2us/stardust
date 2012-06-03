@@ -226,6 +226,28 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 		return this;
 	}
 
+	private FetchType fetchType;
+	
+	public FetchType getFetchType() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.fetchType, FetchType.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "fetchType");
+			this.fetchType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(FetchType.class);
+		}
+
+		return fetchType;
+	}
+
+	public void setFetchType(FetchType fetchType) {
+		verifyMutable();
+		this.fetchType = fetchType;
+	}
+
+	public AttributeBuilder<P> fetchType(FetchType fetchType) {
+		verifyMutable();
+		this.fetchType = fetchType;
+		return this;
+	}
+
     /* CUSTOM CODE *********************************
      * 
      * Put your own custom code below. These codes won't be discarded during generation.

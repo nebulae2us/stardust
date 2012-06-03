@@ -16,7 +16,6 @@
 package org.nebulae2us.stardust.my.domain.scanner;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,31 +24,23 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.DiscriminatorColumn;
-import javax.persistence.DiscriminatorType;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
-import javax.persistence.Transient;
-import javax.persistence.Version;
 
-import org.nebulae2us.electron.Constants;
+import javax.persistence.Embeddable;
+
 import org.nebulae2us.electron.WrapConverter;
 import org.nebulae2us.electron.internal.util.ClassUtils;
-import org.nebulae2us.stardust.Builders;
-import org.nebulae2us.stardust.db.domain.ColumnBuilder;
 import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
+import org.nebulae2us.stardust.def.domain.DefinitionRepository;
+import org.nebulae2us.stardust.def.domain.EntityDefinition;
+import org.nebulae2us.stardust.def.domain.SemiEntityDefinition;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttributeBuilder;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
 import org.nebulae2us.stardust.my.domain.EntityDiscriminatorBuilder;
 import org.nebulae2us.stardust.my.domain.EntityIdentifierBuilder;
+import org.nebulae2us.stardust.my.domain.FetchType;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
 import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
 import org.nebulae2us.stardust.my.domain.ValueObjectAttributeBuilder;
@@ -59,6 +50,9 @@ import static org.nebulae2us.stardust.Builders.*;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
+ * 
+ * Not thread safe.
+ * 
  * @author Trung Phan
  *
  */
@@ -182,7 +176,7 @@ public class EntityScanner {
 		
 		if (scannedEntities.containsKey(entityClass)) {
 			Entity scannedEntity = scannedEntities.get(entityClass);
-			EntityBuilder<?> wrap = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(scannedEntity).to(EntityBuilder.class);
+			EntityBuilder<?> wrap = new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(scannedEntity).to(EntityBuilder.class);
 			return wrap;
 		}
 
@@ -202,7 +196,7 @@ public class EntityScanner {
 		
 		return result;
 	}
-
+	
 	/**
 	 * By default, the inheritance is SINGLE_TABLE. If there is no inheritance, the rootClass = entityClass itself, and the inheritance = SINGLE_TABLE
 	 * @param result
@@ -226,36 +220,35 @@ public class EntityScanner {
 			;
 		
 		if (inheritanceType == InheritanceType.JOINED) {
+			EntityDefinition rootEntityDefinition = DefinitionRepository.getInstance().getEntityDefinition(rootEntityClass);
+			EntityDefinition entityDefinition = DefinitionRepository.getInstance().getEntityDefinition(entityClass);
+			
 			
 			EntityDiscriminatorBuilder<?> discriminator = result.entityDiscriminator$begin();
-			DiscriminatorColumn discriminatorColumn = rootEntityClass.getAnnotation(DiscriminatorColumn.class);
-			DiscriminatorValue discriminatorValue = this.entityClass.getAnnotation(DiscriminatorValue.class);
-			
-			DiscriminatorType discriminatorType = discriminatorColumn != null ? discriminatorColumn.discriminatorType() : DiscriminatorType.STRING;
+			String discriminatorColumn = ObjectUtils.evl(rootEntityDefinition.getDiscriminatorColumn(), "DTYPE");
+			Class<?> discriminatorType = ObjectUtils.nvl(rootEntityDefinition.getDiscriminatorValue(), "").getClass();
+			Object discriminatorValue = ObjectUtils.nvl(entityDefinition.getDiscriminatorValue(), entityClass.getSimpleName());
 			
 			discriminator.column$begin()
-				.name(discriminatorColumn != null && ObjectUtils.notEmpty(discriminatorColumn.name()) ? discriminatorColumn.name().trim().toUpperCase() : "DTYPE")
+				.name(discriminatorColumn)
 				.table(result.getLinkedTableBundle().getRoot().getTable())
 			.end();
 			
-			String value = discriminatorValue != null && ObjectUtils.notEmpty(discriminatorValue.value()) ? discriminatorValue.value() : this.entityClass.getSimpleName();
-			
-			switch (discriminatorType) {
-			case STRING:
-				discriminator.value(value);
-				break;
-			case CHAR:
-				discriminator.value(value.length() == 1 ? value.charAt(0) : value);
-				break;
-			case INTEGER:
+			if (discriminatorType == String.class) {
+				discriminator.value(discriminatorValue.toString());
+			}
+			else if (discriminatorType == Character.class) {
+				discriminator.value(discriminatorValue instanceof Character ? (Character)discriminatorValue : discriminatorValue.toString().charAt(0));
+			}
+			else if (discriminatorType == Integer.class) {
 				try {
-					discriminator.value(Integer.valueOf(value));
+					discriminator.value(discriminatorValue instanceof Integer ? (Integer)discriminatorValue : Integer.valueOf(discriminatorValue.toString()));
 				}
 				catch (Exception e) {
-					discriminator.value(value);
+					discriminator.value(discriminatorValue.toString());
 				}
-				break;
-			default:
+			}
+			else {
 				throw new IllegalStateException("Unknown discriminatorType");
 			}
 			
@@ -264,53 +257,41 @@ public class EntityScanner {
 
 	private void populateAttributes(EntityBuilder<?> result, List<Class<?>> relatedClasses) {
 		
-		AttributeOverrideScanner globalAttributeOverrideScanner = new AttributeOverrideScanner();
-		
 		for (Class<?> relatedClass : relatedClasses) {
-			
-			globalAttributeOverrideScanner = globalAttributeOverrideScanner.combine(result.getLinkedTableBundle().getRoot().getTable().getName(), 
-					relatedClass.getAnnotation(AttributeOverride.class), relatedClass.getAnnotation(AttributeOverrides.class), false);
+			SemiEntityDefinition relatedBaseEntityDefinition = DefinitionRepository.getInstance().getBaseEntityDefinition(entityClass, relatedClass);
 			
 			for (Field field : relatedClass.getDeclaredFields()) {
-				
-				if ((field.getModifiers() & Modifier.TRANSIENT) != 0 || field.getAnnotation(Transient.class) != null) {
+				if (relatedBaseEntityDefinition.getExcludedAttributes().contains(field.getName())) {
 					continue;
 				}
-				
+
 				Class<?> fieldClass = ClassUtils.getClass(field.getType());
 				
-				if (Constants.SCALAR_TYPES.contains(fieldClass) || fieldClass.isEnum()) {
-					if (field.getAnnotation(Id.class) != null) {
+				if (ScannerUtils.isScalarType(field)) {
+					if (relatedBaseEntityDefinition.getIdentifiers().contains(field.getName())) {
 						continue;
 					}
 					
-					ScalarAttributeBuilder<?> scalarAttribute = new ScalarAttributeScanner(result, field, "").produce();
-					
-					if (globalAttributeOverrideScanner.getColumns().containsKey(scalarAttribute.getName())) {
-						ColumnBuilder<?> column = globalAttributeOverrideScanner.getColumns().get(scalarAttribute.getName());
-						scalarAttribute.column(column);
-					}
+					ScalarAttributeBuilder<?> scalarAttribute = new ScalarAttributeScanner(result, field, "", relatedBaseEntityDefinition).produce();
 					
 					result.attributes(scalarAttribute);
-					
-					if (field.getAnnotation(Version.class) != null) {
-						result.version(scalarAttribute);
-					}
-					
 				}
-				else if (field.getAnnotation(Embedded.class) != null || field.getAnnotation(EmbeddedId.class) != null || fieldClass.getAnnotation(Embeddable.class) != null) {
-					if (field.getAnnotation(Id.class) != null || field.getAnnotation(EmbeddedId.class) != null) {
+				else if (relatedBaseEntityDefinition.getEmbeddedAttributes().contains(field.getName())) {
+					if (relatedBaseEntityDefinition.getIdentifiers().contains(field.getName())) {
 						continue;
 					}
 					
-					AttributeOverrideScanner attributeOverrideScanner = globalAttributeOverrideScanner.sub(field.getName()).combine(result.getLinkedTableBundle().getRoot().getTable().getName(), field.getAnnotation(AttributeOverride.class), field.getAnnotation(AttributeOverrides.class), true);
-					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass, field.getName(), attributeOverrideScanner).produce();
+					ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass, field.getName()).produce();
 					
 					ValueObjectAttributeBuilder<?> attributeBuilder = valueObjectAttribute()
 							.fullName(field.getName())
 							.field(field)
 							.valueObject(valueObjectBuilder)
 							.owningEntity(result)
+							.fetchType(FetchType.EAGER)
+							.insertable(true)
+							.updatable(true)
+							.nullable(true)
 							;
 					
 					result.attributes(attributeBuilder);
@@ -320,7 +301,7 @@ public class EntityScanner {
 					Type fieldSubType = ClassUtils.getGenericSubType(field.getGenericType());
 					Class<?> fieldSubClass = ClassUtils.getClass(fieldSubType);
 					
-					if (fieldSubClass == Object.class || fieldSubClass.getAnnotation(Embeddable.class) != null || Constants.SCALAR_TYPES.contains(fieldSubClass)) {
+					if (fieldSubClass == Object.class || fieldSubClass.getAnnotation(Embeddable.class) != null || ScannerUtils.isScalarType(fieldSubClass)) {
 						continue;
 					}
 					else {
@@ -349,45 +330,48 @@ public class EntityScanner {
 		
 		for (Class<?> relatedClass : relatedClasses) {
 			
+			SemiEntityDefinition relatedBaseEntityDefinition = DefinitionRepository.getInstance().getBaseEntityDefinition(entityClass, relatedClass);
+			
 			EntityIdentifierBuilder<?> entityIdentifierBuilder = null;
 			
 			for (Field field : relatedClass.getDeclaredFields()) {
-				
-				if ((field.getModifiers() & Modifier.TRANSIENT) != 0 || field.getAnnotation(Transient.class) != null) {
+				if (relatedBaseEntityDefinition.getExcludedAttributes().contains(field.getName())) {
 					continue;
 				}
 				
 				Class<?> fieldClass = ClassUtils.getClass(field.getType());
 				
-				if (Constants.SCALAR_TYPES.contains(fieldClass) || fieldClass.isEnum()) {
-					if (field.getAnnotation(Id.class) != null) {
+				if (ScannerUtils.isScalarType(field)) {
+					if (relatedBaseEntityDefinition.getIdentifiers().contains(field.getName())) {
 						if (entityIdentifierBuilder != null || result.getEntityIdentifier() == null) {
 							if (entityIdentifierBuilder == null) {
-								entityIdentifierBuilder = Builders.entityIdentifier();
+								entityIdentifierBuilder = entityIdentifier().declaringClass(entityClass);
 							}
 							
-							ScalarAttributeBuilder<?> attributeBuilder = new ScalarAttributeScanner(result, field, "").produce();
+							ScalarAttributeBuilder<?> attributeBuilder = new ScalarAttributeScanner(result, field, "", relatedBaseEntityDefinition).produce();
 							result.attributes(attributeBuilder);
 							entityIdentifierBuilder.attributes(attributeBuilder);
 						}
 					}
 				}
-				else if (field.getAnnotation(Embedded.class) != null || field.getAnnotation(EmbeddedId.class) != null || fieldClass.getAnnotation(Embeddable.class) != null) {
-					if (field.getAnnotation(Id.class) != null || field.getAnnotation(EmbeddedId.class) != null) {
+				else if (relatedBaseEntityDefinition.getEmbeddedAttributes().contains(field.getName())) {
+					if (relatedBaseEntityDefinition.getIdentifiers().contains(field.getName())) {
 						if (entityIdentifierBuilder != null || result.getEntityIdentifier() == null) {
 							if (entityIdentifierBuilder == null) {
-								entityIdentifierBuilder = Builders.entityIdentifier();
+								entityIdentifierBuilder = entityIdentifier().declaringClass(entityClass);
 							}
 
-							AttributeOverrideScanner attributeOverrideScanner = new AttributeOverrideScanner(result, field.getAnnotation(AttributeOverride.class), field.getAnnotation(AttributeOverrides.class));
-
-							ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass, field.getName(), attributeOverrideScanner).produce();
+							ValueObjectBuilder<?> valueObjectBuilder = new ValueObjectScanner(result, fieldClass, field.getName()).produce();
 							
 							ValueObjectAttributeBuilder<?> attributeBuilder = valueObjectAttribute()
 									.fullName(field.getName())
 									.field(field)
 									.valueObject(valueObjectBuilder)
 									.owningEntity(result)
+									.fetchType(FetchType.EAGER)
+									.insertable(true)
+									.updatable(true)
+									.nullable(true)
 									;
 							
 							result.attributes(attributeBuilder);

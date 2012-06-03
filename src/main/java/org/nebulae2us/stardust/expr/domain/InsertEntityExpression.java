@@ -23,24 +23,16 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  */
 public class InsertEntityExpression extends InsertExpression {
 
-	private final Class<?> entityClass;
-
 	/**
 	 * In normal case, tableIndex = 0. However, some entity also defines secondary table, so the index here to tell which table is interested in.
 	 */
 	private final int tableIndex;
 	
-	public InsertEntityExpression(String expression, Class<?> entityClass, int tableIndex) {
+	public InsertEntityExpression(String expression, int tableIndex) {
 		super(expression);
 
-		this.entityClass = entityClass;
 		this.tableIndex = tableIndex;
 		
-		Assert.notNull(this.entityClass, "entityClass cannot be null");
-	}
-
-	public Class<?> getEntityClass() {
-		return entityClass;
 	}
 
 	public int getTableIndex() {

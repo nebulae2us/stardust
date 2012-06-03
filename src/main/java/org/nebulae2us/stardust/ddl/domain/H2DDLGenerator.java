@@ -328,6 +328,9 @@ public class H2DDLGenerator {
 		else if (javaType == Boolean.class || javaType == boolean.class) {
 			return new ColumnType("boolean");
 		}
+		else if (javaType == byte[].class) {
+			return new ColumnType("blob");
+		}
 		else if (javaType.isEnum()) {
 			return new ColumnType("varchar", length == 0 ? 255 : length);
 		}

@@ -42,6 +42,14 @@ public class Table {
 		
 		assertInvariant();
 	}
+	
+	public Table(String name, String schemaName, String catalogName) {
+		this.name = name;
+		this.schemaName = schemaName;
+		this.catalogName = catalogName;
+		
+		assertInvariant();
+	}
 
 	private void assertInvariant() {
 		Assert.notEmpty(this.name, "table name cannot be empty");

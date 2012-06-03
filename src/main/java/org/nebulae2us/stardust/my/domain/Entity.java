@@ -15,8 +15,14 @@
  */
 package org.nebulae2us.stardust.my.domain;
 
+import java.util.List;
+
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.stardust.db.domain.Column;
+import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.db.domain.LinkedTableBundle;
+import org.nebulae2us.stardust.sql.domain.ArrayWrapper;
+import org.nebulae2us.stardust.sql.domain.LinkedEntity;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -115,4 +121,36 @@ public class Entity extends AttributeHolder {
 		return version;
 	}
 	
+	public List<ScalarAttribute> getIdentifierScalarAttributes() {
+		return this.entityIdentifier.getScalarAttributes();
+	}
+
+	@Override
+	public boolean containsColumn(Column column) {
+		if (super.containsColumn(column)) {
+			return true;
+		}
+		if (entityDiscriminator != null && entityDiscriminator.getColumn().equals(column)) {
+			return true;
+		}
+		for (LinkedTable linkedTable : linkedTableBundle.getLinkedTables()) {
+			if (linkedTable.getColumns().contains(column)) {
+				return true;
+			}
+		}
+		return true;
+	}
+	
+	public ArrayWrapper extractIdentifierValue(Object entityInstance) {
+		List<ScalarAttribute> identifierScalarAttributes = entityIdentifier.getScalarAttributes();
+		Object[] ids = new Object[identifierScalarAttributes.size()];
+		
+		for (int i = 0; i < identifierScalarAttributes.size(); i++) {
+			ScalarAttribute identifierScalarAttribute = identifierScalarAttributes.get(i);
+			ids[i] = identifierScalarAttribute.extractAttributeValue(entityInstance);
+		}
+		
+		
+		return new ArrayWrapper(ids);
+	}
 }

@@ -53,6 +53,8 @@ public abstract class Attribute {
 	
 	private final boolean nullable;
 	
+	private final FetchType fetchType;
+	
 	public Attribute(Mirror mirror) {
 		mirror.bind(this);
 		
@@ -62,6 +64,7 @@ public abstract class Attribute {
 		this.insertable = mirror.toBooleanValue("insertable");
 		this.updatable = mirror.toBooleanValue("updatable");
 		this.nullable = mirror.toBooleanValue("nullable");
+		this.fetchType = mirror.to(FetchType.class, "fetchType");
 		
 		this.field.setAccessible(true);
 		
@@ -72,6 +75,7 @@ public abstract class Attribute {
 		Assert.notNull(this.field, "field cannot be null");
 		Assert.notNull(this.owningEntity, "owningEntity cannot be null");
 		Assert.notEmpty(this.fullName, "fullName cannot be empty");
+		Assert.notNull(this.fetchType, "fetchType cannot be null");
 	}
 
 	public String getName() {
@@ -100,6 +104,10 @@ public abstract class Attribute {
 
 	public boolean isNullable() {
 		return nullable;
+	}
+
+	public FetchType getFetchType() {
+		return fetchType;
 	}
 
 	/**

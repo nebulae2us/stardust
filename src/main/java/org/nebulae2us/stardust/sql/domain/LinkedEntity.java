@@ -17,8 +17,10 @@ package org.nebulae2us.stardust.sql.domain;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.db.domain.JoinType;
+import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
+import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -34,6 +36,11 @@ public class LinkedEntity {
 	
 	private final String alias;
 
+	/**
+	 * this is attribute of the parent entity that is used to be linked to this entity.
+	 * Specifically attribute.owningEntity == parent.entity and attribute.entity == entity
+	 * 
+	 */
 	private final EntityAttribute attribute;
 	
 	private final JoinType joinType;

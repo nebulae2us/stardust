@@ -407,7 +407,7 @@ public class EntityMappingRepository {
 		}
 		
 		
-		List<ScalarAttribute> identifierAttributes = entity.getEntityIdentifier().getScalarAttributes();
+		List<ScalarAttribute> identifierAttributes = entity.getIdentifierScalarAttributes();
 		
 		
 

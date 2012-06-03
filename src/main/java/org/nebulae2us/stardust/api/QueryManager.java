@@ -16,6 +16,7 @@
 package org.nebulae2us.stardust.api;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -24,11 +25,16 @@ import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.dao.domain.GenericDataReader;
 import org.nebulae2us.stardust.dao.domain.JdbcOperation;
 import org.nebulae2us.stardust.expr.domain.InsertEntityExpression;
+import org.nebulae2us.stardust.expr.domain.UpdateEntityExpression;
+import org.nebulae2us.stardust.expr.domain.UpdateExpression;
+import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
+import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 import org.nebulae2us.stardust.sql.domain.AliasJoin;
 import org.nebulae2us.stardust.sql.domain.DataReader;
 import org.nebulae2us.stardust.sql.domain.LinkedEntityBundle;
+import org.nebulae2us.stardust.sql.domain.LinkedTableEntity;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
 import org.nebulae2us.stardust.translate.domain.ParamValues;
 import org.nebulae2us.stardust.translate.domain.Translator;
@@ -91,7 +97,7 @@ public class QueryManager {
 		TranslatorContext context = new TranslatorContext(this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
 
 		for (int i = 0; i < linkedTableEntityBundle.getLinkedTableEntities().size(); i++) {
-			InsertEntityExpression insertEntityExpression = new InsertEntityExpression("insert", object.getClass(), i);
+			InsertEntityExpression insertEntityExpression = new InsertEntityExpression("insert", i);
 			
 			ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
 			Translator translator = controller.findTranslator(insertEntityExpression, paramValues);
@@ -105,4 +111,35 @@ public class QueryManager {
 		
 	}
 	
+	
+	public void update(Object object) {
+		Entity entity = entityRepository.getEntity(object.getClass());
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
+		
+		TranslatorContext context = new TranslatorContext(this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
+
+		for (int i = 0; i < linkedTableEntityBundle.getLinkedTableEntities().size(); i++) {
+			UpdateEntityExpression updateEntityExpression = new UpdateEntityExpression("insert", i);
+			
+			ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
+			Translator translator = controller.findTranslator(updateEntityExpression, paramValues);
+			Pair<String, List<?>> translateResult = translator.translate(context, updateEntityExpression, paramValues);
+			
+			String sql = translateResult.getItem1();
+			List<?> values = translateResult.getItem2();
+			
+			int rowsUpdated = jdbcOperation.update(sql, values);
+		}
+		
+	}
+	
+	public void merge(Object entityToMerge, Object currentState) {
+		
+		
+		
+		
+		
+		
+	}
 }

@@ -43,6 +43,39 @@ public class Column {
 		Assert.notEmpty(name, "name cannot be empty");
 		Assert.notNull(table, "table cannot be null for column %s", name);
 	}
+	
+	private Column(String name, Table table) {
+		this.name = name;
+		this.table = table;
+		
+		assertInvariant();
+	}
+	
+	/**
+	 * 
+	 * If table expression is missing, then default table is used.
+	 * 
+	 * @param expression example MY_SCHEMA.MY_TABLE.MY_COLUMN, MY_TABLE.MY_COLUMN, or MY_COLUMN
+	 * @param defaultTable
+	 * @return
+	 */
+	public static Column parse(String expression, Table defaultTable) {
+		
+		String[] segments = expression.split("\\.");
+		if (segments.length == 1) {
+			return new Column(expression, defaultTable);
+		}
+		else if (segments.length == 2) {
+			Table table = new Table(segments[0], "", "");
+			return new Column(segments[1], table);
+		}
+		else if (segments.length == 3) {
+			Table table = new Table(segments[1], segments[0], "");
+			return new Column(segments[2], table);
+		}
+		
+		throw new IllegalStateException("Unknown column expression " + expression);
+	}
 
 	public String getName() {
 		return name;

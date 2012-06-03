@@ -17,6 +17,7 @@ package org.nebulae2us.stardust.api;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import mockit.Mocked;
@@ -28,6 +29,7 @@ import org.nebulae2us.stardust.jpa.group1.House;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.translate.domain.AttributeTranslator;
 import org.nebulae2us.stardust.translate.domain.BetweenTranslator;
+import org.nebulae2us.stardust.translate.domain.CommonTranslatorController;
 import org.nebulae2us.stardust.translate.domain.ComparisonTranslator;
 import org.nebulae2us.stardust.translate.domain.InListTranslator;
 import org.nebulae2us.stardust.translate.domain.IsNullTranslator;
@@ -56,19 +58,8 @@ public class QueryTest {
 	@Before
 	public void setup() {
 		this.entityRepository = new EntityRepository();
-		List<Translator> translators = new ArrayList<Translator>();
-		translators.add(new LogicalTranslator());
-		translators.add(new AttributeTranslator());
-		translators.add(new ComparisonTranslator());
-		translators.add(new InListTranslator());
-		translators.add(new BetweenTranslator());
-		translators.add(new IsNullTranslator());
-		translators.add(new WildcardTranslator());
-		translators.add(new NamedParamTranslator());
-		translators.add(new OrderTranslator());
-		translators.add(new QueryTranslator());
 
-		this.controller = new TranslatorController(translators);
+		this.controller = new CommonTranslatorController(Collections.EMPTY_LIST);
 		this.queryManager = new QueryManager(jdbcOperation, entityRepository, controller);
 	}
 	

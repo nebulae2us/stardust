@@ -29,6 +29,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.nebulae2us.stardust.def.domain.EntityDefinitionBuilder;
+
 /**
  * @author Trung Phan
  *
@@ -42,6 +44,14 @@ public class Person extends AbstractEntity {
 	public Person(String ssn, Date dateBorn) {
 		this.ssn = ssn;
 		this.dateBorn = dateBorn;
+	}
+
+	public static void defineEntity(Person $, EntityDefinitionBuilder mapper) {
+		Object o = $.passport;
+
+		mapper
+			.identifier($.ssn, $.dateBorn)
+			.embedAttributes($.gender);
 	}
 	
 	/**
@@ -73,8 +83,7 @@ public class Person extends AbstractEntity {
 			@JoinColumn(name="OWNER_DATE_BORN", referencedColumnName="DATE_BORN")},
 		inverseJoinColumns={
 			@JoinColumn(name="DWELLING_HOUSE_ID", referencedColumnName="HOUSE_ID"),
-			@JoinColumn(name="DWELLING_HOUSE_LETTER", referencedColumnName="HOUSE_LETTER")
-	}
+			@JoinColumn(name="DWELLING_HOUSE_LETTER", referencedColumnName="HOUSE_LETTER")}
 	)
 	private List<House> houses;
 

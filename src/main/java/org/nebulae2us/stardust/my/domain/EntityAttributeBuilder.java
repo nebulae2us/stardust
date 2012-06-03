@@ -831,6 +831,11 @@ public class EntityAttributeBuilder<P> extends AttributeBuilder<P> {
 		return (EntityAttributeBuilder<P>)super.nullable(nullable);
 	}
 
+	@Override
+	public EntityAttributeBuilder<P> fetchType(FetchType fetchType) {
+		return (EntityAttributeBuilder<P>)super.fetchType(fetchType);
+	}
+
     /* CUSTOM CODE *********************************
      * 
      * Put your own custom code below. These codes won't be discarded during generation.

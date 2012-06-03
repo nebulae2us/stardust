@@ -17,18 +17,25 @@ package org.nebulae2us.stardust.my.domain.scanner;
 
 import static org.nebulae2us.stardust.Builders.*;
 
+import java.lang.reflect.Field;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.PrimaryKeyJoinColumns;
 import javax.persistence.SecondaryTable;
 import javax.persistence.SecondaryTables;
 
+import org.nebulae2us.electron.Constants;
+import org.nebulae2us.electron.internal.util.ClassUtils;
+import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
 import org.nebulae2us.stardust.db.domain.LinkedTableBundleBuilder;
@@ -44,6 +51,26 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  *
  */
 public class ScannerUtils {
+	
+	private static final List<Class<?>> TYPES_FOR_SCALAR_ATTRIBUTES = new ListBuilder<Class<?>>()
+			.add(Constants.SCALAR_TYPES)
+			.add(byte[].class, char[].class, Blob.class, Clob.class)
+			.toList();
+
+	public static boolean isScalarType(Class<?> fieldClass) {
+		return TYPES_FOR_SCALAR_ATTRIBUTES.contains(fieldClass) || fieldClass.isEnum();
+	}
+	
+	public static boolean isScalarType(Field field) {
+		Class<?> fieldClass = ClassUtils.getClass(field.getType());
+
+		if (isScalarType(fieldClass)) {
+			return true;
+		}
+		
+		return false;
+	}
+	
 	
 	/**
 	 * Get list of strictly super class that has @Entity

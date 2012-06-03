@@ -20,7 +20,9 @@ import java.util.List;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.electron.util.ImmutableList;
+import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.Table;
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan
@@ -37,6 +39,13 @@ public class AttributeHolder {
 		
 		this.declaringClass = mirror.to(Class.class, "declaringClass");
 		this.attributes = mirror.toListOf(Attribute.class, "attributes");
+		
+		assertInvariant();
+	}
+
+	private void assertInvariant() {
+		Assert.notNull(this.declaringClass, "declaringClass cannot be null");
+		Assert.notNull(this.attributes, "attributes cannot be null");
 	}
 
 	public Class<?> getDeclaringClass() {
@@ -118,7 +127,7 @@ public class AttributeHolder {
 	}
 	
 	/**
-	 * Return ManyToOne EntityAttribute or OneToOne EntityAttribute what is owned by this entity
+	 * Return ManyToOne or OneToOne EntityAttribute that is owned by this entity
 	 * @param table
 	 * @return
 	 */
@@ -135,9 +144,28 @@ public class AttributeHolder {
 		}
 		
 		return new ImmutableList<EntityAttribute>(result);
-
 	}
 
+	/**
+	 * Return OneToMany, ManyToMany or OneToOne EntityAttribute that is not owned by this entity
+	 * @param table
+	 * @return
+	 */
+	public ImmutableList<EntityAttribute> getNonOwningSideEntityAttributes() {
+		List<EntityAttribute> result = new ArrayList<EntityAttribute>();
+		
+		for (Attribute attribute : this.attributes) {
+			if (attribute instanceof EntityAttribute) {
+				EntityAttribute entityAttribute = (EntityAttribute)attribute;
+				if (!entityAttribute.isOwningSide()) {
+					result.add(entityAttribute);
+				}
+			}
+		}
+		
+		return new ImmutableList<EntityAttribute>(result);
+	}
+	
 	/**
 	 * @param table
 	 * @return
@@ -206,5 +234,24 @@ public class AttributeHolder {
 		}
 		
 		return null;
+	}
+	
+	public boolean containsColumn(Column column) {
+		for (Attribute attribute : attributes) {
+			if (attribute instanceof ScalarAttribute) {
+				ScalarAttribute scalarAttribute = (ScalarAttribute)attribute;
+				if (scalarAttribute.getColumn().equals(column)) {
+					return true;
+				}
+			}
+			else if (attribute instanceof ValueObjectAttribute) {
+				ValueObjectAttribute valueObjectValue = (ValueObjectAttribute)attribute;
+				if (valueObjectValue.getValueObject().containsColumn(column)) {
+					return true;
+				}
+			}
+		}
+		
+		return false;
 	}
 }

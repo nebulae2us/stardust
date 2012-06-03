@@ -26,12 +26,12 @@ import java.util.Arrays;
  */
 public class ArrayWrapper {
 
-	private final Object[] object;
+	private final Object[] objects;
 	private final int hashCode;
 	
-	public ArrayWrapper(Object ... object) {
-		this.object = object;
-		this.hashCode = Arrays.hashCode(object);
+	public ArrayWrapper(Object ... objects) {
+		this.objects = objects;
+		this.hashCode = Arrays.hashCode(objects);
 	}
 	
 	@Override
@@ -43,7 +43,7 @@ public class ArrayWrapper {
 			return false;
 		}
 		ArrayWrapper aw = (ArrayWrapper)o;
-		return Arrays.equals(this.object, aw.object);
+		return Arrays.equals(this.objects, aw.objects);
 	}
 	
 	@Override
@@ -51,4 +51,21 @@ public class ArrayWrapper {
 		return hashCode;
 	}
 	
+	public boolean contains(Object o) {
+		if (o == null) {
+			for (Object object : objects) {
+				if (object == null) {
+					return true;
+				}
+			}
+		}
+		else {
+			for (Object object : objects) {
+				if (o.equals(object)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 }

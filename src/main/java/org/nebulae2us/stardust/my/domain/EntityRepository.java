@@ -26,6 +26,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.nebulae2us.electron.Converter;
 import org.nebulae2us.stardust.Builders;
+import org.nebulae2us.stardust.def.domain.EntityDefinition;
 import org.nebulae2us.stardust.my.domain.scanner.EntityScanner;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -35,10 +36,32 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  */
 public class EntityRepository {
 
-	public final ConcurrentMap<Class<?>, Entity> entities = new ConcurrentHashMap<Class<?>, Entity>();
+	private final ConcurrentMap<Class<?>, Entity> entities = new ConcurrentHashMap<Class<?>, Entity>();
+	
+	
 	
 	public EntityRepository() {
 		
+	}
+	
+	/**
+	 * Trying to guess the entity of this instance without instantiating a new Entity definition
+	 * @param entityInstance
+	 * @return
+	 */
+	public Entity guessEntity(Object entityInstance) {
+		
+		Entity result = null;
+		
+		for (Entity e : entities.values()) {
+			if (e.getDeclaringClass().isInstance(entityInstance)) {
+				if (result == null || e.isSupOf(result)) {
+					result = e;
+				}
+			}
+		}
+		
+		return result;
 	}
 	
 	public void scanEntities(Class<?> ... entityClasses) {

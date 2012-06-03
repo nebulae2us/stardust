@@ -150,6 +150,11 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
 		return (ValueObjectAttributeBuilder<P>)super.nullable(nullable);
 	}
 
+	@Override
+	public ValueObjectAttributeBuilder<P> fetchType(FetchType fetchType) {
+		return (ValueObjectAttributeBuilder<P>)super.fetchType(fetchType);
+	}
+
     /* CUSTOM CODE *********************************
      * 
      * Put your own custom code below. These codes won't be discarded during generation.
