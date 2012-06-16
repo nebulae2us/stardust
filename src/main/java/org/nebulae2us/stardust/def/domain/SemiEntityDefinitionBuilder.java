@@ -15,36 +15,39 @@
  */
 package org.nebulae2us.stardust.def.domain;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.generator.IdentifierGenerator;
 
 /**
  * @author Trung Phan
  *
  */
-public class SemiEntityDefinition extends AttributeRelationshipHolderDefinition {
+public class SemiEntityDefinitionBuilder<P> extends AttributeRelationshipHolderDefinitionBuilder<P> {
 
-	private final List<String> identifiers;
+	
+	private final List<String> identifiers = new ArrayList<String>();
 
-	private final Map<String, IdentifierGenerator> identifierGenerators;
-
-	public SemiEntityDefinition(Mirror mirror) {
-		super(mirror);
-
-		this.identifiers = mirror.toListOf(String.class, "identifiers");
-		this.identifierGenerators = mirror.toMapOf(String.class, IdentifierGenerator.class, "identifierGenerators");
+	private final Map<String, IdentifierGenerator> identifierGenerators = new HashMap<String, IdentifierGenerator>();
+	
+	public P identifier(Object ... attributeLocators ) {
+		for (Object attributeLocator : attributeLocators) {
+			String attributeName = attributeLocator.toString();
+			if (!this.identifiers.contains(attributeName)) {
+				this.identifiers.add(attributeName);
+			}
+		}
+		return (P)this;
 	}
 
-	public final List<String> getIdentifiers() {
-		return identifiers;
+	public P identifierGenerator(String expression, IdentifierGenerator identifierGenerator) {
+		this.identifierGenerators.put(expression, identifierGenerator);
+		return (P)this;
 	}
-
-	public final Map<String, IdentifierGenerator> getIdentifierGenerators() {
-		return identifierGenerators;
-	}
+	
 	
 	
 }

@@ -13,17 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.api;
+package org.nebulae2us.stardust.dialect;
 
 /**
  * @author Trung Phan
  *
  */
-public interface IdentifierGenerator {
-	
-	public boolean isPersistedId(Object entityInstance, Object idHolder);
-	
-	public boolean generationBeforeInsertion();
-	
-	public Object generateId();
+public class H2Dialect extends Dialect {
+
 }

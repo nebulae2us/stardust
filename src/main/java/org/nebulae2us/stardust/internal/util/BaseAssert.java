@@ -98,5 +98,9 @@ public class BaseAssert<T extends Throwable> {
             throwException(errorFormat, args);
         }
     }
+    
+    public void fail(String errorFormat, Object ... args) throws T {
+        throwException(errorFormat, args);
+    }
 
 }

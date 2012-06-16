@@ -5,7 +5,9 @@ import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
 import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.api.*;
 import org.nebulae2us.stardust.db.domain.*;
+import org.nebulae2us.stardust.generator.IdentifierGenerator;
 
 @Builder(destination=ScalarAttribute.class)
 public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
@@ -125,6 +127,28 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 		ColumnBuilder<ScalarAttributeBuilder<P>> result = new ColumnBuilder<ScalarAttributeBuilder<P>>(this);
 		this.column = result;
 		return result;
+	}
+
+	private IdentifierGenerator valueGenerator;
+	
+	public IdentifierGenerator getValueGenerator() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.valueGenerator, IdentifierGenerator.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, ScalarAttribute.class, "valueGenerator");
+			this.valueGenerator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(IdentifierGenerator.class);
+		}
+
+		return valueGenerator;
+	}
+
+	public void setValueGenerator(IdentifierGenerator valueGenerator) {
+		verifyMutable();
+		this.valueGenerator = valueGenerator;
+	}
+
+	public ScalarAttributeBuilder<P> valueGenerator(IdentifierGenerator valueGenerator) {
+		verifyMutable();
+		this.valueGenerator = valueGenerator;
+		return this;
 	}
 
 	@Override

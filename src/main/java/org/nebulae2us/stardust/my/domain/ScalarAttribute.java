@@ -17,6 +17,7 @@ package org.nebulae2us.stardust.my.domain;
 
 import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.stardust.db.domain.Column;
+import org.nebulae2us.stardust.generator.IdentifierGenerator;
 
 /**
  * @author Trung Phan
@@ -28,12 +29,15 @@ public class ScalarAttribute extends Attribute {
 	
 	private final Column column;
 	
+	private final IdentifierGenerator valueGenerator;
+	
 	public ScalarAttribute(Mirror mirror) {
 		super(mirror);
 		mirror.bind(this);
 		
 		this.scalarType = mirror.to(Class.class, "scalarType");
 		this.column = mirror.to(Column.class, "column");
+		this.valueGenerator = mirror.to(IdentifierGenerator.class, "valueGenerator");
 	}
 
 	public Class<?> getScalarType() {
@@ -42,6 +46,10 @@ public class ScalarAttribute extends Attribute {
 	
 	public Column getColumn() {
 		return column;
+	}
+
+	public final IdentifierGenerator getValueGenerator() {
+		return valueGenerator;
 	}
 
 	@Override

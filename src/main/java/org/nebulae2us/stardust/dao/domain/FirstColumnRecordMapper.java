@@ -13,12 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.api;
+package org.nebulae2us.stardust.dao.domain;
 
 /**
  * @author Trung Phan
  *
  */
-public interface IdentifierFactory {
-	public IdentifierGenerator getIdentifierGenerator();
+public final class FirstColumnRecordMapper<T> extends NthColumnRecordMapper<T> {
+	
+	public FirstColumnRecordMapper(Class<T> valueType) {
+		super(valueType, 1);
+	}
 }

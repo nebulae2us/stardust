@@ -24,6 +24,8 @@ import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -31,18 +33,19 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.SecondaryTables;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.nebulae2us.stardust.def.domain.AnnotationEntityDefinitionBuilder;
 import org.nebulae2us.stardust.def.domain.EntityDefinition;
 import org.nebulae2us.stardust.def.domain.RelationshipDefinition;
+import org.nebulae2us.stardust.generator.IdentityValueRetriever;
+import org.nebulae2us.stardust.generator.SequenceIdentifierGenerator;
 import org.nebulae2us.stardust.my.domain.RelationalType;
 
 import static org.junit.Assert.*;
-import static org.hamcrest.Matchers.*;
 
 /**
  * @author Trung Phan
@@ -326,5 +329,57 @@ public class AnnotationEntityDefinitionBuilderTest {
 
 		assertEquals(org.nebulae2us.stardust.my.domain.InheritanceType.SINGLE_TABLE, definition.getInheritanceType());
 	}
+	
+	@Test
+	public void builder_should_recognize_identity_identifier_generator() {
+		
+		class Person {
+			@Id
+			@GeneratedValue(strategy=GenerationType.IDENTITY)
+			private Long id;
+		}
+		
+		EntityDefinition definition = new AnnotationEntityDefinitionBuilder(Person.class)
+		.toEntityDefinition();
 
+		assertEquals(1, definition.getIdentifierGenerators().size());
+		assertTrue(definition.getIdentifierGenerators().get("id") instanceof IdentityValueRetriever);
+	}
+	
+	@Test
+	public void builder_should_recognize_sequence_identifier_generator_defined_in_field() {
+		
+		class Person {
+			@Id
+			@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="person_seq_name")
+			@SequenceGenerator(name="person_seq_name", sequenceName="person_seq")
+			private Long id;
+		}
+		
+		EntityDefinition definition = new AnnotationEntityDefinitionBuilder(Person.class)
+		.toEntityDefinition();
+
+		assertEquals(1, definition.getIdentifierGenerators().size());
+		SequenceIdentifierGenerator sequenceIdentifierGenerator = (SequenceIdentifierGenerator)definition.getIdentifierGenerators().get("id");
+		assertEquals("person_seq", sequenceIdentifierGenerator.getName());
+	}
+
+	@Test
+	public void builder_should_recognize_sequence_identifier_generator_defined_in_class() {
+		
+		@SequenceGenerator(name="person_seq_name", sequenceName="person_seq")
+		class Person {
+			@Id
+			@GeneratedValue(strategy=GenerationType.SEQUENCE, generator="person_seq_name")
+			private Long id;
+		}
+		
+		EntityDefinition definition = new AnnotationEntityDefinitionBuilder(Person.class)
+		.toEntityDefinition();
+
+		assertEquals(1, definition.getIdentifierGenerators().size());
+		SequenceIdentifierGenerator sequenceIdentifierGenerator = (SequenceIdentifierGenerator)definition.getIdentifierGenerators().get("id");
+		assertEquals("person_seq", sequenceIdentifierGenerator.getName());
+	}
+	
 }

@@ -47,11 +47,9 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  */
 public class QueryBuilder<T> {
 
-//	private final SelectQueryBuilder<?> selectQueryBuilder;
-//	
-	private final QueryManager queryManager;
-//	private final EntityRepository entityRepository;
-//	private final TranslatorController controller;
+	private final DaoManager daoManager;
+	
+	private String sql = "";
 	
 	private final Class<?> entityClass;
 	private final List<AliasJoin> aliasJoins = new ArrayList<AliasJoin>();
@@ -66,20 +64,37 @@ public class QueryBuilder<T> {
 	
 	private final Map<String, Object> namedParamValues = new HashMap<String, Object>();
 	private final List<Object> selectWildcardValues = new ArrayList<Object>();
+	private final List<Object> fromWildcardValues = new ArrayList<Object>();
 	private final List<Object> filterWildcardValues = new ArrayList<Object>();
 	private final List<Object> orderWildcardValues = new ArrayList<Object>();
 	
 	
-	public QueryBuilder(QueryManager queryManager, Class<T> entityClass) {
+	public QueryBuilder(DaoManager daoManager, Class<T> entityClass) {
 		
 		AssertSyntax.notNull(entityClass, "Entity Class cannot be null");
+		AssertSyntax.notNull(sql, "SQL cannot be null.");
 		
-		this.queryManager = queryManager;
-//		this.entityRepository = entityRepository;
+		this.daoManager = daoManager;
 		this.entityClass = entityClass;
-//		this.controller = controller;
 	}
+	
+	public QueryBuilder<T> backedBySql(String sql, Object ... values) {
+		AssertSyntax.notEmpty(sql, "sql cannot be empty");
+		AssertSyntax.empty(this.sql, "Cannot change the backed sql from \"%s\" to \"%s\"", this.sql, sql);
 
+		int countWildcards = 0;
+		for (int i = 0; i < sql.length(); i++) {
+			if (sql.charAt(i) == '?') {
+				countWildcards++;
+			}
+		}
+		AssertSyntax.isTrue(values.length == countWildcards, "Supplied values do not match variables required by sql \"%s\"", sql);
+		
+		this.sql = sql;
+		fromWildcardValues.addAll(Arrays.asList(values));
+		return this;
+	}
+	
 	public QueryBuilder<T> join(String target, String alias) {
 		return _join(target, alias, JoinType.DEFAULT_JOIN);
 	}
@@ -174,16 +189,16 @@ public class QueryBuilder<T> {
 	
 	public Query<T> toQuery() {
 		
-		EntityRepository entityRepository = queryManager.getEntityRepository();
-		TranslatorController controller = queryManager.getController();
+		EntityRepository entityRepository = daoManager.getEntityRepository();
+		TranslatorController controller = daoManager.getController();
 		
 		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(this.entityClass), "", this.aliasJoins);
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 
-		TranslatorContext context = new TranslatorContext(controller, linkedTableEntityBundle, linkedEntityBundle, false);
+		TranslatorContext context = new TranslatorContext(daoManager.getDialect(), controller, linkedTableEntityBundle, linkedEntityBundle, sql.length() > 0);
 
-		QueryExpression queryExpression = new QueryExpression("query", 
+		QueryExpression queryExpression = new QueryExpression("query", sql,
 				this.selectorExpressions, this.predicateExpressions, this.orderExpressions, 
 				this.distinct, this.firstResult, this.maxResults,
 				false);
@@ -196,12 +211,12 @@ public class QueryBuilder<T> {
 	
 	public List<T> list() {
 		Query<T> query = toQuery();
-		return queryManager.query(query);
+		return daoManager.query(query);
 	}
 
 	public T uniqueValue() {
 		Query<T> query = toQuery();
-		List<T> result = queryManager.query(query);
+		List<T> result = daoManager.query(query);
 		
 		AssertState.isTrue(result.size() == 1, "Expected one row result.");
 		

@@ -24,7 +24,8 @@ import mockit.Mocked;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.nebulae2us.stardust.dao.domain.JdbcOperation;
+import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
+import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.jpa.group1.House;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.translate.domain.AttributeTranslator;
@@ -51,29 +52,29 @@ public class QueryTest {
 	
 	private TranslatorController controller;
 	
-	private QueryManager queryManager;
+	private DaoManager daoManager;
 	
-	@Mocked JdbcOperation jdbcOperation;
+	@Mocked JdbcExecutor jdbcExecutor;
 	
 	@Before
 	public void setup() {
 		this.entityRepository = new EntityRepository();
 
 		this.controller = new CommonTranslatorController(Collections.EMPTY_LIST);
-		this.queryManager = new QueryManager(jdbcOperation, entityRepository, controller);
+		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, controller, new H2Dialect());
 	}
 	
 	@Test
 	public void createQuery() {
 
-		queryManager.newQuery(House.class)
+		daoManager.newQuery(House.class)
 		.toQuery();
 		
 	}
 	
 	@Test
 	public void filter_equal() {
-		queryManager.newQuery(House.class)
+		daoManager.newQuery(House.class)
 		.distinct()
 		.select("houseId.houseId")
 		.filterBy()

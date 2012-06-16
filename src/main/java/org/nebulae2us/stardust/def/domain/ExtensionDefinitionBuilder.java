@@ -29,32 +29,20 @@ import org.nebulae2us.stardust.my.domain.RelationalType;
  * @author Trung Phan
  *
  */
-public class ExtensionDefinitionBuilder extends AttributeRelationshipHolderDefinitionBuilder<ExtensionDefinitionBuilder> {
+public class ExtensionDefinitionBuilder extends SemiEntityDefinitionBuilder<ExtensionDefinitionBuilder> {
 
 	private final Class<?> extClass;
 	
 	private final Class<?> owningEntityClass;
-
-	private final List<String> identifiers = new ArrayList<String>();
 
 	public ExtensionDefinitionBuilder(Class<?> owningEntityClass, Class<?> extClass) {
 		this.extClass = extClass;
 		this.owningEntityClass = owningEntityClass;
 	}
 	
-	
 	public ExtensionDefinition toExtensionDefinition() {
 		return new Converter().convert(this).to(ExtensionDefinition.class);
 	}
 
-	public ExtensionDefinitionBuilder identifier(Object ... attributeLocators ) {
-		for (Object attributeLocator : attributeLocators) {
-			String attributeName = attributeLocator.toString();
-			if (!this.identifiers.contains(attributeName)) {
-				this.identifiers.add(attributeName);
-			}
-		}
-		return this;
-	}
 	
 }

@@ -24,25 +24,21 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorColumn;
 import javax.persistence.DiscriminatorType;
 import javax.persistence.DiscriminatorValue;
-import javax.persistence.Embedded;
 import javax.persistence.EmbeddedId;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinColumns;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.SecondaryTable;
 import javax.persistence.SecondaryTables;
+import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.nebulae2us.electron.util.ListBuilder;
+import org.nebulae2us.stardust.generator.IdentityValueRetriever;
+import org.nebulae2us.stardust.generator.SequenceIdentifierGenerator;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
@@ -147,7 +143,7 @@ public class AnnotationEntityDefinitionBuilder extends AbstractAnnotationDefinit
 				builder.excludeAttributes(field.getName());
 				continue;
 			}
-		
+			
 			if (field.getAnnotation(Id.class) != null) {
 				builder.identifier(field.getName());
 			}
@@ -155,6 +151,24 @@ public class AnnotationEntityDefinitionBuilder extends AbstractAnnotationDefinit
 			if (field.getAnnotation(EmbeddedId.class) != null) {
 				builder.identifier(field.getName());
 				builder.embedAttributes(field.getName());
+			}
+			
+			if (field.getAnnotation(GeneratedValue.class) != null && field.getAnnotation(Id.class) != null) {
+				GeneratedValue generatedValue = field.getAnnotation(GeneratedValue.class);
+				switch (generatedValue.strategy()) {
+				case IDENTITY:
+					builder.identifierGenerator(field.getName(), IdentityValueRetriever.getInstance());
+					break;
+				case SEQUENCE:
+					SequenceGenerator sequenceGenerator = searchForSequenceGeneratorAnnot(generatedValue.generator(), entityClass);
+					AssertSyntax.notNull(sequenceGenerator, "Cannot find definition for sequence generator \"%s\". Hint: define @SequenceGenerator.", generatedValue.generator());
+					
+					builder.identifierGenerator(field.getName(), new SequenceIdentifierGenerator(sequenceGenerator.schema(), sequenceGenerator.sequenceName()));
+					break;
+				default:
+					AssertSyntax.fail("Unsupported identifier generator strategy %s.", generatedValue.strategy().toString());
+					break;
+				}
 			}
 		
 			if (scanFieldForEmbedded(builder, field)) {
@@ -167,7 +181,31 @@ public class AnnotationEntityDefinitionBuilder extends AbstractAnnotationDefinit
 		
 		return builder.toEntityDefinition();
 	}
+	
+	private SequenceGenerator searchForSequenceGeneratorAnnot(String name, Class<?> aClass) {
+		SequenceGenerator generator = (SequenceGenerator)aClass.getAnnotation(SequenceGenerator.class);
+		if (generator != null && generator.name().equals(name)) {
+			return generator;
+		}
+		
+		for (Field field : aClass.getDeclaredFields()) {
+			generator = field.getAnnotation(SequenceGenerator.class);
+			
+			if (generator != null && generator.name().equals(name)) {
+				return generator;
+			}
+		}
 
+		Class<?> superClass = aClass.getSuperclass();
+		if (superClass != null && superClass != Object.class) {
+			return searchForSequenceGeneratorAnnot(name, superClass);
+		}
+
+		return null;
+	}
+
+	
+	
 	@Override
 	protected Column getColumnAnnot(Field field) {
 		return field.getAnnotation(Column.class);

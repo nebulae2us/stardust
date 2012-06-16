@@ -21,7 +21,7 @@ import org.nebulae2us.stardust.sql.domain.DataReader;
  * @author Trung Phan
  *
  */
-public class NamedColumnRowVisitor<T> extends RowVisitor<T> {
+public class NamedColumnRecordMapper<T> extends RecordMapper<T> {
 
 	private final Class<T> valueType;
 	
@@ -29,7 +29,7 @@ public class NamedColumnRowVisitor<T> extends RowVisitor<T> {
 	
 	private transient int columnIndex;
 	
-	public NamedColumnRowVisitor(Class<T> valueType, String columnName) {
+	public NamedColumnRecordMapper(Class<T> valueType, String columnName) {
 		this.valueType = valueType;
 		this.columnName = columnName;
 	}

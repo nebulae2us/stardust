@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.stardust.api.NewEntityDetector;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
 
 /**
@@ -39,6 +40,7 @@ public class EntityDefinition extends SemiEntityDefinition {
 	
 	private final Object discriminatorValue;
 	
+	private final NewEntityDetector newEntityDetector;
 	
 	public EntityDefinition(Mirror mirror) {
 		super(mirror);
@@ -51,30 +53,35 @@ public class EntityDefinition extends SemiEntityDefinition {
 		this.inheritanceType = mirror.to(InheritanceType.class, "inheritanceType");
 		this.discriminatorColumn = mirror.toString("discriminatorColumn");
 		this.discriminatorValue = mirror.toObject("discriminatorValue");
+		this.newEntityDetector = mirror.to(NewEntityDetector.class, "newEntityDetector");
 	}
 
-	public Class<?> getEntityClass() {
+	public final Class<?> getEntityClass() {
 		return entityClass;
 	}
 
-	public String getTableName() {
+	public final String getTableName() {
 		return tableName;
 	}
 
-	public Map<String, List<String>> getSecondaryTables() {
+	public final Map<String, List<String>> getSecondaryTables() {
 		return secondaryTables;
 	}
 
-	public InheritanceType getInheritanceType() {
+	public final InheritanceType getInheritanceType() {
 		return inheritanceType;
 	}
 
-	public String getDiscriminatorColumn() {
+	public final String getDiscriminatorColumn() {
 		return discriminatorColumn;
 	}
 
-	public Object getDiscriminatorValue() {
+	public final Object getDiscriminatorValue() {
 		return discriminatorValue;
+	}
+
+	public final NewEntityDetector getNewEntityDetector() {
+		return newEntityDetector;
 	}
 	
 	

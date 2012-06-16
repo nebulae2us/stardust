@@ -30,6 +30,9 @@ import org.nebulae2us.electron.internal.util.ClassUtils;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.db.domain.Table;
+import org.nebulae2us.stardust.generator.IdentifierGenerator;
+import org.nebulae2us.stardust.generator.IdentityValueRetriever;
+import org.nebulae2us.stardust.generator.SequenceIdentifierGenerator;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
 import org.nebulae2us.stardust.my.domain.EntityIdentifier;
@@ -44,10 +47,13 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  */
 public class H2DDLGenerator {
 
-	private Map<Table, String> ddlCreateTables = new HashMap<Table, String>();
-	private Map<Column, CreateColumn> createColumnRepository = new HashMap<Column, CreateColumn>();
+	private final Map<Table, String> ddlCreateTables = new HashMap<Table, String>();
 	
-	private Map<Table, Set<String>> ddlForeignKeyConstraints = new HashMap<Table, Set<String>>();
+	private final Map<Column, CreateColumn> createColumnRepository = new HashMap<Column, CreateColumn>();
+	
+	private final Map<Table, Set<String>> ddlForeignKeyConstraints = new HashMap<Table, Set<String>>();
+	
+	private final List<String> ddlSequences = new ArrayList<String>();
 	
 	public List<String> generateTable(EntityRepository entityRepository) {
 
@@ -61,6 +67,7 @@ public class H2DDLGenerator {
 		
 		for (Class<?> entityClass : entityClasses) {
 			generateCreateTableDDL(entityRepository, entityClass);
+			generateSequenceDDL(entityRepository, entityClass);
 		}
 
 		for (Class<?> entityClass : entityClasses) {
@@ -72,6 +79,10 @@ public class H2DDLGenerator {
 		List<String> result = new ArrayList<String>();
 		
 		for (String sql : ddlCreateTables.values()) {
+			result.add(sql);
+		}
+		
+		for (String sql : ddlSequences) {
 			result.add(sql);
 		}
 		
@@ -104,7 +115,7 @@ public class H2DDLGenerator {
 					Column foreignColumn = entityAttribute.getLeftColumns().get(i);
 					CreateColumn foreignCreateColumn = createColumnRepository.get(foreignColumn);
 					AssertState.notNull(foreignCreateColumn, "Column not found: ", foreignColumn);
-					CreateColumn createColumn = new CreateColumn(column, foreignCreateColumn.getColumnType());
+					CreateColumn createColumn = new CreateColumn(column, foreignCreateColumn.getColumnType(), false);
 					createColumns.add(createColumn);
 					createColumnRepository.put(column, createColumn);
 				}
@@ -113,7 +124,7 @@ public class H2DDLGenerator {
 					Column foreignColumn = entityAttribute.getRightColumns().get(i);
 					CreateColumn foreignCreateColumn = createColumnRepository.get(foreignColumn);
 					AssertState.notNull(foreignCreateColumn, "Column not found: ", foreignColumn);
-					CreateColumn createColumn = new CreateColumn(column, foreignCreateColumn.getColumnType());
+					CreateColumn createColumn = new CreateColumn(column, foreignCreateColumn.getColumnType(), false);
 					createColumns.add(createColumn);
 					createColumnRepository.put(column, createColumn);
 				}
@@ -137,6 +148,19 @@ public class H2DDLGenerator {
 		}
 	}
 
+	private void generateSequenceDDL(EntityRepository entityRepository, Class<?> entityClass) {
+		Entity entity = entityRepository.getEntity(entityClass);
+		for (ScalarAttribute scalarAttribute : entity.getScalarAttributes()) {
+			IdentifierGenerator generator = scalarAttribute.getValueGenerator();
+			if (generator instanceof SequenceIdentifierGenerator) {
+				SequenceIdentifierGenerator sequenceGenerator = (SequenceIdentifierGenerator)generator;
+				StringBuilder sql = new StringBuilder();
+				sql.append("create sequence ").append(sequenceGenerator.getName());
+				this.ddlSequences.add(sql.toString());
+			}
+		}
+	}
+	
 	private void generateCreateTableDDL(EntityRepository entityRepository, Class<?> entityClass) {
 		
 		Entity entity = entityRepository.getEntity(entityClass);
@@ -156,7 +180,7 @@ public class H2DDLGenerator {
 		if (entity.getRootEntity() == entity) {
 			if (entity.getEntityDiscriminator() != null) {
 				ColumnType discriminatorColumnType = getColumnType(entity.getEntityDiscriminator().getValue().getClass(), 0);
-				CreateColumn createColumn = new CreateColumn(entity.getEntityDiscriminator().getColumn(), discriminatorColumnType);
+				CreateColumn createColumn = new CreateColumn(entity.getEntityDiscriminator().getColumn(), discriminatorColumnType, false);
 				createColumns.add(createColumn);
 			}
 		}
@@ -182,7 +206,7 @@ public class H2DDLGenerator {
 					CreateColumn parentCreateColumn = createColumnRepository.get(parentColumn);
 					AssertState.notNull(parentCreateColumn, "parentColumn not found: %s.", parentColumn);
 					
-					CreateColumn createColumn = new CreateColumn(column, parentCreateColumn.getColumnType());
+					CreateColumn createColumn = new CreateColumn(column, parentCreateColumn.getColumnType(), false);
 					createColumnRepository.put(column, createColumn);
 					createColumns.add(createColumn);
 					createPrimaryKeys.add(createColumn);
@@ -201,6 +225,11 @@ public class H2DDLGenerator {
 			for (CreateColumn createColumn : createColumns) {
 				if (createColumn.getColumn().getTable().equals(table)) {
 					sqlBuilder.append("    ").append(createColumn.toString());
+					
+					if (createColumn.isIdentity()) {
+						sqlBuilder.append(" identity");
+					}
+					
 					sqlBuilder.append(",\n");
 				}
 			}
@@ -287,7 +316,7 @@ public class H2DDLGenerator {
 	}
 	
 	protected CreateColumn newCreateColumn(ScalarAttribute scalarAttribute) {
-		return new CreateColumn(scalarAttribute.getColumn(), getColumnType(scalarAttribute.getScalarType(), 0));
+		return new CreateColumn(scalarAttribute.getColumn(), getColumnType(scalarAttribute.getScalarType(), 0),  scalarAttribute.getValueGenerator() instanceof IdentityValueRetriever);
 	}
 	
 	protected List<CreateColumn> newCreateColumns(EntityAttribute entityAttribute) {
@@ -298,7 +327,7 @@ public class H2DDLGenerator {
 		int numColumns = identifier.getScalarAttributes().size();
 		for (int i = 0; i < numColumns; i++) {
 			ScalarAttribute scalarAttribute = identifier.getScalarAttributes().get(i);
-			result.add(new CreateColumn(entityAttribute.getLeftColumns().get(i), getColumnType(scalarAttribute.getScalarType(), 0) ));
+			result.add(new CreateColumn(entityAttribute.getLeftColumns().get(i), getColumnType(scalarAttribute.getScalarType(), 0) , false));
 		}
 		
 		return result;

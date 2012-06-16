@@ -13,15 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.api;
+package org.nebulae2us.stardust.generator;
+
+import org.nebulae2us.stardust.dao.domain.JdbcHelper;
+import org.nebulae2us.stardust.dialect.Dialect;
 
 /**
  * @author Trung Phan
  *
  */
-public class OracleDialect extends Dialect {
+public interface IdentifierGenerator {
+	
+	/**
+	 * If true, generateIdentifierValue is called before insertion.
+	 * @return
+	 */
+	public boolean generationBeforeInsertion();
+	
+	public <T> T generateIdentifierValue(Class<T> expectedType, Dialect dialect, JdbcHelper jdbcHelper);
 
-	
-	
-	
 }

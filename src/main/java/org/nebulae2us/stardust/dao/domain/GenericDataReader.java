@@ -21,6 +21,9 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -49,7 +52,7 @@ public class GenericDataReader extends DataReader {
 		try {
 			return resultSet.findColumn(columnName);
 		} catch (SQLException e) {
-			throw new SqlException(e);
+			return -1;
 		}
 	}
 
@@ -61,30 +64,32 @@ public class GenericDataReader extends DataReader {
 			if (valueType == String.class) {
 				return (T)resultSet.getString(columnIndex);
 			}
-			else if (valueType == long.class) {
-				return (T)Long.valueOf(resultSet.getLong(columnIndex));
-			}
-			else if (valueType == int.class) {
-				return (T)Integer.valueOf(resultSet.getInt(columnIndex));
-			}
-			else if (valueType == short.class) {
-				return (T)Short.valueOf(resultSet.getShort(columnIndex));
-			}
-			else if (valueType == byte.class) {
-				return (T)Byte.valueOf(resultSet.getByte(columnIndex));
-			}
-			else if (valueType == double.class) {
-				return (T)Double.valueOf(resultSet.getDouble(columnIndex));
-			}
-			else if (valueType == float.class) {
-				return (T)Float.valueOf(resultSet.getFloat(columnIndex));
-			}
-			else if (valueType == boolean.class) {
-				return (T)Boolean.valueOf(resultSet.getBoolean(columnIndex));
-			}
-			else if (valueType == char.class) {
-				String s = resultSet.getString(columnIndex);
-				return (T)Character.valueOf(s == null || s.length() == 0 ? '\0' : s.charAt(0));
+			else if (valueType.isPrimitive()) {
+				if (valueType == long.class) {
+					return (T)Long.valueOf(resultSet.getLong(columnIndex));
+				}
+				else if (valueType == int.class) {
+					return (T)Integer.valueOf(resultSet.getInt(columnIndex));
+				}
+				else if (valueType == short.class) {
+					return (T)Short.valueOf(resultSet.getShort(columnIndex));
+				}
+				else if (valueType == byte.class) {
+					return (T)Byte.valueOf(resultSet.getByte(columnIndex));
+				}
+				else if (valueType == double.class) {
+					return (T)Double.valueOf(resultSet.getDouble(columnIndex));
+				}
+				else if (valueType == float.class) {
+					return (T)Float.valueOf(resultSet.getFloat(columnIndex));
+				}
+				else if (valueType == boolean.class) {
+					return (T)Boolean.valueOf(resultSet.getBoolean(columnIndex));
+				}
+				else if (valueType == char.class) {
+					String s = resultSet.getString(columnIndex);
+					return (T)Character.valueOf(s == null || s.length() == 0 ? '\0' : s.charAt(0));
+				}
 			}
 			else if (Number.class.isAssignableFrom(valueType)) {
 				T result = null;
@@ -129,6 +134,17 @@ public class GenericDataReader extends DataReader {
 					result = null;
 				}
 				return result;
+			}
+			else if (Date.class.isAssignableFrom(valueType)) {
+				if (valueType == java.sql.Date.class) {
+					return (T)resultSet.getDate(columnIndex);
+				}
+				else if (valueType == Time.class) {
+					return (T)resultSet.getTime(columnIndex);
+				} else {
+					Timestamp ts = resultSet.getTimestamp(columnIndex);
+					return ts == null ? null : (T)new Date(ts.getTime());
+				}
 			}
 			else if (valueType == Boolean.class) {
 				T result = (T)Boolean.valueOf(resultSet.getBoolean(columnIndex));

@@ -15,6 +15,7 @@
  */
 package org.nebulae2us.stardust.translate.domain;
 
+import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.sql.domain.LinkedEntityBundle;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
 
@@ -23,6 +24,8 @@ import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
  *
  */
 public class TranslatorContext {
+
+	private final Dialect dialect;
 
 	private final TranslatorController translatorController;
 	
@@ -34,7 +37,8 @@ public class TranslatorContext {
 	
 	private final LinkedEntityBundle linkedEntityBundle;
 	
-	public TranslatorContext(TranslatorController translatorController, LinkedTableEntityBundle linkedTableEntityBundle, LinkedEntityBundle linkedEntityBundle, boolean externalSql) {
+	public TranslatorContext(Dialect dialect, TranslatorController translatorController, LinkedTableEntityBundle linkedTableEntityBundle, LinkedEntityBundle linkedEntityBundle, boolean externalSql) {
+		this.dialect = dialect;
 		this.translatorController = translatorController;
 		this.linkedTableEntityBundle = linkedTableEntityBundle;
 		this.linkedEntityBundle = linkedEntityBundle;
@@ -59,6 +63,10 @@ public class TranslatorContext {
 
 	public int getMaxInListSize() {
 		return maxInListSize;
+	}
+
+	public final Dialect getDialect() {
+		return dialect;
 	}
 	
 }

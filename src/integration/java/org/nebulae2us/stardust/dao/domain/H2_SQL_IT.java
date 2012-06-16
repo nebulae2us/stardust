@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nebulae2us.stardust.dao.domain;
+package org.nebulae2us.stardust.dao.domain;
 
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -21,9 +21,9 @@ import java.util.Arrays;
 
 import org.junit.Test;
 import org.nebulae2us.electron.util.Immutables;
-import org.nebulae2us.stardust.dao.domain.JdbcTemplate;
+import org.nebulae2us.stardust.dao.domain.JdbcHelper;
 
-import com.nebulae2us.stardust.BaseIntegrationTest;
+import org.nebulae2us.stardust.BaseIntegrationTest;
 import static org.junit.Assert.*;
 
 /**
@@ -36,12 +36,12 @@ import static org.junit.Assert.*;
  */
 public class H2_SQL_IT extends BaseIntegrationTest {
 
-	private JdbcTemplate jdbcTemplate;
+	private JdbcHelper jdbcHelper;
 	
 	public H2_SQL_IT() {
 		super("h2-in-memory");
 		
-		jdbcTemplate = new JdbcTemplate(jdbcOperation);
+		jdbcHelper = new JdbcHelper(jdbcExecutor);
 	}
 
 	@Test
@@ -50,9 +50,9 @@ public class H2_SQL_IT extends BaseIntegrationTest {
 		
 		stmt.execute("create table test_identity(my_id int identity, my_name varchar(100))");
 		
-		jdbcTemplate.update("insert into test_identity(my_name) values (?)", Arrays.asList("some vale"));
+		jdbcHelper.update("insert into test_identity(my_name) values (?)", Arrays.asList("some vale"));
 		
-		Long id = jdbcTemplate.queryForLong("select scope_identity() from dual", Immutables.emptyStringMap(), Immutables.emptyList());
+		Long id = jdbcHelper.queryForLong("select scope_identity() from dual", Immutables.emptyStringMap(), Immutables.emptyList());
 		
 		assertEquals(Long.valueOf(1), id);
 		
@@ -64,7 +64,7 @@ public class H2_SQL_IT extends BaseIntegrationTest {
 		Statement stmt = connection.createStatement();
 		stmt.execute("create sequence my_sequence");
 		
-		Long id = jdbcTemplate.queryForLong("select next value for my_sequence from dual", Immutables.emptyStringMap(), Immutables.emptyList());
+		Long id = jdbcHelper.queryForLong("select next value for my_sequence from dual", Immutables.emptyStringMap(), Immutables.emptyList());
 		
 		assertEquals(Long.valueOf(1), id);
 	}

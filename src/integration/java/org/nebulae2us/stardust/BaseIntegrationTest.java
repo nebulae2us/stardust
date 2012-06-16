@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nebulae2us.stardust;
+package org.nebulae2us.stardust;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -23,7 +23,7 @@ import java.util.Properties;
 
 import org.junit.After;
 import org.nebulae2us.stardust.dao.domain.ConnectionProvider;
-import org.nebulae2us.stardust.dao.domain.JdbcOperation;
+import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
 import org.nebulae2us.stardust.exception.SqlException;
 
 /**
@@ -40,7 +40,7 @@ public class BaseIntegrationTest {
 	
 	protected final Connection connection;
 	
-	protected final JdbcOperation jdbcOperation;
+	protected final JdbcExecutor jdbcExecutor;
 
 	@After
 	public void closeConnection() throws SQLException {
@@ -75,7 +75,7 @@ public class BaseIntegrationTest {
 			throw new SqlException(e);
 		}
 		
-		this.jdbcOperation = new JdbcOperation(new ConnectionProvider() {
+		this.jdbcExecutor = new JdbcExecutor(new ConnectionProvider() {
 			public Connection getConnection() {
 				return connection;
 			}

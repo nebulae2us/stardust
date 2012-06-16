@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nebulae2us.stardust;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
-import com.nebulae2us.stardust.api.QueryManager_H2_IT;
-import com.nebulae2us.stardust.dao.domain.H2_SQL_IT;
-import com.nebulae2us.stardust.dao.domain.JdbcOperation_prepareStatement_IT;
+package org.nebulae2us.stardust.api;
 
 /**
  * @author Trung Phan
  *
  */
-@RunWith(Suite.class)
-@SuiteClasses({
-	QueryManager_H2_IT.class,
-	H2_SQL_IT.class,
-	JdbcOperation_prepareStatement_IT.class
-})
-public class AllIntegrationTests {
+public interface NewEntityDetector {
 
+	public boolean isEntityNew(Object entityInstance);
+	
 }

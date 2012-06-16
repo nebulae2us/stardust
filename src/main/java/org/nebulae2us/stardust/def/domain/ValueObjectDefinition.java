@@ -37,23 +37,23 @@ public class ValueObjectDefinition extends AttributeHolderDefinition {
 		this.attributeFullName = mirror.toString("attributeFullName");
 	}
 
-	public Class<?> getVoClass() {
+	public final Class<?> getVoClass() {
 		return voClass;
 	}
 
-	public void setVoClass(Class<?> voClass) {
+	public final void setVoClass(Class<?> voClass) {
 		this.voClass = voClass;
 	}
 
-	public Class<?> getOwningEntityClass() {
+	public final Class<?> getOwningEntityClass() {
 		return owningEntityClass;
 	}
 
-	public void setOwningEntityClass(Class<?> owningEntityClass) {
+	public final void setOwningEntityClass(Class<?> owningEntityClass) {
 		this.owningEntityClass = owningEntityClass;
 	}
 
-	public String getAttributeFullName() {
+	public final String getAttributeFullName() {
 		return attributeFullName;
 	}
 

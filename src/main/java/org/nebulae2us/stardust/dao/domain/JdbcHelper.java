@@ -27,16 +27,18 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import org.nebulae2us.electron.util.Immutables;
+
 /**
  * @author Trung Phan
  *
  */
-public class JdbcTemplate {
+public class JdbcHelper {
 
-	private final JdbcOperation jdbcOperation;
+	private final JdbcExecutor jdbcExecutor;
 	
-	public JdbcTemplate(JdbcOperation jdbcOperation) {
-		this.jdbcOperation = jdbcOperation;
+	public JdbcHelper(JdbcExecutor jdbcExecutor) {
+		this.jdbcExecutor = jdbcExecutor;
 	}
 	
 
@@ -44,7 +46,7 @@ public class JdbcTemplate {
 	
 	
 	public <T> List<T> queryForListOf(Class<T> valueType, String sql, Map<String, ?> paramValues, List<?> wildcardValues) {
-		return query(sql, paramValues, wildcardValues, new FirstColumnRowVisitor<T>(valueType));
+		return query(sql, paramValues, wildcardValues, new FirstColumnRecordMapper<T>(valueType));
 	}
 	
 	public List<Long> queryForListOfLong(String sql, Map<String,?> paramValues, List<?> wildcardValues) {
@@ -110,23 +112,36 @@ public class JdbcTemplate {
 	public List<Boolean> queryForListOfBoolean(String sql, Map<String,?> paramValues, List<?> wildcardValues) {
 		return queryForListOf(Boolean.class, sql, paramValues, wildcardValues);
 	}
+
+	public <T> List<T> query(String sql, RecordMapper<T> recordMapper) {
+		return query(sql, Immutables.emptyStringMap(), Immutables.emptyList(), recordMapper);
+	}
 	
-	public <T> List<T> query(String sql, Map<String, ?> paramValues, List<?> wildcardValues, RowVisitor<T> rowVisitor) {
+	public <T> List<T> query(String sql, List<?> wildcardValues, RecordMapper<T> recordMapper) {
+		return query(sql, Immutables.emptyStringMap(), wildcardValues, recordMapper);
+	}
+	
+	public <T> List<T> query(String sql, Map<String, ?> paramValues, RecordMapper<T> recordMapper) {
+		return query(sql, paramValues, Immutables.emptyList(), recordMapper);
+	}
+	
+	public <T> List<T> query(String sql, Map<String, ?> paramValues, List<?> wildcardValues, RecordMapper<T> recordMapper) {
 		
-		ResultSet resultSet = jdbcOperation.query(sql, paramValues, wildcardValues);
+		ResultSet resultSet = jdbcExecutor.query(sql, paramValues, wildcardValues);
 		GenericDataReader dataReader = new GenericDataReader(resultSet);
 
 		try {
 			List<T> result = new ArrayList<T>();
-			rowVisitor.before(dataReader);
+			recordMapper.before(dataReader);
 
-			int lineNum = 0;
+			int totalRows = 0;
 			while (dataReader.next()) {
-				T value = rowVisitor.visitRow(dataReader, lineNum++);
+				totalRows = dataReader.getRowNumber() + 1;
+				T value = recordMapper.visitRow(dataReader, dataReader.getRowNumber());
 				result.add(value);
 			}
 			
-			rowVisitor.after(dataReader, lineNum);
+			recordMapper.after(dataReader, totalRows);
 			dataReader.close();
 			
 			return result;
@@ -136,8 +151,12 @@ public class JdbcTemplate {
 		}
 	}
 	
+	public <T> T queryFor(Class<T> valueType, String sql) {
+		return queryFor(valueType, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
 	public <T> T queryFor(Class<T> valueType, String sql, Map<String, ?> paramValues, List<?> wildcardValues) {
-		ResultSet resultSet = jdbcOperation.query(sql, paramValues, wildcardValues);
+		ResultSet resultSet = jdbcExecutor.query(sql, paramValues, wildcardValues);
 		GenericDataReader dataReader = new GenericDataReader(resultSet);
 		
 		try {
@@ -224,19 +243,19 @@ public class JdbcTemplate {
 	}
 	
 	public int update(String sql, List<?> wildcardValues) {
-		return jdbcOperation.update(sql, wildcardValues);
+		return jdbcExecutor.update(sql, wildcardValues);
 	}
 
 	public int update(String sql, Map<String, ?> paramValues, List<?> wildcardValues) {
-		return jdbcOperation.update(sql, paramValues, wildcardValues);
+		return jdbcExecutor.update(sql, paramValues, wildcardValues);
 	}
 	
 	public int batchUpdate(String sql, int size, Map<String, List<?>> paramValues) {
-		return jdbcOperation.batchUpdate(sql, size, paramValues);
+		return jdbcExecutor.batchUpdate(sql, size, paramValues);
 	}
 	
 	public int batchUpdate(String sql, int size, List<?> ... valuesList) {
-		return jdbcOperation.batchUpdate(sql, size, valuesList);
+		return jdbcExecutor.batchUpdate(sql, size, valuesList);
 	}
 	
 }

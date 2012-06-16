@@ -29,7 +29,7 @@ import static org.junit.Assert.*;
  * @author Trung Phan
  *
  */
-public class JdbcOperation_transformSql_Test extends JdbcOperation {
+public class JdbcOperation_transformSql_Test extends JdbcExecutor {
 
 	public JdbcOperation_transformSql_Test() {
 		super(new ConnectionProvider() {

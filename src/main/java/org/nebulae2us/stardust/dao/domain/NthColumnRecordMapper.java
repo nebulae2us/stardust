@@ -13,12 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.api;
+package org.nebulae2us.stardust.dao.domain;
+
+import org.nebulae2us.stardust.sql.domain.DataReader;
 
 /**
  * @author Trung Phan
  *
  */
-public class Oracle11gDialect extends OracleDialect {
+public class NthColumnRecordMapper<T> extends RecordMapper<T> {
 
+	private final int columnIndex;
+	private final Class<T> valueType;
+	
+	public NthColumnRecordMapper(Class<T> valueType, int columnIndex) {
+		this.valueType = valueType;
+		this.columnIndex = columnIndex;
+	}
+
+	@Override
+	public T visitRow(DataReader dataReader, int lineNum) {
+		return dataReader.readObject(valueType, columnIndex);
+	}
+
+	
+	
 }

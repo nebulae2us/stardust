@@ -17,6 +17,7 @@ package org.nebulae2us.stardust.translate.domain;
 
 import java.util.List;
 
+import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
 
 /**
@@ -25,6 +26,10 @@ import org.nebulae2us.electron.util.ListBuilder;
  */
 public class CommonTranslatorController extends TranslatorController {
 
+	public CommonTranslatorController() {
+		this(Immutables.emptyList(Translator.class));
+	}
+	
 	public CommonTranslatorController(List<Translator> translators) {
 		super(new ListBuilder<Translator>()
 				.add(new AnyAllTranslator())

@@ -15,6 +15,7 @@
  */
 package org.nebulae2us.stardust.sql.domain;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.nebulae2us.electron.Mirror;
@@ -180,6 +181,16 @@ public class LinkedTableEntity {
 	
 	public boolean isRoot() {
 		return parent == null;
+	}
+	
+	public List<ScalarAttribute> getScalarAttributes() {
+		List<ScalarAttribute> result = new ArrayList<ScalarAttribute>();
+		for (Attribute attribute : getOwningSideAttributes()) {
+			if (attribute instanceof ScalarAttribute) {
+				result.add((ScalarAttribute)attribute);
+			}
+		}
+		return result;
 	}
 	
 	@Override

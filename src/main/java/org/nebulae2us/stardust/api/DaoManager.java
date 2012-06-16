@@ -16,18 +16,20 @@
 package org.nebulae2us.stardust.api;
 
 import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.Immutables;
+import org.nebulae2us.stardust.dao.domain.ConnectionProvider;
 import org.nebulae2us.stardust.dao.domain.GenericDataReader;
-import org.nebulae2us.stardust.dao.domain.JdbcOperation;
+import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
+import org.nebulae2us.stardust.dao.domain.JdbcHelper;
+import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.expr.domain.InsertEntityExpression;
 import org.nebulae2us.stardust.expr.domain.UpdateEntityExpression;
-import org.nebulae2us.stardust.expr.domain.UpdateExpression;
-import org.nebulae2us.stardust.my.domain.Attribute;
+import org.nebulae2us.stardust.generator.IdentifierGenerator;
+import org.nebulae2us.stardust.internal.util.ReflectionUtils;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
@@ -36,11 +38,11 @@ import org.nebulae2us.stardust.sql.domain.DataReader;
 import org.nebulae2us.stardust.sql.domain.LinkedEntityBundle;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntity;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
+import org.nebulae2us.stardust.translate.domain.CommonTranslatorController;
 import org.nebulae2us.stardust.translate.domain.ParamValues;
 import org.nebulae2us.stardust.translate.domain.Translator;
 import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 import org.nebulae2us.stardust.translate.domain.TranslatorController;
-import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * 
@@ -49,18 +51,32 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  * @author Trung Phan
  *
  */
-public class QueryManager {
+public class DaoManager {
 
 	private final EntityRepository entityRepository;
 	
 	private final TranslatorController controller;
 	
-	private final JdbcOperation jdbcOperation;
+	private final JdbcExecutor jdbcExecutor;
 	
-	public QueryManager(JdbcOperation jdbcOperation, EntityRepository entityRepository, TranslatorController controller) {
-		this.jdbcOperation = jdbcOperation;
+	private final JdbcHelper jdbcHelper;
+	
+	private final Dialect dialect;
+	
+	public DaoManager(ConnectionProvider connectionProvider, Dialect dialect) {
+		this.jdbcExecutor = new JdbcExecutor(connectionProvider);
+		this.jdbcHelper = new JdbcHelper(this.jdbcExecutor);
+		this.dialect = dialect;
+		this.entityRepository = new EntityRepository();
+		this.controller = new CommonTranslatorController();
+	}
+	
+	public DaoManager(JdbcExecutor jdbcExecutor, EntityRepository entityRepository, TranslatorController controller, Dialect dialect) {
+		this.jdbcExecutor = jdbcExecutor;
 		this.entityRepository = entityRepository;
 		this.controller = controller;
+		this.jdbcHelper = new JdbcHelper(jdbcExecutor);
+		this.dialect = dialect;
 	}
 	
 	public EntityRepository getEntityRepository() {
@@ -71,6 +87,10 @@ public class QueryManager {
 		return controller;
 	}
 
+	public final Dialect getDialect() {
+		return this.dialect;
+	}
+	
 	public <T> QueryBuilder<T> newQuery(Class<T> entityClass) {
 		return new QueryBuilder<T>(this, entityClass);
 	}
@@ -81,11 +101,12 @@ public class QueryManager {
 		String sql = translateResult.getItem1();
 		List<?> values = translateResult.getItem2();
 		
-		ResultSet resultSet = jdbcOperation.query(sql, values);
+		ResultSet resultSet = jdbcExecutor.query(sql, values);
 		DataReader dataReader = new GenericDataReader(resultSet);
 		
 		TranslatorContext context = query.getTranslatorContext();
-		return (List<T>)context.getLinkedEntityBundle().readData(this.entityRepository, dataReader);
+		List<T> result = (List<T>)context.getLinkedEntityBundle().readData(this.entityRepository, dataReader);
+		return result;
 	}
 	
 	public void save(Object object) {
@@ -94,9 +115,21 @@ public class QueryManager {
 		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
 		
-		TranslatorContext context = new TranslatorContext(this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
+		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
 
 		for (int i = 0; i < linkedTableEntityBundle.getLinkedTableEntities().size(); i++) {
+			LinkedTableEntity linkedTableEntity = linkedTableEntityBundle.getLinkedTableEntities().get(i);
+
+			// populate identity values
+			for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
+				IdentifierGenerator generator = scalarAttribute.getValueGenerator();
+				if (generator != null && generator.generationBeforeInsertion()) {
+					Object value = generator.generateIdentifierValue(scalarAttribute.getScalarType(), dialect, jdbcHelper);
+					
+					ReflectionUtils.setValue(scalarAttribute.getField(), object, value);
+				}
+			}
+			
 			InsertEntityExpression insertEntityExpression = new InsertEntityExpression("insert", i);
 			
 			ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
@@ -106,7 +139,17 @@ public class QueryManager {
 			String sql = translateResult.getItem1();
 			List<?> values = translateResult.getItem2();
 			
-			int rowsInserted = jdbcOperation.update(sql, values);
+			int rowsInserted = jdbcExecutor.update(sql, values);
+			
+			// retrieve identity values
+			for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
+				IdentifierGenerator generator = scalarAttribute.getValueGenerator();
+				if (generator != null && !generator.generationBeforeInsertion()) {
+					Object value = generator.generateIdentifierValue(scalarAttribute.getScalarType(), dialect, jdbcHelper);
+					
+					ReflectionUtils.setValue(scalarAttribute.getField(), object, value);
+				}
+			}
 		}
 		
 	}
@@ -117,7 +160,7 @@ public class QueryManager {
 		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
 		
-		TranslatorContext context = new TranslatorContext(this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
+		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
 
 		for (int i = 0; i < linkedTableEntityBundle.getLinkedTableEntities().size(); i++) {
 			UpdateEntityExpression updateEntityExpression = new UpdateEntityExpression("insert", i);
@@ -129,17 +172,9 @@ public class QueryManager {
 			String sql = translateResult.getItem1();
 			List<?> values = translateResult.getItem2();
 			
-			int rowsUpdated = jdbcOperation.update(sql, values);
+			int rowsUpdated = jdbcExecutor.update(sql, values);
 		}
 		
 	}
-	
-	public void merge(Object entityToMerge, Object currentState) {
-		
-		
-		
-		
-		
-		
-	}
+
 }

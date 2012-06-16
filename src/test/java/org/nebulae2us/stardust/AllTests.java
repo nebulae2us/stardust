@@ -36,7 +36,8 @@ import org.nebulae2us.stardust.translate.domain.AnyAllTranslatorTest;
 import org.nebulae2us.stardust.translate.domain.InListTranslatorTest;
 import org.nebulae2us.stardust.translate.domain.IsNullTranslatorTest;
 import org.nebulae2us.stardust.translate.domain.LikeTranslatorTest;
-import org.nebulae2us.stardust.translate.domain.TranslatorIntegrationTest;
+import org.nebulae2us.stardust.translate.domain.SqlBackedTranslatorTest;
+import org.nebulae2us.stardust.translate.domain.TranslatorTest;
 
 /**
  * @author Trung Phan
@@ -56,7 +57,8 @@ import org.nebulae2us.stardust.translate.domain.TranslatorIntegrationTest;
 	BaseFilterBuilderTest.class,
 	FilterBuilderTest.class,
 	QueryTest.class,
-	TranslatorIntegrationTest.class,
+	TranslatorTest.class,
+	SqlBackedTranslatorTest.class,
 	AnyAllTranslatorTest.class,
 	InListTranslatorTest.class,
 	IsNullTranslatorTest.class,

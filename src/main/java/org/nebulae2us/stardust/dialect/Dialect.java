@@ -13,29 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.dao.domain;
-
-import org.nebulae2us.stardust.sql.domain.DataReader;
+package org.nebulae2us.stardust.dialect;
 
 /**
  * @author Trung Phan
  *
  */
-public class NthColumnRowVisitor<T> extends RowVisitor<T> {
+public abstract class Dialect {
 
-	private final int columnIndex;
-	private final Class<T> valueType;
-	
-	public NthColumnRowVisitor(Class<T> valueType, int columnIndex) {
-		this.valueType = valueType;
-		this.columnIndex = columnIndex;
-	}
-
-	@Override
-	public T visitRow(DataReader dataReader, int lineNum) {
-		return dataReader.readObject(valueType, columnIndex);
-	}
-
-	
-	
 }

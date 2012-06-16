@@ -24,6 +24,7 @@ import javax.persistence.Basic;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.TableBuilder;
 import org.nebulae2us.stardust.def.domain.AttributeHolderDefinition;
+import org.nebulae2us.stardust.def.domain.SemiEntityDefinition;
 import org.nebulae2us.stardust.internal.util.NameUtils;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
@@ -85,6 +86,11 @@ public class ScalarAttributeScanner {
 				.nullable( !this.attributeHolderDefinition.getNotNullableAttributes().contains(field.getName()))
 				.fetchType(fetchType)
 				;
+		
+		if (this.attributeHolderDefinition instanceof SemiEntityDefinition) {
+			SemiEntityDefinition entityDefinition = (SemiEntityDefinition)this.attributeHolderDefinition;
+			attributeBuilder.valueGenerator(entityDefinition.getIdentifierGenerators().get(attributeBuilder.getFullName()));
+		}
 		
 		return attributeBuilder;
 	}

@@ -13,22 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.dao.domain;
-
-import org.nebulae2us.stardust.sql.domain.DataReader;
+package org.nebulae2us.stardust.dialect;
 
 /**
  * @author Trung Phan
  *
  */
-public abstract class RowVisitor<T> {
+public class OracleDialect extends Dialect {
 
-	public void before(DataReader dataReader) {
-	}
 	
-	public abstract T visitRow(DataReader dataReader, int lineNum);
 	
-	public void after(DataReader dataReader, int totalRows) {
-	}
 	
 }

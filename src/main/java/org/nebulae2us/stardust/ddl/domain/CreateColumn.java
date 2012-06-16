@@ -26,12 +26,14 @@ public class CreateColumn {
 
 	private final Column column;
 	private final ColumnType columnType;
+	private final boolean isIdentity;
 	
-	public CreateColumn(Column column, ColumnType columnType) {
+	public CreateColumn(Column column, ColumnType columnType, boolean isIdentity) {
 		Assert.notNull(column, "column cannot be null");
 		Assert.notNull(columnType, "columnType cannot be null.");
 		this.column = column;
 		this.columnType = columnType;
+		this.isIdentity = isIdentity;
 	}
 
 	public Column getColumn() {
@@ -40,6 +42,10 @@ public class CreateColumn {
 	
 	public ColumnType getColumnType() {
 		return columnType;
+	}
+	
+	public boolean isIdentity() {
+		return isIdentity;
 	}
 
 	@Override

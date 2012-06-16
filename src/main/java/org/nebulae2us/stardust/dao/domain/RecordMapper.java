@@ -15,13 +15,20 @@
  */
 package org.nebulae2us.stardust.dao.domain;
 
+import org.nebulae2us.stardust.sql.domain.DataReader;
+
 /**
  * @author Trung Phan
  *
  */
-public final class FirstColumnRowVisitor<T> extends NthColumnRowVisitor<T> {
-	
-	public FirstColumnRowVisitor(Class<T> valueType) {
-		super(valueType, 1);
+public abstract class RecordMapper<T> {
+
+	public void before(DataReader dataReader) {
 	}
+	
+	public abstract T visitRow(DataReader dataReader, int lineNum);
+	
+	public void after(DataReader dataReader, int totalRows) {
+	}
+	
 }

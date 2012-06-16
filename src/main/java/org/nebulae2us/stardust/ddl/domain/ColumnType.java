@@ -57,7 +57,6 @@ public class ColumnType {
 		return scale;
 	}
 
-
 	@Override
 	public String toString() {
 		if (length == 0 && precision == 0 && scale == 0) {

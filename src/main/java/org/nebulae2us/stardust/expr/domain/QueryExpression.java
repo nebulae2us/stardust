@@ -31,18 +31,24 @@ public class QueryExpression extends Expression {
 	
 	private final boolean count;
 	
+	/**
+	 * In normal scenario, sql = "". Only useful for sql-backed query.
+	 */
+	private final String sql;
+	
 	private final List<SelectExpression> selectors;
 	
 	private final List<PredicateExpression> filters;
 	
 	private final List<OrderExpression> orders;
 	
-	public QueryExpression(String expression, 
+	public QueryExpression(String expression, String sql,
 			List<SelectExpression> selectors, List<PredicateExpression> filters, List<OrderExpression> orders,
 			boolean distinct, int firstResult, int maxResults, boolean count) {
 		
 		super(expression);
 		
+		this.sql = sql;
 		this.selectors = selectors;
 		this.filters = filters;
 		this.orders = orders;
@@ -78,6 +84,14 @@ public class QueryExpression extends Expression {
 
 	public boolean isCount() {
 		return count;
+	}
+
+	public final String getSql() {
+		return sql;
+	}
+	
+	public final boolean isBackedBySql() {
+		return sql.length() > 0;
 	}
 	
 }

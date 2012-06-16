@@ -60,7 +60,8 @@ public class AttributeTranslator implements Translator {
 		AssertSyntax.notNull(result, "Unrecognized expression: %s.", attributeExpression.getExpression());
 			
 		if (context.isExternalSql()) {
-			return new Pair<String, List<?>>(result.getItem1().getAlias() + "_" + result.getItem2().getColumn().getName(), Collections.emptyList());
+			String _alias = result.getItem1().getAlias();
+			return new Pair<String, List<?>>((_alias.length() > 0 ? _alias + "_" : "") + result.getItem2().getColumn().getName(), Collections.emptyList());
 		}
 		else {
 			return new Pair<String, List<?>>(result.getItem1().getTableAlias() + "." + result.getItem2().getColumn().getName(), Collections.emptyList());

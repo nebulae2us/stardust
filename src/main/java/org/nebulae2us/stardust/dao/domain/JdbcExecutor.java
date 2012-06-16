@@ -42,6 +42,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.exception.IllegalSyntaxException;
 import org.nebulae2us.stardust.exception.SqlException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -49,11 +51,13 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  * @author Trung Phan
  *
  */
-public class JdbcOperation {
+public class JdbcExecutor {
+	
+	private static final Logger logger = LoggerFactory.getLogger(JdbcExecutor.class);
 
 	private final ConnectionProvider connectionProvider;
 	
-	public JdbcOperation(ConnectionProvider connectionProvider) {
+	public JdbcExecutor(ConnectionProvider connectionProvider) {
 		this.connectionProvider = connectionProvider;
 	}
 	
@@ -134,6 +138,10 @@ public class JdbcOperation {
 		PreparedStatement preparedStatement;
 		
 		try {
+			if (logger.isDebugEnabled()) {
+				logger.debug(sqlToExecute);
+			}
+			
 			preparedStatement = connection.prepareStatement(sqlToExecute);
 		} catch (SQLException e) {
 			throw new SqlException(e);
@@ -264,7 +272,7 @@ public class JdbcOperation {
 	
 	public ResultSet query(String sql, Map<String, ?> paramValues, List<?> wildcardValues) {
 		PreparedStatement prepStmt = prepareStatement(sql, paramValues, wildcardValues);
-		try {
+		try {			
 			return prepStmt.executeQuery();
 		} catch (SQLException e) {
 			throw new SqlException(e);

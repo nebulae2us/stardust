@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nebulae2us.stardust.dao.domain;
+package org.nebulae2us.stardust.dao.domain;
 
 import java.sql.Blob;
 import java.sql.Clob;
@@ -36,7 +36,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.nebulae2us.stardust.dao.domain.GenericDataReader;
 import org.nebulae2us.stardust.sql.domain.DataReader;
 
-import com.nebulae2us.stardust.BaseIntegrationTest;
+import org.nebulae2us.stardust.BaseIntegrationTest;
 
 import static org.junit.Assert.*;
 
@@ -45,7 +45,7 @@ import static org.junit.Assert.*;
  *
  */
 @RunWith(Parameterized.class)
-public class JdbcOperation_prepareStatement_IT extends BaseIntegrationTest {
+public class JdbcExecutor_prepareStatement_IT extends BaseIntegrationTest {
 	
 	@Parameters
 	public static Collection<Object[]> data() {
@@ -55,7 +55,7 @@ public class JdbcOperation_prepareStatement_IT extends BaseIntegrationTest {
 	}
 	
 	
-	public JdbcOperation_prepareStatement_IT(String configuration) {
+	public JdbcExecutor_prepareStatement_IT(String configuration) {
 		super(configuration);
 	}
 	
@@ -87,7 +87,7 @@ public class JdbcOperation_prepareStatement_IT extends BaseIntegrationTest {
 	}
 	
 	private <T> void testQuery(Class<T> expectedClass, T expectedValue, String sqlTest, Object ... values) throws SQLException {
-		PreparedStatement prepStmt = jdbcOperation.prepareStatement(sqlTest, Arrays.asList(values));
+		PreparedStatement prepStmt = jdbcExecutor.prepareStatement(sqlTest, Arrays.asList(values));
 		
 		ResultSet rs = prepStmt.executeQuery();
 		DataReader dataReader = new GenericDataReader(rs);
@@ -128,8 +128,8 @@ public class JdbcOperation_prepareStatement_IT extends BaseIntegrationTest {
 	
 	}
 	
-	private <T> void _test_null(Class<T> expectedClass, String sqlTest, Object ... values) throws SQLException {
-		PreparedStatement prepStmt = jdbcOperation.prepareStatement(sqlTest, Arrays.asList(values));
+	private <T> void jdbcExecutor_test_null(Class<T> expectedClass, String sqlTest, Object ... values) throws SQLException {
+		PreparedStatement prepStmt = jdbcExecutor.prepareStatement(sqlTest, Arrays.asList(values));
 		
 		ResultSet rs = prepStmt.executeQuery();
 		DataReader dataReader = new GenericDataReader(rs);
@@ -150,23 +150,23 @@ public class JdbcOperation_prepareStatement_IT extends BaseIntegrationTest {
 		}
 		
 		
-		_test_null(Long.class, "select ? from jdbc_test", (Object)null);
-		_test_null(Integer.class, "select ? from jdbc_test", (Object)null);
-		_test_null(Short.class, "select ? from jdbc_test", (Object)null);
-		_test_null(Byte.class, "select ? from jdbc_test", (Object)null);
-		_test_null(Double.class, "select ? from jdbc_test", (Object)null);
-		_test_null(Float.class, "select ? from jdbc_test", (Object)null);
-		_test_null(Boolean.class, "select ? from jdbc_test", (Object)null);
-		_test_null(String.class, "select ? from jdbc_test", (Object)null);
-		_test_null(Character.class, "select ? from jdbc_test", (Object)null);
-		_test_null(Date.class, "select ? from jdbc_test", (Object)null);
-		_test_null(Time.class, "select ? from jdbc_test", (Object)null);
-		_test_null(Timestamp.class, "select ? from jdbc_test", (Object)null);
-		_test_null(java.util.Date.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Long.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Integer.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Short.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Byte.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Double.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Float.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Boolean.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(String.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Character.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Date.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Time.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Timestamp.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(java.util.Date.class, "select ? from jdbc_test", (Object)null);
 		
-		_test_null(byte[].class, "select ? from jdbc_test", (Object)null);
-		_test_null(Clob.class, "select ? from jdbc_test", (Object)null);
-		_test_null(Blob.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(byte[].class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Clob.class, "select ? from jdbc_test", (Object)null);
+		jdbcExecutor_test_null(Blob.class, "select ? from jdbc_test", (Object)null);
 	
 	}
 	
@@ -177,48 +177,48 @@ public class JdbcOperation_prepareStatement_IT extends BaseIntegrationTest {
 		if (configuration.startsWith("derby")) return;
 		
 		
-		_test_null(Long.class, "select null from jdbc_test");
-		_test_null(Integer.class, "select null from jdbc_test");
-		_test_null(Short.class, "select null from jdbc_test");
-		_test_null(Byte.class, "select null from jdbc_test");
-		_test_null(Double.class, "select null from jdbc_test");
-		_test_null(Float.class, "select null from jdbc_test");
-		_test_null(Boolean.class, "select null from jdbc_test");
-		_test_null(String.class, "select null from jdbc_test");
-		_test_null(Character.class, "select null from jdbc_test");
-		_test_null(Date.class, "select null from jdbc_test");
-		_test_null(Time.class, "select null from jdbc_test");
-		_test_null(Timestamp.class, "select null from jdbc_test");
-		_test_null(java.util.Date.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Long.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Integer.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Short.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Byte.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Double.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Float.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Boolean.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(String.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Character.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Date.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Time.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Timestamp.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(java.util.Date.class, "select null from jdbc_test");
 		
-		_test_null(byte[].class, "select null from jdbc_test");
-		_test_null(Clob.class, "select null from jdbc_test");
-		_test_null(Blob.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(byte[].class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Clob.class, "select null from jdbc_test");
+		jdbcExecutor_test_null(Blob.class, "select null from jdbc_test");
 	
 	}
 	
 	@Test
 	public void retrieve_null_int() throws Exception {
-		_test_null(Long.class, "select cast(null as int) from jdbc_test");
-		_test_null(Integer.class, "select cast(null as int) from jdbc_test");
-		_test_null(Short.class, "select cast(null as int) from jdbc_test");
-		_test_null(Byte.class, "select cast(null as int) from jdbc_test");
-		_test_null(Double.class, "select cast(null as int) from jdbc_test");
-		_test_null(Float.class, "select cast(null as int) from jdbc_test");
-		_test_null(Boolean.class, "select cast(null as int) from jdbc_test");
-		_test_null(String.class, "select cast(null as int) from jdbc_test");
-		_test_null(Character.class, "select cast(null as int) from jdbc_test");
-		_test_null(Date.class, "select cast(null as int) from jdbc_test");
-		_test_null(Time.class, "select cast(null as int) from jdbc_test");
-		_test_null(Timestamp.class, "select cast(null as int) from jdbc_test");
-		_test_null(java.util.Date.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Long.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Integer.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Short.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Byte.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Double.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Float.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Boolean.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(String.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Character.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Date.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Time.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Timestamp.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(java.util.Date.class, "select cast(null as int) from jdbc_test");
 		
-		_test_null(byte[].class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(byte[].class, "select cast(null as int) from jdbc_test");
 		
 		if (configuration.startsWith("derby")) return;
 		
-		_test_null(Clob.class, "select cast(null as int) from jdbc_test");
-		_test_null(Blob.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Clob.class, "select cast(null as int) from jdbc_test");
+		jdbcExecutor_test_null(Blob.class, "select cast(null as int) from jdbc_test");
 		
 	}
 	

@@ -13,15 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.nebulae2us.stardust.api;
+package org.nebulae2us.stardust.api;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
-import org.nebulae2us.stardust.api.QueryManager;
+import org.nebulae2us.stardust.api.DaoManager;
 import org.nebulae2us.stardust.ddl.domain.H2DDLGenerator;
+import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.jpa.group1.BasicName;
 import org.nebulae2us.stardust.jpa.group1.BedRoom;
 import org.nebulae2us.stardust.jpa.group1.Bungalow;
@@ -38,22 +39,22 @@ import org.nebulae2us.stardust.translate.domain.InsertEntityTranslator;
 import org.nebulae2us.stardust.translate.domain.Translator;
 import org.nebulae2us.stardust.translate.domain.TranslatorController;
 
-import com.nebulae2us.stardust.BaseIntegrationTest;
+import org.nebulae2us.stardust.BaseIntegrationTest;
 import static org.junit.Assert.*;
 
 /**
  * @author Trung Phan
  *
  */
-public class QueryManager_H2_IT extends BaseIntegrationTest {
+public class DaoManager_H2_IT extends BaseIntegrationTest {
 
 	private final EntityRepository entityRepository;
 	
-	private final QueryManager queryManager;
+	private final DaoManager daoManager;
 	
 	private final TranslatorController controller;
 	
-	public QueryManager_H2_IT() {
+	public DaoManager_H2_IT() {
 		super("h2-in-memory");
 		
 		this.entityRepository = new EntityRepository();
@@ -63,13 +64,13 @@ public class QueryManager_H2_IT extends BaseIntegrationTest {
 		translators.add(new InsertEntityTranslator());
 		
 		this.controller = new CommonTranslatorController(translators);
-		this.queryManager = new QueryManager(jdbcOperation, entityRepository, controller);
+		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, controller, new H2Dialect());
 		
 		H2DDLGenerator generator = new H2DDLGenerator();
 		List<String> ddlSqls = generator.generateTable(entityRepository);
 		
 		for (String ddlSql : ddlSqls) {
-			jdbcOperation.execute(ddlSql);
+			jdbcExecutor.execute(ddlSql);
 		}
 	}
 
@@ -81,9 +82,9 @@ public class QueryManager_H2_IT extends BaseIntegrationTest {
 		person.setName(new BasicName());
 		person.getName().setFirstName("test first name");
 		
-		queryManager.save(person);
+		daoManager.save(person);
 		
-		List<Person> people = queryManager.newQuery(Person.class).list();
+		List<Person> people = daoManager.newQuery(Person.class).list();
 
 		assertEquals(1, people.size());
 		
@@ -97,14 +98,14 @@ public class QueryManager_H2_IT extends BaseIntegrationTest {
 		
 		Person person = new Person("123-12-1234", new Date(0));
 		
-		queryManager.save(person);
+		daoManager.save(person);
 		
 		Passport passport = new Passport(100);
 		passport.setOwner(person);
 		
-		queryManager.save(passport);
+		daoManager.save(passport);
 		
-		List<Passport> passports = queryManager.newQuery(Passport.class).outerJoin("owner", "o").list();
+		List<Passport> passports = daoManager.newQuery(Passport.class).outerJoin("owner", "o").list();
 		
 		assertEquals(1, passports.size());
 		assertEquals(100, passports.get(0).getPassportNumber());
@@ -123,10 +124,10 @@ public class QueryManager_H2_IT extends BaseIntegrationTest {
 		House house = new House(10, "a");
 		house.setBedroomCount(3);
 		
-		queryManager.save(house);
+		daoManager.save(house);
 		
 		
-		house = queryManager.newQuery(House.class).uniqueValue();
+		house = daoManager.newQuery(House.class).uniqueValue();
 		assertEquals(10, house.getHouseId().getHouseId());
 		assertEquals("a", house.getHouseId().getHouseLetter());
 		assertEquals(3, house.getBedroomCount());
@@ -136,15 +137,15 @@ public class QueryManager_H2_IT extends BaseIntegrationTest {
 	@Test
 	public void save_castle() {
 		CastleAssociation castleAssociation = new CastleAssociation(20L);
-		queryManager.save(castleAssociation);
+		daoManager.save(castleAssociation);
 		
 		Castle castle = new Castle(10, "a");
 		castle.setCastleAssociation(castleAssociation);
 		
-		queryManager.save(castle);
+		daoManager.save(castle);
 		
 		
-		House house = queryManager.newQuery(House.class).uniqueValue();
+		House house = daoManager.newQuery(House.class).uniqueValue();
 		
 		assertTrue(house instanceof Castle);
 
@@ -159,14 +160,14 @@ public class QueryManager_H2_IT extends BaseIntegrationTest {
 		
 		Person person = new Person("123-12-1234", new Date(0));
 		
-		queryManager.save(person);
+		daoManager.save(person);
 
 		person.setName(new BasicName());
 		person.getName().setFirstName("test first name");
 
-		queryManager.update(person);
+		daoManager.update(person);
 		
-		List<Person> people = queryManager.newQuery(Person.class).list();
+		List<Person> people = daoManager.newQuery(Person.class).list();
 
 		assertEquals(1, people.size());
 		

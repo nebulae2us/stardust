@@ -19,11 +19,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
+import org.nebulae2us.stardust.exception.IllegalSyntaxException;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.LogicalExpression;
 import org.nebulae2us.stardust.expr.domain.OrderExpression;
@@ -68,9 +70,16 @@ public class QueryTranslator implements Translator {
 		sql.append(selectResult.getItem1());
 		scalarValues.addAll(selectResult.getItem2());
 		
-		Pair<String, List<?>> fromResult = toFromClause(context, queryExpression, paramValues);
-		sql.append("\n  from ").append(fromResult.getItem1());
-		scalarValues.addAll(fromResult.getItem2());
+		if (queryExpression.isBackedBySql()) {
+			Pair<String, List<?>> fromResult = transformSql(queryExpression.getSql(), paramValues);
+			sql.append("\n from (").append(fromResult.getItem1()).append(')');
+			scalarValues.addAll(fromResult.getItem2());
+		}
+		else {
+			Pair<String, List<?>> fromResult = toFromClause(context, queryExpression, paramValues);
+			sql.append("\n  from ").append(fromResult.getItem1());
+			scalarValues.addAll(fromResult.getItem2());
+		}
 		
 		Pair<String, List<?>> whereResult = toWhereClause(context, queryExpression, paramValues);
 		if (whereResult.getItem1().length() > 0) {
@@ -87,6 +96,54 @@ public class QueryTranslator implements Translator {
 		
 		return new Pair<String, List<?>>(sql.toString(), scalarValues);
 	}
+	
+	private Pair<String, List<?>> transformSql(String sql, ParamValues paramValues) {
+		List<Object> values = new ArrayList<Object>();
+		StringBuilder newSql = new StringBuilder();
+		
+		int length = sql.length();
+		
+		boolean inParam = false;
+		StringBuilder paramNameBuilder = null;
+		
+		for (int i = 0, j = 0; i <= length; i++) {
+			char c = i < length ? sql.charAt(i) : '\0';
+			if (c == '?') {
+				if (inParam) {
+					throw new IllegalSyntaxException("Invalid parameter expression \":" + paramNameBuilder.toString() + "\"");
+				}
+				values.add(paramValues.getNextWildcardValue());
+				newSql.append(c);
+			}
+			else if (c == ':') {
+				if (inParam) {
+					throw new IllegalSyntaxException("Invalid parameter expression \":" + paramNameBuilder.toString() + "\"");
+				}
+				
+				paramNameBuilder = new StringBuilder();
+				inParam = true;
+			}
+			else if (inParam) {
+				if (c >= 'a' && c <= 'z' || c >= 'A' && c <= 'Z' || c >= '0' && c < '9' || c == '_' || c == '$' || c == '#') {
+					paramNameBuilder.append(c);
+				}
+				else {
+					inParam = false;
+					String paramName = paramNameBuilder.toString();
+					paramNameBuilder = null;
+					values.add(paramValues.getParamValue(paramName));
+					newSql.append('?').append(c);
+				}
+			}
+			else {
+				newSql.append(c);
+			}
+		}
+
+		newSql.deleteCharAt(newSql.length() - 1);
+		
+		return new Pair<String, List<?>>(newSql.toString(), values);
+	}	
 
 	private List<ColumnHolder> extractAllColumns(TranslatorContext context) {
 		
@@ -141,13 +198,17 @@ public class QueryTranslator implements Translator {
 
 		if (queryExpression.getSelectors().size() == 0) {
 			
-			for (ColumnHolder columnHolder : columnHolders) {
-				result.append(columnHolder.tableAlias).append('.').append(columnHolder.column.getName())
-				.append(" as ").append(columnHolder.alias.length() == 0 ? "" : columnHolder.alias + '_').append(columnHolder.column.getName())
-				.append(",\n       ");
+			if (queryExpression.isBackedBySql()) {
+				result.append('*');
 			}
-			
-			result.delete(result.length() - 9, result.length());
+			else {
+				for (ColumnHolder columnHolder : columnHolders) {
+					result.append(columnHolder.tableAlias).append('.').append(columnHolder.column.getName())
+					.append(" as ").append(columnHolder.alias.length() == 0 ? "" : columnHolder.alias + '_').append(columnHolder.column.getName())
+					.append(",\n       ");
+				}
+				result.delete(result.length() - 9, result.length());
+			}
 		}
 		else {
 			

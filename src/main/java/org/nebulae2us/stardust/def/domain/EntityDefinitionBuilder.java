@@ -15,16 +15,17 @@
  */
 package org.nebulae2us.stardust.def.domain;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.nebulae2us.electron.Converter;
+import org.nebulae2us.electron.DefaultDestinationClassResolver;
+import org.nebulae2us.electron.DestinationClassResolver;
 import org.nebulae2us.electron.util.Immutables;
+import org.nebulae2us.stardust.api.NewEntityDetector;
+import org.nebulae2us.stardust.generator.IdentifierGenerator;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
-import org.nebulae2us.stardust.my.domain.RelationalType;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -32,13 +33,11 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  * @author Trung Phan
  *
  */
-public class EntityDefinitionBuilder extends AttributeRelationshipHolderDefinitionBuilder<EntityDefinitionBuilder> {
+public class EntityDefinitionBuilder extends SemiEntityDefinitionBuilder<EntityDefinitionBuilder> {
 	
 	private final Class<?> entityClass;
 	
 	private String tableName;
-	
-	private final List<String> identifiers = new ArrayList<String>();
 	
 	/**
 	 * Key is secondary table name, List<String> is the list of joins
@@ -51,6 +50,8 @@ public class EntityDefinitionBuilder extends AttributeRelationshipHolderDefiniti
 	
 	private Object discriminatorValue;
 	
+	private NewEntityDetector newEntityDetector;
+	
 	public EntityDefinitionBuilder(Class<?> entityClass) {
 		this.entityClass = entityClass;
 	}
@@ -60,18 +61,8 @@ public class EntityDefinitionBuilder extends AttributeRelationshipHolderDefiniti
 		return this;
 	}
 
-	public EntityDefinitionBuilder identifier(Object ... attributeLocators ) {
-		for (Object attributeLocator : attributeLocators) {
-			String attributeName = attributeLocator.toString();
-			if (!this.identifiers.contains(attributeName)) {
-				this.identifiers.add(attributeName);
-			}
-		}
-		return this;
-	}
-	
 	public EntityDefinition toEntityDefinition() {
-		return new Converter().convert(this).to(EntityDefinition.class);
+		return new Converter(new DefaultDestinationClassResolver(), true).convert(this).to(EntityDefinition.class);
 	}
 
 	public SecondaryTableBuilder joinSecondaryTable(String secondaryTableName) {
@@ -95,6 +86,10 @@ public class EntityDefinitionBuilder extends AttributeRelationshipHolderDefiniti
 		return this;
 	}
 	
+	public EntityDefinitionBuilder newEntityDetector(NewEntityDetector newEntityDetector) {
+		this.newEntityDetector = newEntityDetector;
+		return this;
+	}
 	
 	public class SecondaryTableBuilder {
 		private final String secondaryTableName;
