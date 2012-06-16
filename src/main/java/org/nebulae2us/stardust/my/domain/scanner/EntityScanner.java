@@ -46,8 +46,8 @@ import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;
 import org.nebulae2us.stardust.my.domain.ValueObjectAttributeBuilder;
 import org.nebulae2us.stardust.my.domain.ValueObjectBuilder;
 
-import static org.nebulae2us.stardust.Builders.*;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+import static org.nebulae2us.stardust.internal.util.Builders.*;
 
 /**
  * 

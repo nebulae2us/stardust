@@ -31,7 +31,7 @@
  * SelectExpression.parse(), PredicateExpression.parse(), OrderExpression.parse().
  * And these are called from Filter
  * 
- * @see org.nebulae2us.stardust.api.Filter#toExpression()
+ * @see org.nebulae2us.stardust.Filter#toExpression()
  * @author Trung Phan
  */
 package org.nebulae2us.stardust.expr.domain;

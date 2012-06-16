@@ -33,7 +33,8 @@ public class TranslatorController {
 	}
 	
 	public Translator findTranslator(Expression expression, ParamValues paramValues) {
-		for (Translator translator : translators) {
+		for (int i = translators.size() - 1; i >= 0; i--) {
+			Translator translator = translators.get(i);
 			if (translator.accept(expression, paramValues)) {
 				return translator;
 			}

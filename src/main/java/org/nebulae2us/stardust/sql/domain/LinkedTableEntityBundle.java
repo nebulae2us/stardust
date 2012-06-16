@@ -37,9 +37,9 @@ import org.nebulae2us.stardust.my.domain.EntityAttribute;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 
-import static org.nebulae2us.stardust.Builders.linkedTableEntity;
-import static org.nebulae2us.stardust.Builders.linkedTableEntityBundle;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+import static org.nebulae2us.stardust.internal.util.Builders.linkedTableEntity;
+import static org.nebulae2us.stardust.internal.util.Builders.linkedTableEntityBundle;
 
 /**
  * @author Trung Phan

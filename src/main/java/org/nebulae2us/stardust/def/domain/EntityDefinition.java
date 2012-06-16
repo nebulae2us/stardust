@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.nebulae2us.electron.Mirror;
-import org.nebulae2us.stardust.api.NewEntityDetector;
+import org.nebulae2us.stardust.NewEntityDetector;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
 
 /**

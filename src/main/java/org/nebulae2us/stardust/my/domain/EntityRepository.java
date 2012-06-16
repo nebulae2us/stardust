@@ -25,8 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.nebulae2us.electron.Converter;
-import org.nebulae2us.stardust.Builders;
 import org.nebulae2us.stardust.def.domain.EntityDefinition;
+import org.nebulae2us.stardust.internal.util.Builders;
 import org.nebulae2us.stardust.my.domain.scanner.EntityScanner;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 

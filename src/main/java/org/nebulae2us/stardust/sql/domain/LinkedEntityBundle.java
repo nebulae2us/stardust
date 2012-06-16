@@ -15,7 +15,6 @@
  */
 package org.nebulae2us.stardust.sql.domain;
 
-import static org.nebulae2us.stardust.Builders.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +30,7 @@ import org.nebulae2us.stardust.my.domain.EntityAttribute;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+import static org.nebulae2us.stardust.internal.util.Builders.*;
 
 /**
  * @author Trung Phan

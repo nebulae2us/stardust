@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nebulae2us.electron.Pair;
-import org.nebulae2us.stardust.api.Query;
+import org.nebulae2us.stardust.Query;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.InListExpression;
 import org.nebulae2us.stardust.expr.domain.NamedParamExpression;

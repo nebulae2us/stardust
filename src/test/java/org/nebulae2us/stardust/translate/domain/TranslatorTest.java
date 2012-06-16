@@ -38,7 +38,7 @@ import org.nebulae2us.stardust.sql.domain.AliasJoinBuilder;
 import org.nebulae2us.stardust.sql.domain.LinkedEntityBundle;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
 
-import static org.nebulae2us.stardust.Builders.*;
+import static org.nebulae2us.stardust.internal.util.Builders.*;
 import static org.junit.Assert.*;
 
 /**

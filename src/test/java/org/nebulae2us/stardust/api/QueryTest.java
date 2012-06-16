@@ -24,6 +24,7 @@ import mockit.Mocked;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.nebulae2us.stardust.DaoManager;
 import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.jpa.group1.House;

@@ -1,5 +1,5 @@
 
-package org.nebulae2us.stardust;
+package org.nebulae2us.stardust.internal.util;
 
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;

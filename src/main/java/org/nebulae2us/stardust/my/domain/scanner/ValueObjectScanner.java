@@ -15,15 +15,15 @@
  */
 package org.nebulae2us.stardust.my.domain.scanner;
 
-import static org.nebulae2us.stardust.Builders.*;
+import static org.nebulae2us.stardust.internal.util.Builders.*;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nebulae2us.stardust.Builders;
 import org.nebulae2us.stardust.def.domain.DefinitionRepository;
 import org.nebulae2us.stardust.def.domain.ValueObjectDefinition;
+import org.nebulae2us.stardust.internal.util.Builders;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
 import org.nebulae2us.stardust.my.domain.FetchType;
 import org.nebulae2us.stardust.my.domain.ScalarAttributeBuilder;

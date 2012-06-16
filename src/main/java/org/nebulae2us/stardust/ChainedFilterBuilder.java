@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.api;
-
-import java.util.List;
+package org.nebulae2us.stardust;
 
 import org.nebulae2us.electron.Converter;
 import org.nebulae2us.electron.DestinationClassResolverByAnnotation;
@@ -25,51 +23,17 @@ import org.nebulae2us.electron.Procedure;
  * @author Trung Phan
  *
  */
-public class FilterBuilder extends BaseFilterBuilder {
+public class ChainedFilterBuilder<P> extends BaseFilterBuilder {
 
-	public FilterBuilder() {
-	}
+	private final P parent;
 
-	public FilterBuilder(String expression, List<Object> values) {
-		super(expression, values);
-	}	
-	
-	public FilterBuilder(String expression, Object ... values) {
-		super(expression, values);
-	}	
-	
-	public FilterBuilder(boolean negated, String expression, List<Object> values) {
-		super(negated, expression, values);
+	private final Procedure callback;
+
+	public ChainedFilterBuilder(P parent, Procedure callback) {
+		this.parent = parent;
+		this.callback = callback;
 	}
 	
-	public FilterBuilder(boolean negated, String expression, Object ... values) {
-		super(negated, expression, values);
-	}
-	
-	public boolean isNegated() {
-		return negated;
-	}
-
-	public void setNegated(boolean negated) {
-		this.negated = negated;
-	}
-
-	public String getExpression() {
-		return expression;
-	}
-
-	public void setExpression(String expression) {
-		this.expression = expression;
-	}
-
-	public List<Object> getValues() {
-		return values;
-	}
-
-	public void setValues(List<Object> values) {
-		this.values = values;
-	}
-
 	@Override
 	public RootBuilder3 predicate(String expression, Object ... values) {
 		super.predicate(expression, values);
@@ -101,9 +65,6 @@ public class FilterBuilder extends BaseFilterBuilder {
 		});
 	}
 	
-	public Filter toFilter() {
-		return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(Filter.class);
-	}
 	
 	public class RootBuilder3 extends BaseFilterBuilder.RootBuilder {
 		
@@ -117,9 +78,13 @@ public class FilterBuilder extends BaseFilterBuilder {
 			return new ConnectBuilder<RootBuilder3>(this, "or");
 		}
 		
-		public Filter toFilter() {
-			return FilterBuilder.this.toFilter();
+		public P endFilter() {
+			Filter filter = new Converter(new DestinationClassResolverByAnnotation(), true).convert(ChainedFilterBuilder.this).to(Filter.class);
+			ChainedFilterBuilder.this.callback.execute(filter);
+			return ChainedFilterBuilder.this.parent;
 		}
 		
-	}	
+	}
+	
+	
 }

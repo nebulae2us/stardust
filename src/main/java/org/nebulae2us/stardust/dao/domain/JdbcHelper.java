@@ -242,6 +242,199 @@ public class JdbcHelper {
 		return queryFor(Boolean.class, sql, paramValues, wildcardValues);
 	}
 	
+	
+	public String queryForString(String sql, List<?> wildcardValues) {
+		return queryFor(String.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Long queryForLong(String sql, List<?> wildcardValues) {
+		return queryFor(Long.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Integer queryForInt(String sql, List<?> wildcardValues) {
+		return queryFor(Integer.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Double queryForDouble(String sql, List<?> wildcardValues) {
+		return queryFor(Double.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Float queryForFloat(String sql, List<?> wildcardValues) {
+		return queryFor(Float.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Short queryForShort(String sql, List<?> wildcardValues) {
+		return queryFor(Short.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Byte queryForByte(String sql, List<?> wildcardValues) {
+		return queryFor(Byte.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public byte[] queryForBytes(String sql, List<?> wildcardValues) {
+		return queryFor(byte[].class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Blob queryForBlob(String sql, List<?> wildcardValues) {
+		return queryFor(Blob.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Clob queryForClob(String sql, List<?> wildcardValues) {
+		return queryFor(Clob.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Date queryForDate(String sql, List<?> wildcardValues) {
+		return queryFor(java.sql.Date.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Time queryForTime(String sql, List<?> wildcardValues) {
+		return queryFor(Time.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Date queryForTimestamp(String sql, List<?> wildcardValues) {
+		return queryFor(Timestamp.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public BigDecimal queryForBigDecimal(String sql, List<?> wildcardValues) {
+		return queryFor(BigDecimal.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public BigInteger queryForBigInteger(String sql, List<?> wildcardValues) {
+		return queryFor(BigInteger.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public Boolean queryForBoolean(String sql, List<?> wildcardValues) {
+		return queryFor(Boolean.class, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	public String queryForString(String sql, Map<String,?> paramValues) {
+		return queryFor(String.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Long queryForLong(String sql, Map<String,?> paramValues) {
+		return queryFor(Long.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Integer queryForInt(String sql, Map<String,?> paramValues) {
+		return queryFor(Integer.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Double queryForDouble(String sql, Map<String,?> paramValues) {
+		return queryFor(Double.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Float queryForFloat(String sql, Map<String,?> paramValues) {
+		return queryFor(Float.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Short queryForShort(String sql, Map<String,?> paramValues) {
+		return queryFor(Short.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Byte queryForByte(String sql, Map<String,?> paramValues) {
+		return queryFor(Byte.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public byte[] queryForBytes(String sql, Map<String,?> paramValues) {
+		return queryFor(byte[].class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Blob queryForBlob(String sql, Map<String,?> paramValues) {
+		return queryFor(Blob.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Clob queryForClob(String sql, Map<String,?> paramValues) {
+		return queryFor(Clob.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Date queryForDate(String sql, Map<String,?> paramValues) {
+		return queryFor(java.sql.Date.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Time queryForTime(String sql, Map<String,?> paramValues) {
+		return queryFor(Time.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Date queryForTimestamp(String sql, Map<String,?> paramValues) {
+		return queryFor(Timestamp.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public BigDecimal queryForBigDecimal(String sql, Map<String,?> paramValues) {
+		return queryFor(BigDecimal.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public BigInteger queryForBigInteger(String sql, Map<String,?> paramValues) {
+		return queryFor(BigInteger.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public Boolean queryForBoolean(String sql, Map<String,?> paramValues) {
+		return queryFor(Boolean.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public String queryForString(String sql) {
+		return queryFor(String.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Long queryForLong(String sql) {
+		return queryFor(Long.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Integer queryForInt(String sql) {
+		return queryFor(Integer.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Double queryForDouble(String sql) {
+		return queryFor(Double.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Float queryForFloat(String sql) {
+		return queryFor(Float.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Short queryForShort(String sql) {
+		return queryFor(Short.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Byte queryForByte(String sql) {
+		return queryFor(Byte.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public byte[] queryForBytes(String sql) {
+		return queryFor(byte[].class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Blob queryForBlob(String sql) {
+		return queryFor(Blob.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Clob queryForClob(String sql) {
+		return queryFor(Clob.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Date queryForDate(String sql) {
+		return queryFor(java.sql.Date.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Time queryForTime(String sql) {
+		return queryFor(Time.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Date queryForTimestamp(String sql) {
+		return queryFor(Timestamp.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public BigDecimal queryForBigDecimal(String sql) {
+		return queryFor(BigDecimal.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public BigInteger queryForBigInteger(String sql) {
+		return queryFor(BigInteger.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
+	public Boolean queryForBoolean(String sql) {
+		return queryFor(Boolean.class, sql, Immutables.emptyStringMap(), Immutables.emptyList());
+	}
+	
 	public int update(String sql, List<?> wildcardValues) {
 		return jdbcExecutor.update(sql, wildcardValues);
 	}

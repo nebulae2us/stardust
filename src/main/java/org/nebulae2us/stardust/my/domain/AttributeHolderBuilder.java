@@ -5,6 +5,7 @@ import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
 import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.ColumnBuilder;
+import org.nebulae2us.stardust.internal.util.Builders;
 
 @Builder(destination=AttributeHolder.class)
 public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {

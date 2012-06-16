@@ -16,6 +16,7 @@
 package org.nebulae2us.stardust.api;
 
 import org.junit.Test;
+import org.nebulae2us.stardust.BaseFilterBuilder;
 
 import static org.junit.Assert.*;
 

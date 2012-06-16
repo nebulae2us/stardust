@@ -27,7 +27,7 @@ import mockit.NonStrict;
 
 import org.junit.Before;
 import org.nebulae2us.electron.Pair;
-import org.nebulae2us.stardust.api.Query;
+import org.nebulae2us.stardust.Query;
 import org.nebulae2us.stardust.expr.domain.AttributeExpression;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.NamedParamExpression;

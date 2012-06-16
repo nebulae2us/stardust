@@ -13,38 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.translate.domain;
+package org.nebulae2us.stardust.translate.domain.mysql;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.nebulae2us.electron.Pair;
-import org.nebulae2us.stardust.Query;
+import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.expr.domain.Expression;
-import org.nebulae2us.stardust.expr.domain.WildcardExpression;
+import org.nebulae2us.stardust.expr.domain.LastIdentityQueryExpression;
+import org.nebulae2us.stardust.translate.domain.ParamValues;
+import org.nebulae2us.stardust.translate.domain.Translator;
+import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 
 /**
  * @author Trung Phan
  *
  */
-public class WildcardTranslator implements Translator {
+public class MySQLLastIdentityQueryTranslator implements Translator {
 
-	public boolean accept(Expression expression, ParamValues paramToValue) {
-		return expression instanceof WildcardExpression;
+	public boolean accept(Expression expression, ParamValues paramValues) {
+		return expression instanceof LastIdentityQueryExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context, 
+	public Pair<String, List<?>> translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
-		Object value = paramValues.getNextWildcardValue();
-		
-		if (value instanceof Query) {
-			Pair<String, List<?>> subQueryTranslationResult = ((Query)value).translate();
-			return new Pair<String, List<?>>("(" + subQueryTranslationResult.getItem1() + ")", subQueryTranslationResult.getItem2());
-		}
-		
-		return new Pair<String, List<?>>("?", Collections.singletonList(value));
-		
+		return new Pair<String, List<?>>("select last_insert_id()", Immutables.emptyList());
 	}
 
 }

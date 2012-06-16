@@ -13,38 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.translate.domain;
+package org.nebulae2us.stardust.translate.domain.db2;
 
-import java.util.Collections;
 import java.util.List;
 
 import org.nebulae2us.electron.Pair;
-import org.nebulae2us.stardust.Query;
+import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.expr.domain.Expression;
-import org.nebulae2us.stardust.expr.domain.NamedParamExpression;
+import org.nebulae2us.stardust.expr.domain.SequenceQueryExpression;
+import org.nebulae2us.stardust.translate.domain.ParamValues;
+import org.nebulae2us.stardust.translate.domain.Translator;
+import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 
 /**
  * @author Trung Phan
  *
  */
-public class NamedParamTranslator implements Translator {
+public class DB2SequenceQueryTranslator implements Translator {
 
 	public boolean accept(Expression expression, ParamValues paramValues) {
-		return expression instanceof NamedParamExpression;
+		return expression instanceof SequenceQueryExpression;
 	}
 
 	public Pair<String, List<?>> translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
-		NamedParamExpression namedParamExpression = (NamedParamExpression)expression;
+		SequenceQueryExpression sequenceExpression = (SequenceQueryExpression)expression;
 		
-		Object value = paramValues.getParamValue(namedParamExpression.getParamName());
-		if (value instanceof Query) {
-			Pair<String, List<?>> subQueryTranslationResult = ((Query)value).translate();
-			return new Pair<String, List<?>>("(" + subQueryTranslationResult.getItem1() + ")", subQueryTranslationResult.getItem2());
-		}
+		String sql = "select nextval for " + sequenceExpression.getSequenceName() + " from sysibm.sysdummy1";
 		
-		return new Pair<String, List<?>>("?", Collections.singletonList(value));
+		return new Pair<String, List<?>>(sql, Immutables.emptyList());
 	}
 
 }

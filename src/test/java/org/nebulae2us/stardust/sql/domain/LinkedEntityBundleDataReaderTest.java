@@ -29,7 +29,7 @@ import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 
 import static org.junit.Assert.*;
-import static org.nebulae2us.stardust.Builders.*;
+import static org.nebulae2us.stardust.internal.util.Builders.*;
 
 /**
  * @author Trung Phan

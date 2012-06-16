@@ -58,16 +58,26 @@ public class QueryTranslator implements Translator {
 
 		QueryExpression queryExpression = (QueryExpression)expression;
 		
+		if (queryExpression.getFirstResult() > 0 || queryExpression.getMaxResults() > 0) {
+			throw new UnsupportedOperationException(String.format("firstResult and maxResults are not supported for the current dialect %s", context.getDialect().getClass().getSimpleName()));
+		}
+		
 		StringBuilder sql = new StringBuilder();
 		List<Object> scalarValues = new ArrayList<Object>();
 
 		Pair<String, List<?>> selectResult = toSelectClause(context, queryExpression, paramValues);
-		sql.append("select ");
-		if (queryExpression.isDistinct()) {
-			sql.append("distinct ");
+		
+		if (!queryExpression.isCount()) {
+			sql.append("select ");
+			if (queryExpression.isDistinct()) {
+				sql.append("distinct ");
+			}
+			sql.append(selectResult.getItem1());
+			scalarValues.addAll(selectResult.getItem2());
 		}
-		sql.append(selectResult.getItem1());
-		scalarValues.addAll(selectResult.getItem2());
+		else {
+			sql.append("select count(*)");
+		}
 		
 		if (queryExpression.isBackedBySql()) {
 			Pair<String, List<?>> fromResult = transformSql(queryExpression.getSql(), paramValues);
@@ -87,9 +97,12 @@ public class QueryTranslator implements Translator {
 		}
 
 		Pair<String, List<?>> orderResult = toOrderClause(context, queryExpression, paramValues);
-		if (orderResult.getItem1().length() > 0) {
-			sql.append("\n order by ").append(orderResult.getItem1());
-			scalarValues.addAll(orderResult.getItem2());
+		
+		if (!queryExpression.isCount()) {
+			if (orderResult.getItem1().length() > 0) {
+				sql.append("\n order by ").append(orderResult.getItem1());
+				scalarValues.addAll(orderResult.getItem2());
+			}
 		}
 		
 		

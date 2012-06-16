@@ -15,7 +15,6 @@
  */
 package org.nebulae2us.stardust.my.domain.scanner;
 
-import static org.nebulae2us.stardust.Builders.*;
 
 import java.lang.reflect.Field;
 import java.sql.Blob;
@@ -45,6 +44,7 @@ import org.nebulae2us.stardust.internal.util.NameUtils;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+import static org.nebulae2us.stardust.internal.util.Builders.*;
 
 /**
  * @author Trung Phan

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.api;
+package org.nebulae2us.stardust;
 
 import static org.junit.Assert.assertEquals;
 
@@ -27,14 +27,13 @@ import javax.persistence.SequenceGenerator;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.nebulae2us.stardust.api.DaoManager;
 import org.nebulae2us.stardust.ddl.domain.H2DDLGenerator;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.translate.domain.CommonTranslatorController;
 
-import org.nebulae2us.stardust.BaseIntegrationTest;
+import org.nebulae2us.stardust.DaoManager;
 
 /**
  * @author Trung Phan

@@ -31,7 +31,7 @@ import org.nebulae2us.stardust.jpa.group1.Person;
 import org.nebulae2us.stardust.jpa.group1.Room;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 
-import static org.nebulae2us.stardust.Builders.*;
+import static org.nebulae2us.stardust.internal.util.Builders.*;
 import static org.junit.Assert.*;
 import static org.hamcrest.Matchers.*;
 import static org.nebulae2us.electron.util.Immutables.*;

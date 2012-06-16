@@ -5,6 +5,7 @@ import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
 import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.*;
+import org.nebulae2us.stardust.internal.util.Builders;
 
 @Builder(destination=AliasJoin.class)
 public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {

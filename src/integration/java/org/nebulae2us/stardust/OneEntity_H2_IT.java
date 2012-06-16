@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.api;
+package org.nebulae2us.stardust;
 
 import java.util.Date;
 import java.util.List;
@@ -24,14 +24,14 @@ import javax.persistence.Id;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.nebulae2us.stardust.api.DaoManager;
-import org.nebulae2us.stardust.api.OneEntity_H2_IT.Person;
+import org.nebulae2us.stardust.OneEntity_H2_IT.Person;
 import org.nebulae2us.stardust.ddl.domain.H2DDLGenerator;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.translate.domain.CommonTranslatorController;
 
-import org.nebulae2us.stardust.BaseIntegrationTest;
+import org.nebulae2us.stardust.DaoManager;
+
 import static org.junit.Assert.*;
 
 /**
@@ -118,5 +118,17 @@ public class OneEntity_H2_IT extends BaseIntegrationTest {
 		assertNull(person.dateBorn);
 		assertNull(person.id);
 		assertEquals("first", person.firstName);
+	}
+	
+	@Test
+	public void should_be_able_to_count() {
+		
+		should_be_able_to_insert_one_record();
+		
+		long count = daoManager.newQuery(Person.class)
+				.count();
+
+		assertEquals(1, count);
+		
 	}
 }

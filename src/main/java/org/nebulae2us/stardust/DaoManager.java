@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.api;
+package org.nebulae2us.stardust;
 
 import java.sql.ResultSet;
 import java.util.Collections;
@@ -21,11 +21,17 @@ import java.util.List;
 
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.Immutables;
+import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.stardust.dao.domain.ConnectionProvider;
 import org.nebulae2us.stardust.dao.domain.GenericDataReader;
 import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
 import org.nebulae2us.stardust.dao.domain.JdbcHelper;
+import org.nebulae2us.stardust.dialect.DB2Dialect;
 import org.nebulae2us.stardust.dialect.Dialect;
+import org.nebulae2us.stardust.dialect.H2Dialect;
+import org.nebulae2us.stardust.dialect.MySQLDialect;
+import org.nebulae2us.stardust.dialect.OracleDialect;
+import org.nebulae2us.stardust.dialect.SQLServerDialect;
 import org.nebulae2us.stardust.expr.domain.InsertEntityExpression;
 import org.nebulae2us.stardust.expr.domain.UpdateEntityExpression;
 import org.nebulae2us.stardust.generator.IdentifierGenerator;
@@ -43,6 +49,14 @@ import org.nebulae2us.stardust.translate.domain.ParamValues;
 import org.nebulae2us.stardust.translate.domain.Translator;
 import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 import org.nebulae2us.stardust.translate.domain.TranslatorController;
+import org.nebulae2us.stardust.translate.domain.db2.DB2LastIdentityQueryTranslator;
+import org.nebulae2us.stardust.translate.domain.db2.DB2SequenceQueryTranslator;
+import org.nebulae2us.stardust.translate.domain.h2.H2LastIdentityQueryTranslator;
+import org.nebulae2us.stardust.translate.domain.h2.H2SequenceQueryTranslator;
+import org.nebulae2us.stardust.translate.domain.mysql.MySQLLastIdentityQueryTranslator;
+import org.nebulae2us.stardust.translate.domain.oracle.OracleFunctionTranslator;
+import org.nebulae2us.stardust.translate.domain.oracle.OracleSequenceQueryTranslator;
+import org.nebulae2us.stardust.translate.domain.sqlserver.SQLServerLastIdentityQueryTranslator;
 
 /**
  * 
@@ -68,7 +82,7 @@ public class DaoManager {
 		this.jdbcHelper = new JdbcHelper(this.jdbcExecutor);
 		this.dialect = dialect;
 		this.entityRepository = new EntityRepository();
-		this.controller = new CommonTranslatorController();
+		this.controller = resolveTranslatorController(dialect);
 	}
 	
 	public DaoManager(JdbcExecutor jdbcExecutor, EntityRepository entityRepository, TranslatorController controller, Dialect dialect) {
@@ -77,6 +91,40 @@ public class DaoManager {
 		this.controller = controller;
 		this.jdbcHelper = new JdbcHelper(jdbcExecutor);
 		this.dialect = dialect;
+	}
+	
+	private TranslatorController resolveTranslatorController(Dialect dialect) {
+		if (dialect instanceof H2Dialect) {
+			return new CommonTranslatorController(new ListBuilder<Translator>()
+					.add(new H2LastIdentityQueryTranslator())
+					.add(new H2SequenceQueryTranslator())
+					.toList());
+		}
+		else if (dialect instanceof OracleDialect) {
+			return new CommonTranslatorController(new ListBuilder<Translator>()
+					.add(new OracleFunctionTranslator())
+					.add(new OracleSequenceQueryTranslator())
+					.toList());
+		}
+		else if (dialect instanceof DB2Dialect) {
+			return new CommonTranslatorController(new ListBuilder<Translator>()
+					.add(new DB2LastIdentityQueryTranslator())
+					.add(new DB2SequenceQueryTranslator())
+					.toList());
+		}
+		else if (dialect instanceof MySQLDialect) {
+			return new CommonTranslatorController(new ListBuilder<Translator>()
+					.add(new MySQLLastIdentityQueryTranslator())
+					.toList());
+		}
+		else if (dialect instanceof SQLServerDialect) {
+			return new CommonTranslatorController(new ListBuilder<Translator>()
+					.add(new SQLServerLastIdentityQueryTranslator())
+					.toList());
+		}
+		else {
+			return new CommonTranslatorController();
+		}
 	}
 	
 	public EntityRepository getEntityRepository() {
@@ -91,6 +139,14 @@ public class DaoManager {
 		return this.dialect;
 	}
 	
+	public final JdbcExecutor getJdbcExecutor() {
+		return jdbcExecutor;
+	}
+
+	public final JdbcHelper getJdbcHelper() {
+		return jdbcHelper;
+	}
+
 	public <T> QueryBuilder<T> newQuery(Class<T> entityClass) {
 		return new QueryBuilder<T>(this, entityClass);
 	}

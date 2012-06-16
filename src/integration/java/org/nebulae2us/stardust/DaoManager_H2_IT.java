@@ -13,14 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.api;
+package org.nebulae2us.stardust;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
-import org.nebulae2us.stardust.api.DaoManager;
 import org.nebulae2us.stardust.ddl.domain.H2DDLGenerator;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.jpa.group1.BasicName;
@@ -39,7 +38,8 @@ import org.nebulae2us.stardust.translate.domain.InsertEntityTranslator;
 import org.nebulae2us.stardust.translate.domain.Translator;
 import org.nebulae2us.stardust.translate.domain.TranslatorController;
 
-import org.nebulae2us.stardust.BaseIntegrationTest;
+import org.nebulae2us.stardust.DaoManager;
+
 import static org.junit.Assert.*;
 
 /**

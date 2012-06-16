@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.api;
+package org.nebulae2us.stardust;
 
+import java.beans.Expression;
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -23,7 +25,9 @@ import java.util.Map;
 
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.Procedure;
+import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
+import org.nebulae2us.stardust.dao.domain.GenericDataReader;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.expr.domain.OrderExpression;
 import org.nebulae2us.stardust.expr.domain.PredicateExpression;
@@ -31,15 +35,16 @@ import org.nebulae2us.stardust.expr.domain.QueryExpression;
 import org.nebulae2us.stardust.expr.domain.SelectExpression;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.sql.domain.AliasJoin;
+import org.nebulae2us.stardust.sql.domain.DataReader;
 import org.nebulae2us.stardust.sql.domain.LinkedEntityBundle;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
 import org.nebulae2us.stardust.translate.domain.ParamValues;
 import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 import org.nebulae2us.stardust.translate.domain.TranslatorController;
 
-import static org.nebulae2us.stardust.Builders.*;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+import static org.nebulae2us.stardust.internal.util.Builders.*;
 
 /**
  * @author Trung Phan
@@ -209,6 +214,26 @@ public class QueryBuilder<T> {
 		return new Query<T>(context, queryExpression, paramValues);
 	}
 	
+	public Query<T> toCountQuery() {
+		EntityRepository entityRepository = daoManager.getEntityRepository();
+		TranslatorController controller = daoManager.getController();
+		
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entityRepository.getEntity(this.entityClass), "", this.aliasJoins);
+		
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
+
+		TranslatorContext context = new TranslatorContext(daoManager.getDialect(), controller, linkedTableEntityBundle, linkedEntityBundle, sql.length() > 0);
+
+		QueryExpression queryExpression = new QueryExpression("query", sql,
+				this.selectorExpressions, this.predicateExpressions, Immutables.emptyList(OrderExpression.class), 
+				this.distinct, 0, 0, true);
+		
+		ParamValues paramValues = new ParamValues(namedParamValues, 
+				new ListBuilder<Object>().add(selectWildcardValues).add(filterWildcardValues).toList());
+
+		return new Query<T>(context, queryExpression, paramValues);
+	}
+	
 	public List<T> list() {
 		Query<T> query = toQuery();
 		return daoManager.query(query);
@@ -223,6 +248,23 @@ public class QueryBuilder<T> {
 		return result.get(0);
 	}
 	
+	public long count() {
+		Query<T> query = toCountQuery();
+		Pair<String, List<?>> translateResult = query.translate();
+		
+		String sql = translateResult.getItem1();
+		List<?> values = translateResult.getItem2();
+		
+		long result = daoManager.getJdbcHelper().queryForLong(sql, values);
+		return result;
+	}
+	
+	public Pair<Long, List<T>> countAndList() {
+		long count = count();
+		List<T> list = list();
+		
+		return new Pair<Long, List<T>>(count, list);
+	}
 	
 	
 }

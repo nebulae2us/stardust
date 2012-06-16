@@ -41,9 +41,9 @@ import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 import org.nebulae2us.stardust.my.domain.ValueObjectAttribute;
 
-import static org.nebulae2us.stardust.Builders.*;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+import static org.nebulae2us.stardust.internal.util.Builders.*;
 
 import static org.nebulae2us.stardust.internal.util.ReflectionUtils.*;
 

@@ -8,6 +8,7 @@ import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.api.*;
 import org.nebulae2us.stardust.db.domain.*;
 import org.nebulae2us.stardust.generator.IdentifierGenerator;
+import org.nebulae2us.stardust.internal.util.Builders;
 
 @Builder(destination=ScalarAttribute.class)
 public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {

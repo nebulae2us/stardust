@@ -15,7 +15,7 @@
  */
 package org.nebulae2us.stardust.my.domain.scanner;
 
-import static org.nebulae2us.stardust.Builders.*;
+import static org.nebulae2us.stardust.internal.util.Builders.*;
 
 import java.lang.reflect.Field;
 
