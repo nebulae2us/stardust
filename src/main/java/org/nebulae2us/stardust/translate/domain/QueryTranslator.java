@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.nebulae2us.electron.Pair;
@@ -106,7 +105,7 @@ public class QueryTranslator implements Translator {
 		boolean inParam = false;
 		StringBuilder paramNameBuilder = null;
 		
-		for (int i = 0, j = 0; i <= length; i++) {
+		for (int i = 0; i <= length; i++) {
 			char c = i < length ? sql.charAt(i) : '\0';
 			if (c == '?') {
 				if (inParam) {

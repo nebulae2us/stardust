@@ -218,9 +218,11 @@ public class QueryBuilder<T> {
 		Query<T> query = toQuery();
 		List<T> result = daoManager.query(query);
 		
-		AssertState.isTrue(result.size() == 1, "Expected one row result.");
+		AssertState.isTrue(result.size() == 1, "Expected one record result.");
 		
 		return result.get(0);
 	}
+	
+	
 	
 }
