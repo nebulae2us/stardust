@@ -15,10 +15,42 @@
  */
 package org.nebulae2us.stardust.dialect;
 
+import java.util.List;
+
+import org.nebulae2us.electron.Pair;
+
 /**
  * @author Trung Phan
  *
  */
 public class MySQLDialect extends Dialect {
+
+	@Override
+	public String getSqlToRetrieveIdentityValue() {
+		return "select last_insert_id()";
+	}
+
+	@Override
+	public String getSqlToRetrieveNextSequenceValue(String sequenceName) {
+		throw new UnsupportedOperationException("MySQL does not support sequence.");
+	}
+
+	@Override
+	public Pair<String, List<?>> applyLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
+		String newSql = sql + " limit " + limitValue;
+		return new Pair<String, List<?>>(newSql, values);
+	}
+
+	@Override
+	public Pair<String, List<?>> applyOffsetLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
+		String newSql = sql + " limit " + limitValue + " offset " + offsetValue;
+		return new Pair<String, List<?>>(newSql, values);
+	}
+
+	@Override
+	public Pair<String, List<?>> applyOffset(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
+		String newSql = sql + " offset " + offsetValue;
+		return new Pair<String, List<?>>(newSql, values);
+	}
 
 }

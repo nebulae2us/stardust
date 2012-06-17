@@ -45,7 +45,7 @@ public class InListTranslator implements Translator {
 		
 		List<Object> scalarValues = new ArrayList<Object>();
 		int count  = 0;
-		final int maxInListSize = context.getMaxInListSize() > 0 ? context.getMaxInListSize() : Integer.MAX_VALUE;
+		final int maxInListSize = context.getDialect().getMaxInListSize();
 		boolean extended = false;
 		
 		StringBuilder result = new StringBuilder();

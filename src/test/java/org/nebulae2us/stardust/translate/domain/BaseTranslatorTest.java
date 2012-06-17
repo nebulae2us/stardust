@@ -28,6 +28,7 @@ import mockit.NonStrict;
 import org.junit.Before;
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.Query;
+import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.expr.domain.AttributeExpression;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.NamedParamExpression;
@@ -47,6 +48,8 @@ public class BaseTranslatorTest {
 	@NonStrict protected TranslatorContext context;
 	
 	@NonStrict protected TranslatorController translatorController;
+	
+	@NonStrict protected Dialect dialect;
 	
 	protected ParamValues paramValues;
 	
@@ -89,12 +92,15 @@ public class BaseTranslatorTest {
 			mockedSubQuery.translate();
 			result = new Pair<String, List<?>>("select ? from mockedSubQuery", Collections.singletonList("mockedSubQueryValue"));
 			
-			context.getMaxInListSize();
-			result = 10;
-			
 			context.getTranslatorController();
 			result = translatorController;
 			
+			context.getDialect();
+			result = dialect;
+
+			dialect.getMaxInListSize();
+			result = 10;
+
 			translatorController.findTranslator(withInstanceOf(WildcardExpression.class), paramValues);
 			result = new WildcardTranslator();
 

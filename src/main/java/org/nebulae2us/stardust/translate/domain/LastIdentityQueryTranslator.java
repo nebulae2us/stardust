@@ -13,36 +13,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.translate.domain.h2;
+package org.nebulae2us.stardust.translate.domain;
 
 import java.util.List;
 
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.expr.domain.Expression;
-import org.nebulae2us.stardust.expr.domain.SequenceQueryExpression;
-import org.nebulae2us.stardust.translate.domain.ParamValues;
-import org.nebulae2us.stardust.translate.domain.Translator;
-import org.nebulae2us.stardust.translate.domain.TranslatorContext;
+import org.nebulae2us.stardust.expr.domain.LastIdentityQueryExpression;
 
 /**
  * @author Trung Phan
  *
  */
-public class H2SequenceQueryTranslator implements Translator {
+public class LastIdentityQueryTranslator implements Translator {
 
 	public boolean accept(Expression expression, ParamValues paramValues) {
-		return expression instanceof SequenceQueryExpression;
+		return expression instanceof LastIdentityQueryExpression;
 	}
 
 	public Pair<String, List<?>> translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
-		
-		SequenceQueryExpression sequenceExpression = (SequenceQueryExpression)expression;
-		
-		String sql = "select next value for " + sequenceExpression.getSequenceName() + " from dual";
-		
-		return new Pair<String, List<?>>(sql, Immutables.emptyList());
+
+		return new Pair<String, List<?>>(context.getDialect().getSqlToRetrieveIdentityValue(), Immutables.emptyList());
 	}
 
 }

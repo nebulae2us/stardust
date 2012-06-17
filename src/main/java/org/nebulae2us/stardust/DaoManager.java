@@ -49,14 +49,7 @@ import org.nebulae2us.stardust.translate.domain.ParamValues;
 import org.nebulae2us.stardust.translate.domain.Translator;
 import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 import org.nebulae2us.stardust.translate.domain.TranslatorController;
-import org.nebulae2us.stardust.translate.domain.db2.DB2LastIdentityQueryTranslator;
-import org.nebulae2us.stardust.translate.domain.db2.DB2SequenceQueryTranslator;
-import org.nebulae2us.stardust.translate.domain.h2.H2LastIdentityQueryTranslator;
-import org.nebulae2us.stardust.translate.domain.h2.H2SequenceQueryTranslator;
-import org.nebulae2us.stardust.translate.domain.mysql.MySQLLastIdentityQueryTranslator;
 import org.nebulae2us.stardust.translate.domain.oracle.OracleFunctionTranslator;
-import org.nebulae2us.stardust.translate.domain.oracle.OracleSequenceQueryTranslator;
-import org.nebulae2us.stardust.translate.domain.sqlserver.SQLServerLastIdentityQueryTranslator;
 
 /**
  * 
@@ -96,30 +89,23 @@ public class DaoManager {
 	private TranslatorController resolveTranslatorController(Dialect dialect) {
 		if (dialect instanceof H2Dialect) {
 			return new CommonTranslatorController(new ListBuilder<Translator>()
-					.add(new H2LastIdentityQueryTranslator())
-					.add(new H2SequenceQueryTranslator())
 					.toList());
 		}
 		else if (dialect instanceof OracleDialect) {
 			return new CommonTranslatorController(new ListBuilder<Translator>()
 					.add(new OracleFunctionTranslator())
-					.add(new OracleSequenceQueryTranslator())
 					.toList());
 		}
 		else if (dialect instanceof DB2Dialect) {
 			return new CommonTranslatorController(new ListBuilder<Translator>()
-					.add(new DB2LastIdentityQueryTranslator())
-					.add(new DB2SequenceQueryTranslator())
 					.toList());
 		}
 		else if (dialect instanceof MySQLDialect) {
 			return new CommonTranslatorController(new ListBuilder<Translator>()
-					.add(new MySQLLastIdentityQueryTranslator())
 					.toList());
 		}
 		else if (dialect instanceof SQLServerDialect) {
 			return new CommonTranslatorController(new ListBuilder<Translator>()
-					.add(new SQLServerLastIdentityQueryTranslator())
 					.toList());
 		}
 		else {

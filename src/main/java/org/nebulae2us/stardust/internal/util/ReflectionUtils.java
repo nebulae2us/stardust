@@ -23,6 +23,18 @@ import java.lang.reflect.Field;
  */
 public class ReflectionUtils {
 
+	public static Field findField(Class<?> objectClass, String fieldName) {
+		try {
+			Field field = objectClass.getDeclaredField(fieldName);
+			return field;
+		} catch (Exception e) {
+			if (objectClass.getSuperclass() != null) {
+				return findField(objectClass.getSuperclass(), fieldName);
+			}
+			return null;
+		}
+	}
+	
 	public static void setValue(Field field, Object object, Object value) {
 		try {
 			field.set(object, value);

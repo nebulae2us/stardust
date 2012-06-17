@@ -46,6 +46,8 @@ public class CommonTranslatorController extends TranslatorController {
 				.add(new WildcardTranslator())
 				.add(new InsertEntityTranslator())
 				.add(new UpdateEntityTranslator())
+				.add(new LastIdentityQueryTranslator())
+				.add(new SequenceQueryTranslator())
 				.add(translators)
 				.toList());
 	}

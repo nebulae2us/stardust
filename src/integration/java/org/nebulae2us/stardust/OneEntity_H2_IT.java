@@ -15,6 +15,7 @@
  */
 package org.nebulae2us.stardust;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -24,9 +25,9 @@ import javax.persistence.Id;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.nebulae2us.stardust.OneEntity_H2_IT.Person;
 import org.nebulae2us.stardust.ddl.domain.H2DDLGenerator;
 import org.nebulae2us.stardust.dialect.H2Dialect;
+import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.translate.domain.CommonTranslatorController;
 
@@ -74,6 +75,17 @@ public class OneEntity_H2_IT extends BaseIntegrationTest {
 		for (String ddl : ddls) {
 			jdbcExecutor.execute(ddl);
 		}
+	}
+	
+	private Long insertPerson(String firstName, String lastName, Date dateBorn) {
+		Person person = new Person();
+		person.firstName = firstName;
+		person.lastName = lastName;
+		person.dateBorn = dateBorn;
+		
+		daoManager.save(person);
+		
+		return person.id;
 	}
 	
 	@Test
@@ -131,4 +143,62 @@ public class OneEntity_H2_IT extends BaseIntegrationTest {
 		assertEquals(1, count);
 		
 	}
+	
+	@Test
+	public void should_be_able_to_count_distinct() {
+		should_be_able_to_insert_one_record();
+		
+		long count = daoManager.newQuery(Person.class)
+				.distinct()
+				.count();
+		
+		assertEquals(1, count);
+	}
+	
+	@Test
+	public void should_be_able_to_list_top_5() {
+		
+		insertPerson("First 1", "Last 1", null);
+		insertPerson("First 2", "Last 2", null);
+		insertPerson("First 3", "Last 3", null);
+		insertPerson("First 4", "Last 4", null);
+		insertPerson("First 5", "Last 5", null);
+		insertPerson("First 6", "Last 6", null);
+		insertPerson("First 7", "Last 7", null);
+		insertPerson("First 8", "Last 8", null);
+		insertPerson("First 9", "Last 9", null);
+
+		List<Person> people = daoManager.newQuery(Person.class)
+				.maxResults(5)
+				.orderBy("firstName")
+				.list();
+		
+		assertEquals(5, people.size());
+		assertEquals(Arrays.asList("First 1", "First 2", "First 3", "First 4", "First 5"), ObjectUtils.extractValues(Person.class, people, "firstName"));
+		
+	}
+	
+	@Test
+	public void should_be_able_to_list_next_5() {
+		
+		insertPerson("First 1", "Last 1", null);
+		insertPerson("First 2", "Last 2", null);
+		insertPerson("First 3", "Last 3", null);
+		insertPerson("First 4", "Last 4", null);
+		insertPerson("First 5", "Last 5", null);
+		insertPerson("First 6", "Last 6", null);
+		insertPerson("First 7", "Last 7", null);
+		insertPerson("First 8", "Last 8", null);
+		insertPerson("First 9", "Last 9", null);
+
+		List<Person> people = daoManager.newQuery(Person.class)
+				.firstResult(3)
+				.maxResults(5)
+				.orderBy("firstName")
+				.list();
+		
+		assertEquals(5, people.size());
+		assertEquals(Arrays.asList("First 4", "First 5", "First 6", "First 7", "First 8"), ObjectUtils.extractValues(Person.class, people, "firstName"));
+	}
+	
 }

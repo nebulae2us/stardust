@@ -16,6 +16,8 @@
 package org.nebulae2us.stardust.internal.util;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -106,5 +108,23 @@ public class ObjectUtils {
 
     public static boolean notEmpty(Object object) {
         return !isEmpty(object);
+    }
+    
+    public static <T> List<?> extractValues(Class<T> objectType, Collection<? extends T> objects, String fieldName) {
+    	List<Object> result = new ArrayList<Object>();
+    	Field field = ReflectionUtils.findField(objectType, fieldName);
+    	field.setAccessible(true);
+    	
+    	for (T object : objects) {
+    		if (object != null) {
+	    		Object value = ReflectionUtils.getValue(field, object);
+	    		result.add(value);
+    		}
+    		else {
+    			result.add(null);
+    		}
+    	}
+    	
+    	return result;
     }
 }

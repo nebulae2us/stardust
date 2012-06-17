@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.translate.domain.oracle;
+package org.nebulae2us.stardust.translate.domain;
 
 import java.util.List;
 
@@ -21,15 +21,12 @@ import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.SequenceQueryExpression;
-import org.nebulae2us.stardust.translate.domain.ParamValues;
-import org.nebulae2us.stardust.translate.domain.Translator;
-import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 
 /**
  * @author Trung Phan
  *
  */
-public class OracleSequenceQueryTranslator implements Translator {
+public class SequenceQueryTranslator implements Translator {
 
 	public boolean accept(Expression expression, ParamValues paramValues) {
 		return expression instanceof SequenceQueryExpression;
@@ -40,8 +37,8 @@ public class OracleSequenceQueryTranslator implements Translator {
 
 		SequenceQueryExpression sequenceExpression = (SequenceQueryExpression)expression;
 		
-		String sql = "select " + sequenceExpression.getSequenceName() + ".nextval from dual";
-		
+		String sql = context.getDialect().getSqlToRetrieveNextSequenceValue(sequenceExpression.getSequenceName());
+
 		return new Pair<String, List<?>>(sql, Immutables.emptyList());
 	}
 
