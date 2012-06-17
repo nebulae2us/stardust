@@ -61,4 +61,14 @@ public class DefaultDialect extends Dialect {
 		throw new UnsupportedOperationException();
 	}
 
+	@Override
+	public String getSqlToCreateSequence(String sequenceName) {
+		throw new UnsupportedOperationException();
+	}
+
+	@Override
+	public String getSqlToDropSequence(String sequenceName) {
+		throw new UnsupportedOperationException();
+	}
+
 }

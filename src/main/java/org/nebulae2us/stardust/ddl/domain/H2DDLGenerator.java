@@ -161,8 +161,7 @@ public class H2DDLGenerator {
 			IdentifierGenerator generator = scalarAttribute.getValueGenerator();
 			if (generator instanceof SequenceIdentifierGenerator) {
 				SequenceIdentifierGenerator sequenceGenerator = (SequenceIdentifierGenerator)generator;
-				StringBuilder sql = new StringBuilder();
-				sql.append("create sequence ").append(sequenceGenerator.getName()).append(" start with 1 increment by 1");
+				String sql = dialect.getSqlToCreateSequence(sequenceGenerator.getName());
 				this.ddlSequences.add(sql.toString());
 			}
 		}

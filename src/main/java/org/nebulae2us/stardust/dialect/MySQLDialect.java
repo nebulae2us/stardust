@@ -58,4 +58,14 @@ public class MySQLDialect extends Dialect {
 		return "auto_increment";
 	}
 
+	@Override
+	public String getSqlToCreateSequence(String sequenceName) {
+		throw new UnsupportedOperationException("MySQL does not support sequence.");
+	}
+
+	@Override
+	public String getSqlToDropSequence(String sequenceName) {
+		throw new UnsupportedOperationException("MySQL does not support sequence.");
+	}
+
 }

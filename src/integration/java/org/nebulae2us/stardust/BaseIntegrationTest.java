@@ -25,6 +25,7 @@ import org.junit.After;
 import org.nebulae2us.stardust.dao.domain.ConnectionProvider;
 import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
 import org.nebulae2us.stardust.dialect.Dialect;
+import org.nebulae2us.stardust.dialect.MckoiDialect;
 import org.nebulae2us.stardust.exception.SqlException;
 
 /**
@@ -39,7 +40,7 @@ public class BaseIntegrationTest {
 	protected final String username;
 	protected final String password;
 	
-	protected final Connection connection;
+	protected Connection connection;
 	
 	protected final JdbcExecutor jdbcExecutor;
 	
@@ -83,7 +84,16 @@ public class BaseIntegrationTest {
 		try {
 			connection = DriverManager.getConnection(url, username, password);
 		} catch (SQLException e) {
-			throw new SqlException(e);
+			if (dialect instanceof MckoiDialect) {
+				try {
+					connection = DriverManager.getConnection(url + "?create=true", username, password);
+				} catch (SQLException e1) {
+					throw new SqlException(e);
+				}
+			}
+			else {
+				throw new SqlException(e);
+			}
 		}
 		
 		this.jdbcExecutor = new JdbcExecutor(dialect, new ConnectionProvider() {

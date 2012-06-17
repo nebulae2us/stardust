@@ -23,50 +23,52 @@ import org.nebulae2us.electron.Pair;
  * @author Trung Phan
  *
  */
-public class PostgreDialect extends Dialect {
+public class MckoiDialect extends Dialect {
 
 	@Override
 	public String getSqlToRetrieveIdentityValue() {
-		throw new UnsupportedOperationException("Postgre does not support IDENTITY column. Use sequence instead.");
+		throw new UnsupportedOperationException("Mckoi does not support IDENTITY.");
 	}
 
 	@Override
 	public String getSqlToRetrieveNextSequenceValue(String sequenceName) {
-		return "select nextval('" + sequenceName +  "')";
+		return "select nextval('" + sequenceName + "')";
 	}
 
 	@Override
-	public Pair<String, List<?>> applyLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
-		String newSql = sql + " limit " + limitValue;
-		return new Pair<String, List<?>>(newSql, values);
+	public Pair<String, List<?>> applyLimit(String sql, List<?> values,
+			long offsetValue, long limitValue, String orderBy,
+			List<?> orderByValues) {
+		throw new UnsupportedOperationException("Mckoi does not support paginated SQL.");
 	}
 
 	@Override
-	public Pair<String, List<?>> applyOffsetLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
-		String newSql = sql + " limit " + limitValue + " offset " + offsetValue;
-		return new Pair<String, List<?>>(newSql, values);
+	public Pair<String, List<?>> applyOffsetLimit(String sql, List<?> values,
+			long offsetValue, long limitValue, String orderBy,
+			List<?> orderByValues) {
+		throw new UnsupportedOperationException("Mckoi does not support paginated SQL.");
 	}
 
 	@Override
-	public Pair<String, List<?>> applyOffset(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
-		String newSql = sql + " offset " + offsetValue;
-		return new Pair<String, List<?>>(newSql, values);
+	public Pair<String, List<?>> applyOffset(String sql, List<?> values,
+			long offsetValue, long limitValue, String orderBy,
+			List<?> orderByValues) {
+		throw new UnsupportedOperationException("Mckoi does not support paginated SQL.");
 	}
 
 	@Override
 	public String getIdentityDeclare() {
-		throw new UnsupportedOperationException("Postgre does not support IDENTITY column. Use sequence instead.");
+		throw new UnsupportedOperationException("McKoi does not support IDENTITY.");
 	}
 
 	@Override
 	public String getSqlToCreateSequence(String sequenceName) {
-		return "create sequence " + sequenceName + " start with 1 increment by 1";
+		return "create sequence " + sequenceName + " increment 1 start 0";
 	}
 
 	@Override
 	public String getSqlToDropSequence(String sequenceName) {
 		return "drop sequence " + sequenceName;
 	}
-
 
 }

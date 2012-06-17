@@ -36,6 +36,10 @@ public abstract class Dialect {
 	
 	public abstract String getSqlToRetrieveNextSequenceValue(String sequenceName);
 	
+	public abstract String getSqlToCreateSequence(String sequenceName);
+	
+	public abstract String getSqlToDropSequence(String sequenceName);
+	
 	public int getMaxInListSize() {
 		return Integer.MAX_VALUE;
 	}

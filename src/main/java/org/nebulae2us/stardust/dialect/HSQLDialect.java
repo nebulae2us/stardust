@@ -58,4 +58,14 @@ public class HSQLDialect extends Dialect {
 		return "generated always as identity(start with 1, increment by 1)";
 	}
 
+	@Override
+	public String getSqlToCreateSequence(String sequenceName) {
+		return "create sequence " + sequenceName + " start with 1 increment by 1";
+	}
+
+	@Override
+	public String getSqlToDropSequence(String sequenceName) {
+		return "drop sequence " + sequenceName;
+	}
+
 }

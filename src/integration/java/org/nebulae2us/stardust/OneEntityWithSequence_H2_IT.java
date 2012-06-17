@@ -87,7 +87,7 @@ public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
 	@Parameters
 	public static Collection<Object[]> data() {
 		return Arrays.asList(new Object[][]{
-				{"derby-in-memory"}, {"h2-in-memory"}, {"hsqldb-in-memory"}
+				{"derby-in-memory"}, {"h2-in-memory"}, {"hsqldb-in-memory"}, {"mckoi-embedded"}
 		});
 	}
 	
@@ -105,6 +105,7 @@ public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
 		H2DDLGenerator schemaGenerator = new H2DDLGenerator(dialect);
 		List<String> ddls = schemaGenerator.generateTable(entityRepository);
 		for (String ddl : ddls) {
+			System.out.println(ddl);
 			jdbcExecutor.execute(ddl);
 		}
 	}
@@ -112,12 +113,9 @@ public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
 	@After
 	public void tearDown() throws Exception {
 		if (connection != null && !connection.isClosed()) {
-			try {
-				Statement stmt = connection.createStatement();
-				stmt.execute("drop table person");
-				stmt.execute("drop sequence person_seq restrict");
-			}
-			catch (Exception e) {}
+			Statement stmt = connection.createStatement();
+			stmt.execute("drop table PERSON");
+			stmt.execute(dialect.getSqlToDropSequence("person_seq"));
 			connection.close();
 		}
 	}

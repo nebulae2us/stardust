@@ -68,5 +68,15 @@ public class DerbyDialect extends Dialect {
 		return super.getJavaTypeForPersistence(javaType);
 	}
 
+	@Override
+	public String getSqlToCreateSequence(String sequenceName) {
+		return "create sequence " + sequenceName + " start with 1 increment by 1";
+	}
+
+	@Override
+	public String getSqlToDropSequence(String sequenceName) {
+		return "drop sequence " + sequenceName + " restrict";
+	}
+
 
 }

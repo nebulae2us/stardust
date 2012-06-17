@@ -78,6 +78,12 @@
     		<scope>test</scope>
     	</dependency>
     	<dependency>
+    		<groupId>mckoi</groupId>
+    		<artifactId>mckoi</artifactId>
+    		<version>1.0.2</version>
+    		<scope>test</scope>
+    	</dependency>
+    	<dependency>
     		<groupId>info.cukes</groupId>
     		<artifactId>cucumber-java</artifactId>
     		<version>1.0.8</version>
