@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
-import org.nebulae2us.stardust.ddl.domain.H2DDLGenerator;
+import org.nebulae2us.stardust.ddl.domain.DDLGenerator;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.jpa.group1.BasicName;
 import org.nebulae2us.stardust.jpa.group1.BedRoom;
@@ -76,8 +76,8 @@ public class DaoManager_H2_IT extends BaseIntegrationTest {
 		this.controller = new CommonTranslatorController(translators);
 		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, controller, new H2Dialect());
 		
-		H2DDLGenerator generator = new H2DDLGenerator(dialect);
-		List<String> ddlSqls = generator.generateTable(entityRepository);
+		DDLGenerator generator = new DDLGenerator(dialect, entityRepository);
+		List<String> ddlSqls = generator.generateCreateSchemaObjectsDDL();
 		
 		for (String ddlSql : ddlSqls) {
 			jdbcExecutor.execute(ddlSql);

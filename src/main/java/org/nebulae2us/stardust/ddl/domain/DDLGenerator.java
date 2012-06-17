@@ -15,9 +15,6 @@
  */
 package org.nebulae2us.stardust.ddl.domain;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,42 +43,35 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  * @author Trung Phan
  *
  */
-public class H2DDLGenerator {
+public class DDLGenerator {
+	
+	private final EntityRepository entityRepository;
 	
 	private final Dialect dialect;
 
 	private final Map<Table, String> ddlCreateTables = new HashMap<Table, String>();
 	
+	private final Map<Table, String> ddlDropTables = new HashMap<Table, String>();
+	
 	private final Map<Column, CreateColumn> createColumnRepository = new HashMap<Column, CreateColumn>();
 	
-	private final Map<Table, Set<String>> ddlForeignKeyConstraints = new HashMap<Table, Set<String>>();
+	private final Map<Table, Set<String>> ddlCreateForeignKeyConstraints = new HashMap<Table, Set<String>>();
 	
-	private final List<String> ddlSequences = new ArrayList<String>();
+	private final Map<Table, Set<String>> ddlDropForeignKeyConstraints = new HashMap<Table, Set<String>>();
 	
-	public H2DDLGenerator(Dialect dialect) {
+	private final Map<String, String> ddlCreateSequences = new HashMap<String, String>();
+	
+	private final Map<String, String> ddlDropSequences = new HashMap<String, String>();
+	
+	public DDLGenerator(Dialect dialect, EntityRepository entityRepository) {
 		this.dialect = dialect;
+		this.entityRepository = entityRepository;
 	}
 	
-	public List<String> generateTable(EntityRepository entityRepository) {
+	
+	public List<String> generateCreateSchemaObjectsDDL() {
 
-
-		List<Class<?>> entityClasses = new ArrayList<Class<?>>();
-		for (Entity entity : entityRepository.getAllEntities()) {
-			entityClasses.add(entity.getDeclaringClass());
-		}
-		
-		entityClasses = ClassUtils.sortClassesByLevelOfInheritance(entityClasses);
-		
-		for (Class<?> entityClass : entityClasses) {
-			generateCreateTableDDL(entityRepository, entityClass);
-			generateSequenceDDL(entityRepository, entityClass);
-		}
-
-		for (Class<?> entityClass : entityClasses) {
-			generateCreateJunctionTableDDL(entityRepository, entityClass);
-			generateForeignKeyConstraint(entityRepository, entityClass);
-		}
-		
+		prepareDDL();
 		
 		List<String> result = new ArrayList<String>();
 		
@@ -89,11 +79,11 @@ public class H2DDLGenerator {
 			result.add(sql);
 		}
 		
-		for (String sql : ddlSequences) {
+		for (String sql : ddlCreateSequences.values()) {
 			result.add(sql);
 		}
 		
-		for (Set<String> foreignKeys : ddlForeignKeyConstraints.values()) {
+		for (Set<String> foreignKeys : ddlCreateForeignKeyConstraints.values()) {
 			for (String sql : foreignKeys) {
 				result.add(sql);
 			}
@@ -102,7 +92,48 @@ public class H2DDLGenerator {
 		return result;
 	}
 
-	private void generateCreateJunctionTableDDL(EntityRepository entityRepository, Class<?> entityClass) {
+	public List<String> generateDropSchemaObjectsDDL() {
+		List<String> result = new ArrayList<String>();
+
+		for (String sql : ddlDropSequences.values()) {
+			result.add(sql);
+		}
+		
+		for (Set<String> foreignKeys : ddlDropForeignKeyConstraints.values()) {
+			for (String sql : foreignKeys) {
+				result.add(sql);
+			}
+		}
+
+		for (String sql : ddlDropTables.values()) {
+			result.add(sql);
+		}
+		
+		
+
+		return result;
+	}
+
+	private void prepareDDL() {
+		List<Class<?>> entityClasses = new ArrayList<Class<?>>();
+		for (Entity entity : entityRepository.getAllEntities()) {
+			entityClasses.add(entity.getDeclaringClass());
+		}
+		
+		entityClasses = ClassUtils.sortClassesByLevelOfInheritance(entityClasses);
+		
+		for (Class<?> entityClass : entityClasses) {
+			prepareTableDDL(entityClass);
+			prepareSequenceDDL(entityClass);
+		}
+
+		for (Class<?> entityClass : entityClasses) {
+			prepareJunctionTableDDL(entityClass);
+			prepareForeignKeyConstraint(entityClass);
+		}
+	}
+	
+	private void prepareJunctionTableDDL(Class<?> entityClass) {
 		
 		Entity entity = entityRepository.getEntity(entityClass);
 		
@@ -112,6 +143,10 @@ public class H2DDLGenerator {
 			
 			List<CreateColumn> createColumns = new ArrayList<CreateColumn>();
 
+			if (table != null && !this.ddlDropTables.containsKey(table)) {
+				this.ddlDropTables.put(table, dialect.getSqlToDropTable(table.getExtName()));
+			}
+			
 			if (table != null && !ddlCreateTables.containsKey(table)) {
 				
 				StringBuilder junctionTableBuilder = new StringBuilder();
@@ -155,19 +190,25 @@ public class H2DDLGenerator {
 		}
 	}
 
-	private void generateSequenceDDL(EntityRepository entityRepository, Class<?> entityClass) {
+	private void prepareSequenceDDL(Class<?> entityClass) {
 		Entity entity = entityRepository.getEntity(entityClass);
 		for (ScalarAttribute scalarAttribute : entity.getScalarAttributes()) {
 			IdentifierGenerator generator = scalarAttribute.getValueGenerator();
 			if (generator instanceof SequenceIdentifierGenerator) {
 				SequenceIdentifierGenerator sequenceGenerator = (SequenceIdentifierGenerator)generator;
-				String sql = dialect.getSqlToCreateSequence(sequenceGenerator.getName());
-				this.ddlSequences.add(sql.toString());
+				String sequenceName = sequenceGenerator.getName();
+				
+				if (!this.ddlCreateSequences.containsKey(sequenceName)) {
+					this.ddlCreateSequences.put(sequenceName, dialect.getSqlToCreateSequence(sequenceName));
+				}
+				if (!this.ddlDropSequences.containsKey(sequenceName)) {
+					this.ddlDropSequences.put(sequenceName, dialect.getSqlToDropSequence(sequenceName));
+				}
 			}
 		}
 	}
 	
-	private void generateCreateTableDDL(EntityRepository entityRepository, Class<?> entityClass) {
+	private void prepareTableDDL(Class<?> entityClass) {
 		
 		Entity entity = entityRepository.getEntity(entityClass);
 		
@@ -201,6 +242,8 @@ public class H2DDLGenerator {
 			if (ddlCreateTables.containsKey(table)) {
 				continue;
 			}
+			
+			this.ddlDropTables.put(table, dialect.getSqlToDropTable(table.getExtName()));
 
 			Set<CreateColumn> createPrimaryKeys = new LinkedHashSet<CreateColumn>();
 			
@@ -254,27 +297,37 @@ public class H2DDLGenerator {
 		}
 	}
 	
-	private void generateForeignKeyConstraint(EntityRepository entityRepository, Class<?> entityClass) {
+	private void prepareForeignKeyConstraint(Class<?> entityClass) {
 		Entity entity = entityRepository.getEntity(entityClass);
 		
 		for (LinkedTable linkedTable : entity.getLinkedTableBundle().getLinkedTables()) {
 			Table table = linkedTable.getTable();
-			if (ddlForeignKeyConstraints.containsKey(table)) {
+			if (ddlCreateForeignKeyConstraints.containsKey(table)) {
 				continue;
 			}
 			
 			for (EntityAttribute entityAttribute : entity.getEntityAttributes()) {
 				if (entityAttribute.isOwningSide() && entityAttribute.getLeftColumns().get(0).getTable().equals(table)) {
 
-					Set<String> foreignKeys = ddlForeignKeyConstraints.get(table);
-					if (foreignKeys == null) {
-						foreignKeys = new LinkedHashSet<String>();
-						ddlForeignKeyConstraints.put(table, foreignKeys);
+					Set<String> createForeignKeys = this.ddlCreateForeignKeyConstraints.get(table);
+					if (createForeignKeys == null) {
+						createForeignKeys = new LinkedHashSet<String>();
+						this.ddlCreateForeignKeyConstraints.put(table, createForeignKeys);
 					}
-
+					
+					Set<String> dropForeignKeys = this.ddlDropForeignKeyConstraints.get(table);
+					if (dropForeignKeys == null) {
+						dropForeignKeys = new LinkedHashSet<String>();
+						this.ddlDropForeignKeyConstraints.put(table, dropForeignKeys);
+					}
+					
+					String constraintName = "fk_" + table.getName() + (createForeignKeys.size() + 1);
+					
+					dropForeignKeys.add("alter table " + table.getExtName() + " drop constraint " + constraintName);
+					
 					StringBuilder referenceBuilder = new StringBuilder(" references ").append(entityAttribute.getRightColumns().get(0).getTable().getName()).append(" (");
-					StringBuilder foreignKeyConstraintBuilder = new StringBuilder("alter table ").append(table.getName())
-							.append(" add\n    constraint fk_").append(table.getName()).append(foreignKeys.size() + 1).append(" foreign key (");
+					StringBuilder foreignKeyConstraintBuilder = new StringBuilder("alter table ").append(table.getExtName())
+							.append(" add\n    constraint ").append(constraintName).append(" foreign key (");
 					
 					for (int i = 0; i < entityAttribute.getLeftColumns().size(); i++) {
 						Column leftColumn = entityAttribute.getLeftColumns().get(i);
@@ -287,7 +340,7 @@ public class H2DDLGenerator {
 					foreignKeyConstraintBuilder.replace(foreignKeyConstraintBuilder.length() - 2, foreignKeyConstraintBuilder.length(), ")")
 						.append(referenceBuilder);
 					
-					foreignKeys.add(foreignKeyConstraintBuilder.toString());
+					createForeignKeys.add(foreignKeyConstraintBuilder.toString());
 
 				}
 			}
@@ -309,10 +362,10 @@ public class H2DDLGenerator {
 				foreignKeyConstraintBuilder.replace(foreignKeyConstraintBuilder.length() - 2, foreignKeyConstraintBuilder.length(), ")")
 					.append(referenceBuilder);
 				
-				Set<String> foreignKeys = ddlForeignKeyConstraints.get(table);
+				Set<String> foreignKeys = ddlCreateForeignKeyConstraints.get(table);
 				if (foreignKeys == null) {
 					foreignKeys = new LinkedHashSet<String>();
-					ddlForeignKeyConstraints.put(table, foreignKeys);
+					ddlCreateForeignKeyConstraints.put(table, foreignKeys);
 				}
 				foreignKeys.add(foreignKeyConstraintBuilder.toString());
 				
@@ -372,5 +425,7 @@ public class H2DDLGenerator {
 		
 		throw new IllegalStateException("Unknown type: " + javaType.getSimpleName());
 	}
+	
+	
 	
 }

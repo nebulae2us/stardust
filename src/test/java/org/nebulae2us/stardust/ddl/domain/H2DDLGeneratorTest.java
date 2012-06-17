@@ -39,7 +39,7 @@ public class H2DDLGeneratorTest {
 
 	private EntityRepository entityRepository = new EntityRepository();
 	
-	private H2DDLGenerator generator = new H2DDLGenerator(new H2Dialect());
+	private DDLGenerator generator = new DDLGenerator(new H2Dialect(), entityRepository);
 	
 	private List<Class<? extends AbstractEntity>> entityClasses = 
 			Arrays.asList(Person.class, Room.class, BedRoom.class, Kitchen.class, House.class, Bungalow.class, Castle.class);
@@ -55,7 +55,7 @@ public class H2DDLGeneratorTest {
 	@Test
 	public void create_person_table() throws Exception {
 
-		generator.generateTable(entityRepository);
+		generator.generateCreateSchemaObjectsDDL();
 
 //		String ddl = generator.generateTable(entityRepository, Room.class);
 //		

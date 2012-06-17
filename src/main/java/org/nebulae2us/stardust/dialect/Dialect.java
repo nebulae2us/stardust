@@ -40,6 +40,10 @@ public abstract class Dialect {
 	
 	public abstract String getSqlToDropSequence(String sequenceName);
 	
+	public String getSqlToDropTable(String tableName) {
+		return "drop table " + tableName;
+	}
+	
 	public int getMaxInListSize() {
 		return Integer.MAX_VALUE;
 	}

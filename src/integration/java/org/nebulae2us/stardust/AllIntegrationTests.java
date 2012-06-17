@@ -28,8 +28,8 @@ import org.nebulae2us.stardust.dao.domain.JdbcExecutor_prepareStatement_IT;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-	OneEntity_H2_IT.class,
-	OneEntityWithSequence_H2_IT.class,
+	OneEntity_IT.class,
+	OneEntityWithSequence_IT.class,
 	DaoManager_H2_IT.class,
 	H2_SQL_IT.class,
 	JdbcExecutor_prepareStatement_IT.class

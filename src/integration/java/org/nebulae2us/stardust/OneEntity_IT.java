@@ -32,7 +32,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.nebulae2us.stardust.ddl.domain.H2DDLGenerator;
+import org.nebulae2us.stardust.ddl.domain.DDLGenerator;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.translate.domain.CommonTranslatorController;
@@ -46,11 +46,13 @@ import static org.junit.Assert.*;
  *
  */
 @RunWith(Parameterized.class)
-public class OneEntity_H2_IT extends BaseIntegrationTest {
+public class OneEntity_IT extends BaseIntegrationTest {
 
 	private EntityRepository entityRepository;
 	
 	private DaoManager daoManager;
+
+	private DDLGenerator ddlGenerator;
 
 	@Parameters
 	public static Collection<Object[]> data() {
@@ -74,7 +76,7 @@ public class OneEntity_H2_IT extends BaseIntegrationTest {
 	}
 	
 	
-	public OneEntity_H2_IT(String config) {
+	public OneEntity_IT(String config) {
 		super(config);
 	}
 
@@ -82,23 +84,26 @@ public class OneEntity_H2_IT extends BaseIntegrationTest {
 	@Before
 	public void setup() {
 		this.entityRepository = new EntityRepository();
+		this.ddlGenerator = new DDLGenerator(dialect, entityRepository);
 		this.entityRepository.scanEntities(Person.class);
 		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, new CommonTranslatorController(), dialect);
 		
-		H2DDLGenerator schemaGenerator = new H2DDLGenerator(dialect);
-		List<String> ddls = schemaGenerator.generateTable(entityRepository);
+		List<String> ddls = ddlGenerator.generateCreateSchemaObjectsDDL();
 		for (String ddl : ddls) {
+			System.out.println(ddl);
 			jdbcExecutor.execute(ddl);
 		}
 	}
 	
 	@After
 	public void tearDown() throws Exception {
-		String sqlDropTestTable = "drop table person";
+		List<String> ddls = ddlGenerator.generateDropSchemaObjectsDDL();
+		for (String ddl : ddls) {
+			System.out.println(ddl);
+			jdbcExecutor.execute(ddl);
+		}
 
 		if (connection != null && !connection.isClosed()) {
-			Statement stmt = connection.createStatement();
-			stmt.execute(sqlDropTestTable);
 			connection.close();
 		}
 	}

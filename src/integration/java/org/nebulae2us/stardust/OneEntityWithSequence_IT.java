@@ -18,7 +18,6 @@ package org.nebulae2us.stardust;
 import static org.junit.Assert.assertEquals;
 
 import java.sql.Statement;
-import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -35,8 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
-import org.nebulae2us.stardust.ddl.domain.H2DDLGenerator;
-import org.nebulae2us.stardust.dialect.H2Dialect;
+import org.nebulae2us.stardust.ddl.domain.DDLGenerator;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.translate.domain.CommonTranslatorController;
@@ -48,10 +46,12 @@ import org.nebulae2us.stardust.DaoManager;
  *
  */
 @RunWith(Parameterized.class)
-public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
+public class OneEntityWithSequence_IT extends BaseIntegrationTest {
 	private EntityRepository entityRepository;
 	
 	private DaoManager daoManager;
+	
+	private DDLGenerator ddlGenerator;
 
 	public static class Person {
 		
@@ -91,7 +91,7 @@ public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
 		});
 	}
 	
-	public OneEntityWithSequence_H2_IT(String config) {
+	public OneEntityWithSequence_IT(String config) {
 		super(config);
 	}
 
@@ -99,11 +99,11 @@ public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
 	@Before
 	public void setup() {
 		this.entityRepository = new EntityRepository();
+		this.ddlGenerator = new DDLGenerator(dialect, entityRepository);
 		this.entityRepository.scanEntities(Person.class);
 		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, new CommonTranslatorController(), dialect);
 		
-		H2DDLGenerator schemaGenerator = new H2DDLGenerator(dialect);
-		List<String> ddls = schemaGenerator.generateTable(entityRepository);
+		List<String> ddls = ddlGenerator.generateCreateSchemaObjectsDDL();
 		for (String ddl : ddls) {
 			System.out.println(ddl);
 			jdbcExecutor.execute(ddl);
@@ -112,10 +112,13 @@ public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
 	
 	@After
 	public void tearDown() throws Exception {
+		List<String> ddls = ddlGenerator.generateDropSchemaObjectsDDL();
+		for (String ddl : ddls) {
+			System.out.println(ddl);
+			jdbcExecutor.execute(ddl);
+		}
+
 		if (connection != null && !connection.isClosed()) {
-			Statement stmt = connection.createStatement();
-			stmt.execute("drop table PERSON");
-			stmt.execute(dialect.getSqlToDropSequence("person_seq"));
 			connection.close();
 		}
 	}
