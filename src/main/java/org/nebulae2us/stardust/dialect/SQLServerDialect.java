@@ -71,4 +71,9 @@ public class SQLServerDialect extends Dialect {
 		return new Pair<String, List<?>>(newSql, newValues);
 	}
 
+	@Override
+	public String getIdentityDeclare() {
+		return "identity(1, 1)";
+	}
+
 }

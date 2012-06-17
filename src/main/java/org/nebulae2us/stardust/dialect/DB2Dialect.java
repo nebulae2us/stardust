@@ -59,4 +59,9 @@ public class DB2Dialect extends Dialect {
 		return new Pair<String, List<?>>(newSql, values);
 	}
 
+	@Override
+	public String getIdentityDeclare() {
+		return "generated always as identity(start with 1, increment by 1)";
+	}
+
 }

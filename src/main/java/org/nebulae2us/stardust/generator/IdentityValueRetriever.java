@@ -46,16 +46,8 @@ public class IdentityValueRetriever implements IdentifierGenerator {
 	public <T> T generateIdentifierValue(Class<T> expectedType, Dialect dialect, JdbcHelper jdbcHelper) {
 		Assert.isTrue(Number.class.isAssignableFrom(expectedType), "Expected numeric type.");
 		
-		if (dialect instanceof OracleDialect) {
-			throw new UnsupportedOperationException("Oracle does not support IDENTITY type.");
-		}
-		else if (dialect instanceof H2Dialect) {
-			String sql = "select scope_identity() from dual";
-			return jdbcHelper.queryFor(expectedType, sql);
-		}
-		else {
-			throw new UnsupportedOperationException("Unsupported dialect " + dialect.getClass().getSimpleName());
-		}
+		String sql = dialect.getSqlToRetrieveIdentityValue();
+		return jdbcHelper.queryFor(expectedType, sql);
 	}
 
 }

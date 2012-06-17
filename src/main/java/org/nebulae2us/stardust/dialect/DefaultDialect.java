@@ -23,39 +23,42 @@ import org.nebulae2us.electron.Pair;
  * @author Trung Phan
  *
  */
-public class MySQLDialect extends Dialect {
+public class DefaultDialect extends Dialect {
 
 	@Override
 	public String getSqlToRetrieveIdentityValue() {
-		return "select last_insert_id()";
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String getSqlToRetrieveNextSequenceValue(String sequenceName) {
-		throw new UnsupportedOperationException("MySQL does not support sequence.");
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Pair<String, List<?>> applyLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
-		String newSql = sql + " limit " + limitValue;
-		return new Pair<String, List<?>>(newSql, values);
+	public Pair<String, List<?>> applyLimit(String sql, List<?> values,
+			long offsetValue, long limitValue, String orderBy,
+			List<?> orderByValues) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Pair<String, List<?>> applyOffsetLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
-		String newSql = sql + " limit " + limitValue + " offset " + offsetValue;
-		return new Pair<String, List<?>>(newSql, values);
+	public Pair<String, List<?>> applyOffsetLimit(String sql, List<?> values,
+			long offsetValue, long limitValue, String orderBy,
+			List<?> orderByValues) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
-	public Pair<String, List<?>> applyOffset(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
-		String newSql = sql + " offset " + offsetValue;
-		return new Pair<String, List<?>>(newSql, values);
+	public Pair<String, List<?>> applyOffset(String sql, List<?> values,
+			long offsetValue, long limitValue, String orderBy,
+			List<?> orderByValues) {
+		throw new UnsupportedOperationException();
 	}
 
 	@Override
 	public String getIdentityDeclare() {
-		return "auto_increment";
+		throw new UnsupportedOperationException();
 	}
 
 }

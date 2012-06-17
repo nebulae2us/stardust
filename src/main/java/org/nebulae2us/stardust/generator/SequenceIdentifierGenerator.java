@@ -53,17 +53,8 @@ public class SequenceIdentifierGenerator implements IdentifierGenerator {
 	public <T> T generateIdentifierValue(Class<T> expectedType, Dialect dialect, JdbcHelper jdbcHelper) {
 		Assert.isTrue(Number.class.isAssignableFrom(expectedType), "Expected numeric type.");
 
-		if (dialect instanceof OracleDialect) {
-			String sql = ObjectUtils.isEmpty(schema) ? "select " + sequenceName + " from dual" : "select " + schema + "." + sequenceName + " from dual";
-			return jdbcHelper.queryFor(expectedType, sql);
-		}
-		else if (dialect instanceof H2Dialect) {
-			String sql = ObjectUtils.isEmpty(schema) ? "select next value for " + sequenceName + " from dual" : "select next value for " + schema + "." + sequenceName + " from dual";
-			return jdbcHelper.queryFor(expectedType, sql);
-		}
-		else {
-			throw new UnsupportedOperationException("Unsupported dialect " + dialect.getClass().getSimpleName());
-		}
+		String sql = dialect.getSqlToRetrieveNextSequenceValue(ObjectUtils.isEmpty(schema) ? sequenceName : schema + "." + sequenceName);
+		return jdbcHelper.queryFor(expectedType, sql);
 	}
 
 	/**

@@ -17,6 +17,10 @@ package org.nebulae2us.stardust;
 
 import static org.junit.Assert.assertEquals;
 
+import java.sql.Statement;
+import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -25,8 +29,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.nebulae2us.stardust.ddl.domain.H2DDLGenerator;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
@@ -39,6 +47,7 @@ import org.nebulae2us.stardust.DaoManager;
  * @author Trung Phan
  *
  */
+@RunWith(Parameterized.class)
 public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
 	private EntityRepository entityRepository;
 	
@@ -75,9 +84,15 @@ public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
 		}
 	}
 	
+	@Parameters
+	public static Collection<Object[]> data() {
+		return Arrays.asList(new Object[][]{
+				{"derby-in-memory"}, {"h2-in-memory"}, {"hsqldb-in-memory"}
+		});
+	}
 	
-	public OneEntityWithSequence_H2_IT() {
-		super("h2-in-memory");
+	public OneEntityWithSequence_H2_IT(String config) {
+		super(config);
 	}
 
 	
@@ -85,12 +100,25 @@ public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
 	public void setup() {
 		this.entityRepository = new EntityRepository();
 		this.entityRepository.scanEntities(Person.class);
-		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, new CommonTranslatorController(), new H2Dialect());
+		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, new CommonTranslatorController(), dialect);
 		
-		H2DDLGenerator schemaGenerator = new H2DDLGenerator();
+		H2DDLGenerator schemaGenerator = new H2DDLGenerator(dialect);
 		List<String> ddls = schemaGenerator.generateTable(entityRepository);
 		for (String ddl : ddls) {
 			jdbcExecutor.execute(ddl);
+		}
+	}
+	
+	@After
+	public void tearDown() throws Exception {
+		if (connection != null && !connection.isClosed()) {
+			try {
+				Statement stmt = connection.createStatement();
+				stmt.execute("drop table person");
+				stmt.execute("drop sequence person_seq restrict");
+			}
+			catch (Exception e) {}
+			connection.close();
 		}
 	}
 	
@@ -111,7 +139,7 @@ public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
 		Person person = new Person();
 		person.firstName = "First";
 		person.lastName = "Last";
-		person.dateBorn = new Date(100);
+		person.dateBorn = new Date(0);
 		
 		daoManager.save(person);
 		
@@ -121,8 +149,6 @@ public class OneEntityWithSequence_H2_IT extends BaseIntegrationTest {
 		
 		assertEquals(1, people.size());
 		
-		assertEquals(person, people.get(0));
-
 	}
 	
 	@Test

@@ -53,4 +53,9 @@ public class H2Dialect extends Dialect {
 		return new Pair<String, List<?>>(newSql, values);
 	}
 
+	@Override
+	public String getIdentityDeclare() {
+		return "identity";
+	}
+
 }

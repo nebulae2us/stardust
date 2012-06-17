@@ -53,4 +53,9 @@ public class PostgreDialect extends Dialect {
 		return new Pair<String, List<?>>(newSql, values);
 	}
 
+	@Override
+	public String getIdentityDeclare() {
+		throw new UnsupportedOperationException("Postgre does not support IDENTITY column. Use sequence instead.");
+	}
+
 }

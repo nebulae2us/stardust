@@ -77,7 +77,7 @@ public class QueryTranslator implements Translator {
 		
 		if (queryExpression.isBackedBySql()) {
 			Pair<String, List<?>> fromResult = transformSql(queryExpression.getSql(), paramValues);
-			sql.append("\n from (").append(fromResult.getItem1()).append(')');
+			sql.append("\n from (").append(fromResult.getItem1()).append(") tmp_in");
 			scalarValues.addAll(fromResult.getItem2());
 		}
 		else {

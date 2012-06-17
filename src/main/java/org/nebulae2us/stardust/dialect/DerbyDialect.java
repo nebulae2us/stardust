@@ -15,6 +15,8 @@
  */
 package org.nebulae2us.stardust.dialect;
 
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.nebulae2us.electron.Pair;
@@ -27,12 +29,12 @@ public class DerbyDialect extends Dialect {
 
 	@Override
 	public String getSqlToRetrieveIdentityValue() {
-		return "select identity_val_local()";
+		return "select identity_val_local() from sysibm.sysdummy1";
 	}
 
 	@Override
 	public String getSqlToRetrieveNextSequenceValue(String sequenceName) {
-		return "select next value for " + sequenceName;
+		return "select next value for " + sequenceName + " from sysibm.sysdummy1";
 	}
 
 	@Override
@@ -51,6 +53,19 @@ public class DerbyDialect extends Dialect {
 	public Pair<String, List<?>> applyOffset(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
 		String newSql = sql + " offset " + offsetValue + " rows";
 		return new Pair<String, List<?>>(newSql, values);
+	}
+
+	@Override
+	public String getIdentityDeclare() {
+		return "generated always as identity(start with 1, increment by 1)";
+	}
+
+	@Override
+	public Class<?> getJavaTypeForPersistence(Class<?> javaType) {
+		if (javaType == Date.class) {
+			return Timestamp.class;
+		}
+		return super.getJavaTypeForPersistence(javaType);
 	}
 
 

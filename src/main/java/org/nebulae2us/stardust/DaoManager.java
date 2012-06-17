@@ -71,7 +71,7 @@ public class DaoManager {
 	private final Dialect dialect;
 	
 	public DaoManager(ConnectionProvider connectionProvider, Dialect dialect) {
-		this.jdbcExecutor = new JdbcExecutor(connectionProvider);
+		this.jdbcExecutor = new JdbcExecutor(dialect, connectionProvider);
 		this.jdbcHelper = new JdbcHelper(this.jdbcExecutor);
 		this.dialect = dialect;
 		this.entityRepository = new EntityRepository();

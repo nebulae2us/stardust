@@ -15,31 +15,26 @@
  */
 package org.nebulae2us.stardust.dao.domain;
 
-import java.io.InputStream;
-import java.io.Reader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.sql.Blob;
-import java.sql.Clob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLXML;
 import java.sql.Statement;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dialect.DefaultDialect;
+import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.exception.IllegalSyntaxException;
 import org.nebulae2us.stardust.exception.SqlException;
 import org.slf4j.Logger;
@@ -57,11 +52,22 @@ public class JdbcExecutor {
 
 	private final ConnectionProvider connectionProvider;
 	
+	protected final Dialect dialect;
+	
 	public JdbcExecutor(ConnectionProvider connectionProvider) {
-		this.connectionProvider = connectionProvider;
+		this(new DefaultDialect(), connectionProvider);
 	}
 	
+	public JdbcExecutor(Dialect dialect, ConnectionProvider connectionProvider) {
+		this.connectionProvider = connectionProvider;
+		this.dialect = dialect;
+	}
 	
+	public final Dialect getDialect() {
+		return dialect;
+	}
+
+
 	protected Pair<String, List<?>> transformSql(String sql, Map<String, ?> paramValues, List<?> wildcardValues) {
 		List<Object> values = new ArrayList<Object>();
 		StringBuilder newSql = new StringBuilder();
@@ -156,105 +162,113 @@ public class JdbcExecutor {
 		return preparedStatement;
 	}
 
-
-	private void setParamValueForPreparedStatement(PreparedStatement preparedStatement, int i, Object value) {
+	
+	private void setParamValueForPreparedStatement(PreparedStatement preparedStatement, int i, Object _value) {
+		
+		Class<?> targetType = _value == null ? null : _value instanceof NullObject ? ((NullObject)_value).getJavaType() : dialect.getJavaTypeForPersistence(_value.getClass());
+		Object value = convertValue(targetType, _value);
 		try {
-			if (value == null) {
+			if (_value instanceof NullObject) {
+				preparedStatement.setNull(i, dialect.getSqlTypeFrom(targetType));
+			}
+			else if (value == null) {
 				preparedStatement.setNull(i, Types.NULL);
 			}
-			else if (value instanceof NullObject) {
-				preparedStatement.setNull(i, ((NullObject)value).getSqlType());
-			}
-			else if (value instanceof String) {
-				preparedStatement.setString(i, (String)value);
-			}
-			else if (value instanceof Character) {
-				preparedStatement.setString(i, String.valueOf((Character)value));
-			}
-			else if (value instanceof Enum) {
-				preparedStatement.setString(i, ((Enum<?>)value).name());
-			}
-			else if (value instanceof Number) {
-				Number number = (Number)value;
-				if (value instanceof Long) {
-					preparedStatement.setLong(i, number.longValue());
-				}
-				else if (value instanceof Integer) {
-					preparedStatement.setInt(i, number.intValue());
-				}
-				else if (value instanceof Short) {
-					preparedStatement.setShort(i, number.shortValue());
-				}
-				else if (value instanceof Byte) {
-					preparedStatement.setByte(i, number.byteValue());
-				}
-				else if (value instanceof Double) {
-					preparedStatement.setDouble(i, number.doubleValue());
-				}
-				else if (value instanceof Float) {
-					preparedStatement.setFloat(i, number.floatValue());
-				}
-				else if (value instanceof BigDecimal) {
-					preparedStatement.setBigDecimal(i, (BigDecimal)value);
-				}
-				else if (value instanceof AtomicInteger) {
-					preparedStatement.setInt(i, ((AtomicInteger)value).get());
-				}
-				else if (value instanceof AtomicLong) {
-					preparedStatement.setLong(i, ((AtomicLong)value).get());
-				}
-				else if (value instanceof BigInteger) {
-					BigDecimal d = new BigDecimal((BigInteger)value);
-					preparedStatement.setBigDecimal(i, d);
-				}
-				else {
-					preparedStatement.setObject(i, value);
-				}
-			}
-			else if (value instanceof Date) {
-				preparedStatement.setDate(i, (Date)value);
-			}
-			else if (value instanceof Time) {
-				preparedStatement.setTime(i, (Time)value);
-			}
-			else if (value instanceof Timestamp) {
-				preparedStatement.setTimestamp(i, (Timestamp)value);
-			}
-			else if (value instanceof java.util.Date) {
-				preparedStatement.setObject(i, value);
-			}
-			else if (value instanceof Boolean) {
-				preparedStatement.setBoolean(i, (Boolean)value);
-			}
-			else if (value instanceof AtomicBoolean) {
-				preparedStatement.setBoolean(i, ((AtomicBoolean)value).get());
-			}
-			else if (value instanceof byte[]) {
-				preparedStatement.setBytes(i, (byte[]) value);
-			}
-			else if (value instanceof Blob) {
-				preparedStatement.setBlob(i, (Blob)value);
-			}
-			else if (value instanceof Clob) {
-				preparedStatement.setClob(i, (Clob)value);
-			}
-			else if (value instanceof Reader) {
-				preparedStatement.setCharacterStream(i, (Reader)value);
-			}
-			else if (value instanceof InputStream) {
-				preparedStatement.setBinaryStream(i, (InputStream)value);
-			}
-			else if (value instanceof SQLXML) {
-				preparedStatement.setSQLXML(i, (SQLXML)value);
-			}
 			else {
-				preparedStatement.setObject(i, value);
+				preparedStatement.setObject(i, value, dialect.getSqlTypeFrom(targetType));
 			}
 		}
 		catch (SQLException e) {
 			throw new SqlException(e);
 		}
 	}
+	
+
+	private Object convertValue(Class<?> targetType, Object value) {
+		if (value == null || targetType == null || value instanceof NullObject) {
+			return null;
+		}
+		
+		if (targetType.isInstance(value)) {
+			return value;
+		}
+		
+		if (String.class.isAssignableFrom(targetType)) {
+			return value.toString();
+		}
+		else if (Number.class.isAssignableFrom(targetType)) {
+			Number number = null;
+			if (value instanceof Number) {
+				number = (Number)value;
+			}
+			else if (value instanceof Character) {
+				number = (int)((Character)value).charValue();
+			}
+			else {
+				throw new IllegalStateException("Cannot convert value of type " + value.getClass().getSimpleName() + " to type " + targetType.getSimpleName());
+			}
+			
+			if (targetType == Long.class) {
+				return Long.valueOf(number.longValue());
+			}
+			else if (targetType == Integer.class) {
+				return Integer.valueOf(number.intValue());
+			}
+			else if (targetType == Short.class) {
+				return Short.valueOf(number.shortValue());
+			}
+			else if (targetType == Byte.class) {
+				return Byte.valueOf(number.byteValue());
+			}
+			else if (targetType == Double.class) {
+				return Double.valueOf(number.doubleValue());
+			}
+			else if (targetType == Float.class) {
+				return Float.valueOf(number.floatValue());
+			}
+			else if (BigDecimal.class.isAssignableFrom(targetType)) {
+				if (value instanceof BigInteger) {
+					return new BigDecimal((BigInteger)value);
+				}
+				else {
+					return BigDecimal.valueOf(number.doubleValue());
+				}
+			}
+			else if (BigInteger.class.isAssignableFrom(targetType)) {
+				if (value instanceof BigDecimal) {
+					return ((BigDecimal)value).toBigInteger();
+				}
+				else {
+					return BigInteger.valueOf(number.longValue());
+				}
+			}
+		}
+		else if (java.util.Date.class.isAssignableFrom(targetType)) {
+			java.util.Date date = null;
+			if (value instanceof java.util.Date) {
+				date = (java.util.Date)value;
+			}
+			else if (value instanceof Calendar) {
+				date = ((Calendar)value).getTime();
+			}
+			
+			if (Timestamp.class.isAssignableFrom(targetType)) {
+				return new Timestamp(date.getTime());
+			}
+			else if (Time.class.isAssignableFrom(targetType)) {
+				return new Time(date.getTime());
+			}
+			else if (Date.class.isAssignableFrom(targetType)) {
+				return new Date(date.getTime());
+			}
+
+			throw new IllegalStateException("Cannot convert value of type " + value.getClass().getSimpleName() + " to type " + targetType.getSimpleName());
+		}
+		
+		throw new IllegalStateException("Cannot convert value of type " + value.getClass().getSimpleName() + " to type " + targetType.getSimpleName());
+		
+	}
+
 	
 	@SuppressWarnings("unchecked")
 	public ResultSet query(String sql) {

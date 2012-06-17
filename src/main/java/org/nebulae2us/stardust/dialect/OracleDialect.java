@@ -58,6 +58,11 @@ public class OracleDialect extends Dialect {
 		return new Pair<String, List<?>>(newSql, values);
 	}
 
+	@Override
+	public String getIdentityDeclare() {
+		throw new UnsupportedOperationException("Oracle Dialect does not support IDENTITY.");
+	}
+
 
 	
 	

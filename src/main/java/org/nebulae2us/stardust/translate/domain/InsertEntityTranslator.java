@@ -19,10 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dao.domain.NullObject;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.InsertEntityExpression;
+import org.nebulae2us.stardust.generator.IdentityValueRetriever;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
@@ -87,7 +89,12 @@ public class InsertEntityTranslator implements Translator {
 				wildcardBuilder.append("?, ");
 
 				Object value = identifierScalarAttribute.extractAttributeValue(entityToInsert);
-				values.add(value);
+				if (value != null) {
+					values.add(value);
+				}
+				else {
+					values.add(NullObject.valueOf(identifierScalarAttribute.getScalarType()));
+				}
 			}
 		}
 		
@@ -98,12 +105,17 @@ public class InsertEntityTranslator implements Translator {
 				}
 				
 				ScalarAttribute scalarAttribute = (ScalarAttribute)attribute;
+				if (scalarAttribute.getValueGenerator() instanceof IdentityValueRetriever) {
+					continue;
+				}
+				
+				
 				insertSql.append(scalarAttribute.getColumn().getName())
 					.append(", ");
 				wildcardBuilder.append("?, ");
 				
 				Object value = attribute.extractAttributeValue(entityToInsert);
-				values.add(value);
+				values.add(value != null ? value : NullObject.valueOf(scalarAttribute.getScalarType()));
 				
 			}
 			else if (attribute instanceof EntityAttribute) {

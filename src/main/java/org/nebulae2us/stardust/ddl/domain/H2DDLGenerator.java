@@ -30,6 +30,7 @@ import org.nebulae2us.electron.internal.util.ClassUtils;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.db.domain.Table;
+import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.generator.IdentifierGenerator;
 import org.nebulae2us.stardust.generator.IdentityValueRetriever;
 import org.nebulae2us.stardust.generator.SequenceIdentifierGenerator;
@@ -46,6 +47,8 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  *
  */
 public class H2DDLGenerator {
+	
+	private final Dialect dialect;
 
 	private final Map<Table, String> ddlCreateTables = new HashMap<Table, String>();
 	
@@ -54,6 +57,10 @@ public class H2DDLGenerator {
 	private final Map<Table, Set<String>> ddlForeignKeyConstraints = new HashMap<Table, Set<String>>();
 	
 	private final List<String> ddlSequences = new ArrayList<String>();
+	
+	public H2DDLGenerator(Dialect dialect) {
+		this.dialect = dialect;
+	}
 	
 	public List<String> generateTable(EntityRepository entityRepository) {
 
@@ -155,7 +162,7 @@ public class H2DDLGenerator {
 			if (generator instanceof SequenceIdentifierGenerator) {
 				SequenceIdentifierGenerator sequenceGenerator = (SequenceIdentifierGenerator)generator;
 				StringBuilder sql = new StringBuilder();
-				sql.append("create sequence ").append(sequenceGenerator.getName());
+				sql.append("create sequence ").append(sequenceGenerator.getName()).append(" start with 1 increment by 1");
 				this.ddlSequences.add(sql.toString());
 			}
 		}
@@ -227,7 +234,7 @@ public class H2DDLGenerator {
 					sqlBuilder.append("    ").append(createColumn.toString());
 					
 					if (createColumn.isIdentity()) {
-						sqlBuilder.append(" identity");
+						sqlBuilder.append(' ').append(dialect.getIdentityDeclare());
 					}
 					
 					sqlBuilder.append(",\n");

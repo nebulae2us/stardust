@@ -24,6 +24,7 @@ import java.util.Properties;
 import org.junit.After;
 import org.nebulae2us.stardust.dao.domain.ConnectionProvider;
 import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
+import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.exception.SqlException;
 
 /**
@@ -41,6 +42,8 @@ public class BaseIntegrationTest {
 	protected final Connection connection;
 	
 	protected final JdbcExecutor jdbcExecutor;
+	
+	protected final Dialect dialect;
 
 	@After
 	public void closeConnection() throws SQLException {
@@ -64,6 +67,14 @@ public class BaseIntegrationTest {
 		this.username = prop.getProperty("username");
 		this.password = prop.getProperty("password");
 		
+		String _dialect = prop.getProperty("dialect");
+		try {
+			Class<?> _dialectClass = Class.forName(Dialect.class.getName().replace("Dialect", _dialect + "Dialect"));
+			this.dialect = (Dialect)_dialectClass.newInstance();
+		} catch (Exception e1) {
+			throw new RuntimeException("Failed to find dialect " + _dialect);
+		}
+		
 		try {
 			Class.forName(driverClass);
 		} catch (ClassNotFoundException e) {
@@ -75,7 +86,7 @@ public class BaseIntegrationTest {
 			throw new SqlException(e);
 		}
 		
-		this.jdbcExecutor = new JdbcExecutor(new ConnectionProvider() {
+		this.jdbcExecutor = new JdbcExecutor(dialect, new ConnectionProvider() {
 			public Connection getConnection() {
 				return connection;
 			}

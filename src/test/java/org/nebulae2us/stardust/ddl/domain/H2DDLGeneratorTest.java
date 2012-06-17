@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.jpa.group1.AbstractEntity;
 import org.nebulae2us.stardust.jpa.group1.BedRoom;
 import org.nebulae2us.stardust.jpa.group1.Bungalow;
@@ -38,7 +39,7 @@ public class H2DDLGeneratorTest {
 
 	private EntityRepository entityRepository = new EntityRepository();
 	
-	private H2DDLGenerator generator = new H2DDLGenerator();
+	private H2DDLGenerator generator = new H2DDLGenerator(new H2Dialect());
 	
 	private List<Class<? extends AbstractEntity>> entityClasses = 
 			Arrays.asList(Person.class, Room.class, BedRoom.class, Kitchen.class, House.class, Bungalow.class, Castle.class);

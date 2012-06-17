@@ -27,7 +27,7 @@ public class HSQLDialect extends Dialect {
 
 	@Override
 	public String getSqlToRetrieveIdentityValue() {
-		return "select identity()";
+		return "call identity()";
 	}
 
 	@Override
@@ -51,6 +51,11 @@ public class HSQLDialect extends Dialect {
 	public Pair<String, List<?>> applyOffset(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
 		String newSql = sql + " offset " + offsetValue;
 		return new Pair<String, List<?>>(newSql, values);
+	}
+
+	@Override
+	public String getIdentityDeclare() {
+		return "generated always as identity(start with 1, increment by 1)";
 	}
 
 }

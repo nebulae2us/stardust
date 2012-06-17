@@ -16,10 +16,13 @@
 package org.nebulae2us.stardust;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
 import org.junit.Test;
+import org.junit.runners.Parameterized.Parameters;
 import org.nebulae2us.stardust.ddl.domain.H2DDLGenerator;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.jpa.group1.BasicName;
@@ -54,6 +57,13 @@ public class DaoManager_H2_IT extends BaseIntegrationTest {
 	
 	private final TranslatorController controller;
 	
+	@Parameters
+	public static Collection<Object[]> data() {
+		return Arrays.asList(new Object[][]{
+				{"derby-in-memory"}, {"h2-in-memory"}, {"hsqldb-in-memory"}
+		});
+	}
+	
 	public DaoManager_H2_IT() {
 		super("h2-in-memory");
 		
@@ -66,7 +76,7 @@ public class DaoManager_H2_IT extends BaseIntegrationTest {
 		this.controller = new CommonTranslatorController(translators);
 		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, controller, new H2Dialect());
 		
-		H2DDLGenerator generator = new H2DDLGenerator();
+		H2DDLGenerator generator = new H2DDLGenerator(dialect);
 		List<String> ddlSqls = generator.generateTable(entityRepository);
 		
 		for (String ddlSql : ddlSqls) {

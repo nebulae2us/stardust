@@ -41,10 +41,6 @@ public class JdbcHelper {
 		this.jdbcExecutor = jdbcExecutor;
 	}
 	
-
-	
-	
-	
 	public <T> List<T> queryForListOf(Class<T> valueType, String sql, Map<String, ?> paramValues, List<?> wildcardValues) {
 		return query(sql, paramValues, wildcardValues, new FirstColumnRecordMapper<T>(valueType));
 	}

@@ -22,6 +22,7 @@ import java.util.List;
 import org.junit.Test;
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.MapBuilder;
+import org.nebulae2us.stardust.dialect.DefaultDialect;
 
 import static org.junit.Assert.*;
 
@@ -32,7 +33,7 @@ import static org.junit.Assert.*;
 public class JdbcOperation_transformSql_Test extends JdbcExecutor {
 
 	public JdbcOperation_transformSql_Test() {
-		super(new ConnectionProvider() {
+		super(new DefaultDialect(), new ConnectionProvider() {
 			public Connection getConnection() {
 				return null;
 			}

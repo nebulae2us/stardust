@@ -15,7 +15,10 @@
  */
 package org.nebulae2us.stardust;
 
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -23,10 +26,13 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 import org.nebulae2us.stardust.ddl.domain.H2DDLGenerator;
-import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.translate.domain.CommonTranslatorController;
@@ -39,12 +45,21 @@ import static org.junit.Assert.*;
  * @author Trung Phan
  *
  */
+@RunWith(Parameterized.class)
 public class OneEntity_H2_IT extends BaseIntegrationTest {
 
 	private EntityRepository entityRepository;
 	
 	private DaoManager daoManager;
 
+	@Parameters
+	public static Collection<Object[]> data() {
+		return Arrays.asList(new Object[][]{
+				{"derby-in-memory"}, {"h2-in-memory"}, {"hsqldb-in-memory"}
+		});
+	}
+	
+	
 	public static class Person {
 		
 		@Id
@@ -59,8 +74,8 @@ public class OneEntity_H2_IT extends BaseIntegrationTest {
 	}
 	
 	
-	public OneEntity_H2_IT() {
-		super("h2-in-memory");
+	public OneEntity_H2_IT(String config) {
+		super(config);
 	}
 
 	
@@ -68,12 +83,23 @@ public class OneEntity_H2_IT extends BaseIntegrationTest {
 	public void setup() {
 		this.entityRepository = new EntityRepository();
 		this.entityRepository.scanEntities(Person.class);
-		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, new CommonTranslatorController(), new H2Dialect());
+		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, new CommonTranslatorController(), dialect);
 		
-		H2DDLGenerator schemaGenerator = new H2DDLGenerator();
+		H2DDLGenerator schemaGenerator = new H2DDLGenerator(dialect);
 		List<String> ddls = schemaGenerator.generateTable(entityRepository);
 		for (String ddl : ddls) {
 			jdbcExecutor.execute(ddl);
+		}
+	}
+	
+	@After
+	public void tearDown() throws Exception {
+		String sqlDropTestTable = "drop table person";
+
+		if (connection != null && !connection.isClosed()) {
+			Statement stmt = connection.createStatement();
+			stmt.execute(sqlDropTestTable);
+			connection.close();
 		}
 	}
 	
@@ -105,7 +131,7 @@ public class OneEntity_H2_IT extends BaseIntegrationTest {
 		Person person = new Person();
 		person.firstName = "First";
 		person.lastName = "Last";
-		person.dateBorn = new Date(100);
+		person.dateBorn = new Timestamp(100);
 		
 		daoManager.save(person);
 		
@@ -118,9 +144,9 @@ public class OneEntity_H2_IT extends BaseIntegrationTest {
 		should_be_able_to_insert_one_record();
 		
 		List<Person> people = daoManager.newQuery(Person.class)
-			.backedBySql("select lower(first_name) first_name, last_name from person")
+			.backedBySql("select first_name first_name, last_name from person")
 			.filterBy()
-				.predicate("firstName = ?", "first")
+				.predicate("firstName = ?", "First")
 			.endFilter()
 			.list();
 
@@ -129,7 +155,7 @@ public class OneEntity_H2_IT extends BaseIntegrationTest {
 		Person person = people.get(0);
 		assertNull(person.dateBorn);
 		assertNull(person.id);
-		assertEquals("first", person.firstName);
+		assertEquals("First", person.firstName);
 	}
 	
 	@Test

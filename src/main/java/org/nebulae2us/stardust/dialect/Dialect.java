@@ -15,10 +15,17 @@
  */
 package org.nebulae2us.stardust.dialect;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.sql.Blob;
+import java.sql.Clob;
+import java.sql.Date;
+import java.sql.Time;
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.nebulae2us.electron.Pair;
-
+import static java.sql.Types.*;
 /**
  * @author Trung Phan
  *
@@ -39,4 +46,79 @@ public abstract class Dialect {
 	
 	public abstract Pair<String, List<?>> applyOffset(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues);
 	
+	public abstract String getIdentityDeclare();
+	
+	public Class<?> getJavaTypeForPersistence(Class<?> javaType) {
+		if (Enum.class.isAssignableFrom(javaType)) {
+			return String.class;
+		}
+		return javaType;
+	}
+	
+	public int getSqlTypeFrom(Class<?> javaType) {
+		if (java.util.Date.class.isAssignableFrom(javaType)) {
+			if (Timestamp.class.isAssignableFrom(javaType)) {
+				return TIMESTAMP;
+			}
+			else if (Time.class.isAssignableFrom(javaType)) {
+				return TIME;
+			}
+			else if (Date.class.isAssignableFrom(javaType)) {
+				return DATE;
+			}
+			else {
+				return TIMESTAMP;
+			}
+		}
+		else if (Number.class.isAssignableFrom(javaType)) {
+			if (Long.class.isAssignableFrom(javaType)) {
+				return BIGINT;
+			}
+			else if (Integer.class.isAssignableFrom(javaType)) {
+				return INTEGER;
+			}
+			else if (Short.class.isAssignableFrom(javaType)) {
+				return SMALLINT;
+			}
+			else if (Byte.class.isAssignableFrom(javaType)) {
+				return TINYINT;
+			}
+			else if (Double.class.isAssignableFrom(javaType)) {
+				return DOUBLE;
+			}
+			else if (Float.class.isAssignableFrom(javaType)) {
+				return FLOAT;
+			}
+			else if (BigDecimal.class.isAssignableFrom(javaType)) {
+				return DECIMAL;
+			}
+			else if (BigInteger.class.isAssignableFrom(javaType)) {
+				return INTEGER;
+			}
+		}
+		else if (Enum.class.isAssignableFrom(javaType)) {
+			return VARCHAR;
+		}
+		else if (Character.class.isAssignableFrom(javaType)) {
+			return CHAR;
+		}
+		else if (String.class.isAssignableFrom(javaType)) {
+			return VARCHAR;
+		}
+		else if (byte[].class.isAssignableFrom(javaType)) {
+			return BINARY;
+		}
+		else if (char[].class.isAssignableFrom(javaType)) {
+			return VARCHAR;
+		}
+		else if (Blob.class.isAssignableFrom(javaType)) {
+			return BLOB;
+		}
+		else if (Clob.class.isAssignableFrom(javaType)) {
+			return CLOB;
+		}
+		
+		
+		return NULL;
+	}
 }
