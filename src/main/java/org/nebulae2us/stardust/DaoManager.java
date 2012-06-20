@@ -15,8 +15,6 @@
  */
 package org.nebulae2us.stardust;
 
-import java.sql.ResultSet;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,15 +23,10 @@ import javax.sql.DataSource;
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
-import org.nebulae2us.stardust.dao.domain.GenericDataReader;
 import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
 import org.nebulae2us.stardust.dao.domain.RecordSetHandler;
-import org.nebulae2us.stardust.dialect.DB2Dialect;
 import org.nebulae2us.stardust.dialect.Dialect;
-import org.nebulae2us.stardust.dialect.H2Dialect;
-import org.nebulae2us.stardust.dialect.MySQLDialect;
 import org.nebulae2us.stardust.dialect.OracleDialect;
-import org.nebulae2us.stardust.dialect.SQLServerDialect;
 import org.nebulae2us.stardust.expr.domain.InsertEntityExpression;
 import org.nebulae2us.stardust.expr.domain.UpdateEntityExpression;
 import org.nebulae2us.stardust.generator.IdentifierGenerator;
@@ -84,26 +77,18 @@ public class DaoManager {
 		this.dialect = dialect;
 	}
 	
+	public void beginUnitOfWork() {
+		this.jdbcExecutor.beginUnitOfWork();
+	}
+	
+	public void endUnitOfWork() {
+		this.jdbcExecutor.endUnitOfWork();
+	}
+	
 	private TranslatorController resolveTranslatorController(Dialect dialect) {
-		if (dialect instanceof H2Dialect) {
-			return new CommonTranslatorController(new ListBuilder<Translator>()
-					.toList());
-		}
-		else if (dialect instanceof OracleDialect) {
+		if (dialect instanceof OracleDialect) {
 			return new CommonTranslatorController(new ListBuilder<Translator>()
 					.add(new OracleFunctionTranslator())
-					.toList());
-		}
-		else if (dialect instanceof DB2Dialect) {
-			return new CommonTranslatorController(new ListBuilder<Translator>()
-					.toList());
-		}
-		else if (dialect instanceof MySQLDialect) {
-			return new CommonTranslatorController(new ListBuilder<Translator>()
-					.toList());
-		}
-		else if (dialect instanceof SQLServerDialect) {
-			return new CommonTranslatorController(new ListBuilder<Translator>()
 					.toList());
 		}
 		else {
@@ -160,16 +145,14 @@ public class DaoManager {
 	
 	public void save(Object object) {
 		
-		jdbcExecutor.beginUnitOfWork();
+		Entity entity = entityRepository.getEntity(object.getClass());
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
 		
+		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
+
+		jdbcExecutor.beginUnitOfWork();
 		try {
-			
-			Entity entity = entityRepository.getEntity(object.getClass());
-			LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
-			LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
-			
-			TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
-	
 			for (int i = 0; i < linkedTableEntityBundle.getLinkedTableEntities().size(); i++) {
 				LinkedTableEntity linkedTableEntity = linkedTableEntityBundle.getLinkedTableEntities().get(i);
 	
@@ -218,19 +201,24 @@ public class DaoManager {
 		
 		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
 
-		for (int i = 0; i < linkedTableEntityBundle.getLinkedTableEntities().size(); i++) {
-			UpdateEntityExpression updateEntityExpression = new UpdateEntityExpression("insert", i);
-			
-			ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
-			Translator translator = controller.findTranslator(updateEntityExpression, paramValues);
-			Pair<String, List<?>> translateResult = translator.translate(context, updateEntityExpression, paramValues);
-			
-			String sql = translateResult.getItem1();
-			List<?> values = translateResult.getItem2();
-			
-			int rowsUpdated = jdbcExecutor.update(sql, values);
+		jdbcExecutor.beginUnitOfWork();
+		try {
+			for (int i = 0; i < linkedTableEntityBundle.getLinkedTableEntities().size(); i++) {
+				UpdateEntityExpression updateEntityExpression = new UpdateEntityExpression("insert", i);
+				
+				ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
+				Translator translator = controller.findTranslator(updateEntityExpression, paramValues);
+				Pair<String, List<?>> translateResult = translator.translate(context, updateEntityExpression, paramValues);
+				
+				String sql = translateResult.getItem1();
+				List<?> values = translateResult.getItem2();
+				
+				int rowsUpdated = jdbcExecutor.update(sql, values);
+			}
 		}
-		
+		finally {
+			jdbcExecutor.endUnitOfWork();
+		}
 	}
 
 }

@@ -15,9 +15,6 @@
  */
 package org.nebulae2us.stardust.dao.domain;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.nebulae2us.stardust.sql.domain.DataReader;
 
 /**

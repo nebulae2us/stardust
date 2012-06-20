@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.datasource;
+package org.nebulae2us.stardust.dao.domain;
 
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -46,32 +46,26 @@ public class DriverManagerDataSource implements DataSource {
 	}
 
 	public PrintWriter getLogWriter() throws SQLException {
-		// TODO Auto-generated method stub
-		return null;
+		throw new UnsupportedOperationException();
 	}
 
 	public void setLogWriter(PrintWriter out) throws SQLException {
-		// TODO Auto-generated method stub
-		
+		throw new UnsupportedOperationException();
 	}
 
 	public void setLoginTimeout(int seconds) throws SQLException {
-		// TODO Auto-generated method stub
-		
+		throw new UnsupportedOperationException();
 	}
 
 	public int getLoginTimeout() throws SQLException {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 
 	public <T> T unwrap(Class<T> iface) throws SQLException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public boolean isWrapperFor(Class<?> iface) throws SQLException {
-		// TODO Auto-generated method stub
 		return false;
 	}
 

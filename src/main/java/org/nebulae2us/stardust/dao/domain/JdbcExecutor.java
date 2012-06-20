@@ -387,7 +387,12 @@ public class JdbcExecutor {
 	
 	protected void releaseConnection(Connection connection) {
 		if (connectionHolders.get() == null) {
-			closePhysicalConnection(connection);
+			if (dataSource instanceof ReleaseConnectionHandler) {
+				((ReleaseConnectionHandler)dataSource).releaseConnection(connection);
+			}
+			else {
+				closePhysicalConnection(connection);
+			}
 		}
 	}
 	
