@@ -29,8 +29,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.nebulae2us.stardust.def.domain.EntityDefinitionBuilder;
-
 /**
  * @author Trung Phan
  *
@@ -46,14 +44,6 @@ public class Person extends AbstractEntity {
 		this.dateBorn = dateBorn;
 	}
 
-	public static void defineEntity(Person $, EntityDefinitionBuilder mapper) {
-		Object o = $.passport;
-
-		mapper
-			.identifier($.ssn, $.dateBorn)
-			.embedAttributes($.gender);
-	}
-	
 	/**
 	 * Note: SSN may not uniquely identify a person as SSN is reused.
 	 */

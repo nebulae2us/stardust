@@ -43,7 +43,7 @@ import static org.junit.Assert.*;
  */
 public class BaseTranslatorTest {
 
-	@NonStrict protected Query mockedSubQuery;
+	@NonStrict protected Query<?> mockedSubQuery;
 	
 	@NonStrict protected TranslatorContext context;
 	

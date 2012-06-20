@@ -76,7 +76,7 @@ public final class NullObject {
 	
 	public static final NullObject NULL_BOOLEAN = new NullObject(Boolean.class);
 	
-	public static final List<NullObject> VALUES = new ListBuilder<NullObject>()
+	private static final List<NullObject> VALUES = new ListBuilder<NullObject>()
 			.add(NULL_CHAR, NULL_STRING, NULL_LONG, NULL_INTEGER,NULL_SHORT, NULL_BYTE, NULL_DOUBLE, NULL_FLOAT, NULL_BIG_DECIMAL, NULL_BIG_INTEGER, 
 					NULL_DATE, NULL_TIME, NULL_TIMESTAMP, NULL_JAVA_DATE, NULL_CALENDAR, NULL_GREGORIAN_CALENDAR,
 					NULL_BYTE_ARRAY, NULL_CHAR_ARRAY, NULL_BLOB, NULL_CLOB, NULL_BOOLEAN)

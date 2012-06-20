@@ -16,7 +16,6 @@
 package org.nebulae2us.stardust.dao.domain;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
 
 import org.nebulae2us.stardust.sql.domain.DataReader;
 
@@ -24,34 +23,40 @@ import org.nebulae2us.stardust.sql.domain.DataReader;
  * @author Trung Phan
  *
  */
-public class NamedColumnRecordMapper<T> extends RecordSetHandler<T> {
+public abstract class RecordSetHandler<T> {
+	
+	public static final int MODE_DATA_READER = 1;
+	
+	public static final int MODE_RESULT_SET = 2;
+	
+	public static final int ACTION_MAP_RECORD = 1;
+	
+	public static final int SKIP_MAPPING_RECORD = 2;
 
-	private final Class<T> valueType;
+	private final int mode;
 	
-	private final String columnName;
-	
-	private transient int columnIndex;
-	
-	public NamedColumnRecordMapper(Class<T> valueType, String columnName) {
-		super(RecordSetHandler.MODE_DATA_READER);
-		this.valueType = valueType;
-		this.columnName = columnName;
+	public RecordSetHandler(int mode) {
+		this.mode = mode;
 	}
-	
-	@Override
+
+	public final int getMode() {
+		return mode;
+	}
+
 	public int handleRecordSet(DataReader dataReader) {
-		
-		this.columnIndex = dataReader.findColumn(columnName);
-		if (this.columnIndex == -1) {
-			throw new IllegalStateException("Column " + columnName + " not found.");
-		}
-		
-		return super.handleRecordSet(dataReader);
+		return ACTION_MAP_RECORD;
 	}
-
-	@Override
+	
 	public T mapRecord(DataReader dataReader) {
-		return dataReader.read(valueType, columnIndex);
+		throw new IllegalStateException("This method must be overriden.");
 	}
-
+	
+	public int handleRecordSet(ResultSet resultSet) {
+		return ACTION_MAP_RECORD;
+	}
+	
+	public T mapRecord(ResultSet resultSet, int lineNum) {
+		throw new IllegalStateException("This method must be overriden.");
+	}
+	
 }

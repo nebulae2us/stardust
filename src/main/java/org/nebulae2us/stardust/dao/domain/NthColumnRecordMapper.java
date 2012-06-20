@@ -21,19 +21,20 @@ import org.nebulae2us.stardust.sql.domain.DataReader;
  * @author Trung Phan
  *
  */
-public class NthColumnRecordMapper<T> extends RecordMapper<T> {
+public class NthColumnRecordMapper<T> extends RecordSetHandler<T> {
 
 	private final int columnIndex;
 	private final Class<T> valueType;
 	
 	public NthColumnRecordMapper(Class<T> valueType, int columnIndex) {
+		super(RecordSetHandler.MODE_DATA_READER);
 		this.valueType = valueType;
 		this.columnIndex = columnIndex;
 	}
 
 	@Override
-	public T visitRow(DataReader dataReader, int lineNum) {
-		return dataReader.readObject(valueType, columnIndex);
+	public T mapRecord(DataReader dataReader) {
+		return dataReader.read(valueType, columnIndex);
 	}
 
 	

@@ -59,7 +59,7 @@ public class MockedDataReader extends DataReader {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T readObject(Class<T> expectedClass, int columnIndex) {
+	public <T> T read(Class<T> expectedClass, int columnIndex) {
 		return (T)this.data.get(currentPos)[columnIndex - 1];
 	}
 
@@ -69,9 +69,9 @@ public class MockedDataReader extends DataReader {
 	}
 
 	@Override
-	public <T> T readObject(Class<T> expectedClass, String columnName) {
+	public <T> T read(Class<T> expectedClass, String columnName) {
 		int index = columnNameIndexes.get(columnName);
-		return readObject(expectedClass, index + 1);
+		return read(expectedClass, index + 1);
 	}
 
 	@Override

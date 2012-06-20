@@ -17,16 +17,17 @@ package org.nebulae2us.stardust;
 
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import javax.sql.DataSource;
+
 import org.junit.After;
-import org.nebulae2us.stardust.dao.domain.ConnectionProvider;
 import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
+import org.nebulae2us.stardust.datasource.DriverManagerDataSource;
 import org.nebulae2us.stardust.dialect.Dialect;
+import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.dialect.MckoiDialect;
-import org.nebulae2us.stardust.exception.SqlException;
 
 /**
  * @author Trung Phan
@@ -40,19 +41,17 @@ public class BaseIntegrationTest {
 	protected final String username;
 	protected final String password;
 	
-	protected Connection connection;
+	protected final DataSource dataSource;
 	
 	protected final JdbcExecutor jdbcExecutor;
 	
 	protected final Dialect dialect;
-
-	@After
-	public void closeConnection() throws SQLException {
-		if (connection != null && !connection.isClosed()) {
-			connection.close();
-		}
-	}
 	
+	/**
+	 * Dummy connection is needed for in-memory database such as H2 to keep the database open.
+	 */
+	private Connection dummyConnection;
+
 	public BaseIntegrationTest(String configuration) {
 		Properties prop = new Properties();
 		
@@ -76,32 +75,33 @@ public class BaseIntegrationTest {
 			throw new RuntimeException("Failed to find dialect " + _dialect);
 		}
 		
-		try {
-			Class.forName(driverClass);
-		} catch (ClassNotFoundException e) {
-			throw new IllegalStateException("Failed to load driver class: " + driverClass, e);
-		}
-		try {
-			connection = DriverManager.getConnection(url, username, password);
-		} catch (SQLException e) {
-			if (dialect instanceof MckoiDialect) {
-				try {
-					connection = DriverManager.getConnection(url + "?create=true", username, password);
-				} catch (SQLException e1) {
-					throw new SqlException(e);
-				}
-			}
-			else {
-				throw new SqlException(e);
-			}
+		this.dataSource = new DriverManagerDataSource(this.driverClass, this.url, this.username, this.password, null);
+
+		if (dialect instanceof H2Dialect) {
+			try {
+				this.dummyConnection = this.dataSource.getConnection();
+			} catch (SQLException e) {}
 		}
 		
-		this.jdbcExecutor = new JdbcExecutor(dialect, new ConnectionProvider() {
-			public Connection getConnection() {
-				return connection;
-			}
-		});
+		this.jdbcExecutor = new JdbcExecutor(dialect, dataSource);
 		
+		if (dialect instanceof MckoiDialect) {
+			this.jdbcExecutor.beginUnitOfWork();
+		}
+		
+	}
+	
+	@After
+	public void releaseResource() {
+		if (dialect instanceof MckoiDialect) {
+			this.jdbcExecutor.endUnitOfWork();
+		}
+		try {
+			if (this.dummyConnection != null && !this.dummyConnection.isClosed()) {
+				this.dummyConnection.close();
+			}
+		}
+		catch (SQLException e) {}
 	}
 
 }

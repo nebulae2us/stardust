@@ -16,16 +16,18 @@
 package org.nebulae2us.stardust;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+
+import javax.sql.DataSource;
 
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
-import org.nebulae2us.stardust.dao.domain.ConnectionProvider;
 import org.nebulae2us.stardust.dao.domain.GenericDataReader;
 import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
-import org.nebulae2us.stardust.dao.domain.JdbcHelper;
+import org.nebulae2us.stardust.dao.domain.RecordSetHandler;
 import org.nebulae2us.stardust.dialect.DB2Dialect;
 import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.dialect.H2Dialect;
@@ -66,13 +68,10 @@ public class DaoManager {
 	
 	private final JdbcExecutor jdbcExecutor;
 	
-	private final JdbcHelper jdbcHelper;
-	
 	private final Dialect dialect;
 	
-	public DaoManager(ConnectionProvider connectionProvider, Dialect dialect) {
-		this.jdbcExecutor = new JdbcExecutor(dialect, connectionProvider);
-		this.jdbcHelper = new JdbcHelper(this.jdbcExecutor);
+	public DaoManager(DataSource dataSource, Dialect dialect) {
+		this.jdbcExecutor = new JdbcExecutor(dialect, dataSource);
 		this.dialect = dialect;
 		this.entityRepository = new EntityRepository();
 		this.controller = resolveTranslatorController(dialect);
@@ -82,7 +81,6 @@ public class DaoManager {
 		this.jdbcExecutor = jdbcExecutor;
 		this.entityRepository = entityRepository;
 		this.controller = controller;
-		this.jdbcHelper = new JdbcHelper(jdbcExecutor);
 		this.dialect = dialect;
 	}
 	
@@ -129,71 +127,87 @@ public class DaoManager {
 		return jdbcExecutor;
 	}
 
-	public final JdbcHelper getJdbcHelper() {
-		return jdbcHelper;
-	}
-
 	public <T> QueryBuilder<T> newQuery(Class<T> entityClass) {
 		return new QueryBuilder<T>(this, entityClass);
 	}
 	
 	public <T> List<T> query(Query<T> query) {
+		final TranslatorContext context = query.getTranslatorContext();
+
 		Pair<String, List<?>> translateResult = query.translate();
 		
 		String sql = translateResult.getItem1();
 		List<?> values = translateResult.getItem2();
+
+		final List<T>[] result = new List[1];
+
+		jdbcExecutor.beginUnitOfWork();
+		try {
+			jdbcExecutor.query(sql, values, new RecordSetHandler<T>(RecordSetHandler.MODE_DATA_READER) {
+				@Override
+				public int handleRecordSet(DataReader dataReader) {
+					result[0] = (List<T>)context.getLinkedEntityBundle().readData(entityRepository, dataReader);
+					return RecordSetHandler.SKIP_MAPPING_RECORD;
+				}
+			});
+		}
+		finally {
+			jdbcExecutor.endUnitOfWork();
+		}
 		
-		ResultSet resultSet = jdbcExecutor.query(sql, values);
-		DataReader dataReader = new GenericDataReader(resultSet);
-		
-		TranslatorContext context = query.getTranslatorContext();
-		List<T> result = (List<T>)context.getLinkedEntityBundle().readData(this.entityRepository, dataReader);
-		return result;
+		return result[0];
 	}
 	
 	public void save(Object object) {
 		
-		Entity entity = entityRepository.getEntity(object.getClass());
-		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
-		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
+		jdbcExecutor.beginUnitOfWork();
 		
-		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
-
-		for (int i = 0; i < linkedTableEntityBundle.getLinkedTableEntities().size(); i++) {
-			LinkedTableEntity linkedTableEntity = linkedTableEntityBundle.getLinkedTableEntities().get(i);
-
-			// populate identity values
-			for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
-				IdentifierGenerator generator = scalarAttribute.getValueGenerator();
-				if (generator != null && generator.generationBeforeInsertion()) {
-					Object value = generator.generateIdentifierValue(scalarAttribute.getScalarType(), dialect, jdbcHelper);
-					
-					ReflectionUtils.setValue(scalarAttribute.getField(), object, value);
+		try {
+			
+			Entity entity = entityRepository.getEntity(object.getClass());
+			LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
+			LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
+			
+			TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
+	
+			for (int i = 0; i < linkedTableEntityBundle.getLinkedTableEntities().size(); i++) {
+				LinkedTableEntity linkedTableEntity = linkedTableEntityBundle.getLinkedTableEntities().get(i);
+	
+				// populate identity values
+				for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
+					IdentifierGenerator generator = scalarAttribute.getValueGenerator();
+					if (generator != null && generator.generationBeforeInsertion()) {
+						Object value = generator.generateIdentifierValue(scalarAttribute.getScalarType(), this.dialect, this.jdbcExecutor);
+						
+						ReflectionUtils.setValue(scalarAttribute.getField(), object, value);
+					}
 				}
-			}
-			
-			InsertEntityExpression insertEntityExpression = new InsertEntityExpression("insert", i);
-			
-			ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
-			Translator translator = controller.findTranslator(insertEntityExpression, paramValues);
-			Pair<String, List<?>> translateResult = translator.translate(context, insertEntityExpression, paramValues);
-			
-			String sql = translateResult.getItem1();
-			List<?> values = translateResult.getItem2();
-			
-			int rowsInserted = jdbcExecutor.update(sql, values);
-			
-			// retrieve identity values
-			for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
-				IdentifierGenerator generator = scalarAttribute.getValueGenerator();
-				if (generator != null && !generator.generationBeforeInsertion()) {
-					Object value = generator.generateIdentifierValue(scalarAttribute.getScalarType(), dialect, jdbcHelper);
-					
-					ReflectionUtils.setValue(scalarAttribute.getField(), object, value);
+				
+				InsertEntityExpression insertEntityExpression = new InsertEntityExpression("insert", i);
+				
+				ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
+				Translator translator = controller.findTranslator(insertEntityExpression, paramValues);
+				Pair<String, List<?>> translateResult = translator.translate(context, insertEntityExpression, paramValues);
+				
+				String sql = translateResult.getItem1();
+				List<?> values = translateResult.getItem2();
+				
+				int rowsInserted = jdbcExecutor.update(sql, values);
+				
+				// retrieve identity values
+				for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
+					IdentifierGenerator generator = scalarAttribute.getValueGenerator();
+					if (generator != null && !generator.generationBeforeInsertion()) {
+						Object value = generator.generateIdentifierValue(scalarAttribute.getScalarType(), this.dialect, this.jdbcExecutor);
+						
+						ReflectionUtils.setValue(scalarAttribute.getField(), object, value);
+					}
 				}
 			}
 		}
-		
+		finally {
+			jdbcExecutor.endUnitOfWork();
+		}
 	}
 	
 	

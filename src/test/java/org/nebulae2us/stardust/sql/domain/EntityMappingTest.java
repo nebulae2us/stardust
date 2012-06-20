@@ -17,7 +17,6 @@ package org.nebulae2us.stardust.sql.domain;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import mockit.Expectations;
 import mockit.NonStrict;

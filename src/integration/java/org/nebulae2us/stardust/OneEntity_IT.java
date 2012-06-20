@@ -15,7 +15,6 @@
  */
 package org.nebulae2us.stardust;
 
-import java.sql.Statement;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collection;
@@ -90,7 +89,6 @@ public class OneEntity_IT extends BaseIntegrationTest {
 		
 		List<String> ddls = ddlGenerator.generateCreateSchemaObjectsDDL();
 		for (String ddl : ddls) {
-			System.out.println(ddl);
 			jdbcExecutor.execute(ddl);
 		}
 	}
@@ -99,12 +97,7 @@ public class OneEntity_IT extends BaseIntegrationTest {
 	public void tearDown() throws Exception {
 		List<String> ddls = ddlGenerator.generateDropSchemaObjectsDDL();
 		for (String ddl : ddls) {
-			System.out.println(ddl);
 			jdbcExecutor.execute(ddl);
-		}
-
-		if (connection != null && !connection.isClosed()) {
-			connection.close();
 		}
 	}
 	
@@ -141,7 +134,7 @@ public class OneEntity_IT extends BaseIntegrationTest {
 		daoManager.save(person);
 		
 		assertEquals(Long.valueOf(1), person.id);
-	}
+	} 
 	
 	@Test
 	public void should_be_able_to_use_customized_sql() {

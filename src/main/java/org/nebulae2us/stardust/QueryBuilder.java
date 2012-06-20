@@ -15,8 +15,6 @@
  */
 package org.nebulae2us.stardust;
 
-import java.beans.Expression;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -27,7 +25,6 @@ import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.Procedure;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
-import org.nebulae2us.stardust.dao.domain.GenericDataReader;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.expr.domain.OrderExpression;
 import org.nebulae2us.stardust.expr.domain.PredicateExpression;
@@ -35,7 +32,6 @@ import org.nebulae2us.stardust.expr.domain.QueryExpression;
 import org.nebulae2us.stardust.expr.domain.SelectExpression;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 import org.nebulae2us.stardust.sql.domain.AliasJoin;
-import org.nebulae2us.stardust.sql.domain.DataReader;
 import org.nebulae2us.stardust.sql.domain.LinkedEntityBundle;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
 import org.nebulae2us.stardust.translate.domain.ParamValues;
@@ -255,7 +251,7 @@ public class QueryBuilder<T> {
 		String sql = translateResult.getItem1();
 		List<?> values = translateResult.getItem2();
 		
-		long result = daoManager.getJdbcHelper().queryForLong(sql, values);
+		long result = daoManager.getJdbcExecutor().queryForLong(sql, values);
 		return result;
 	}
 	

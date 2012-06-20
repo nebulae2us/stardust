@@ -26,9 +26,9 @@ public abstract class DataReader {
 	
 	public abstract int findColumn(String columnName);
 	
-	public abstract <T> T readObject(Class<T> expectedClass, int columnIndex);
+	public abstract <T> T read(Class<T> expectedType, int columnIndex);
 
-	public abstract <T> T readObject(Class<T> expectedClass, String columnName);
+	public abstract <T> T read(Class<T> expectedType, String columnName);
 	
 	public abstract boolean next();
 	

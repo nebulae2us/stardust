@@ -19,6 +19,7 @@ import java.util.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.jpa.group1.House;
@@ -50,7 +51,7 @@ public class LinkedEntityBundleDataReaderTest {
 		DataReader dataReader = new MockedDataReader(Arrays.asList("SSN", "DATE_BORN"));
 		
 		Entity entity = entityRepository.getEntity(Person.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
 
 		assertEquals(0, bundle.readData(this.entityRepository, dataReader).size());
 		
@@ -66,7 +67,7 @@ public class LinkedEntityBundleDataReaderTest {
 		DataReader dataReader = new MockedDataReader(columnNames, data);
 
 		Entity entity = entityRepository.getEntity(Person.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
 
 		List<Person> persons = (List<Person>)bundle.readData(this.entityRepository, dataReader);
 		assertEquals(1, persons.size());
@@ -86,7 +87,7 @@ public class LinkedEntityBundleDataReaderTest {
 		DataReader dataReader = new MockedDataReader(columnNames, data);
 
 		Entity entity = entityRepository.getEntity(Person.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
 
 		List<Person> persons = (List<Person>)bundle.readData(this.entityRepository, dataReader);
 		assertEquals(2, persons.size());
@@ -108,7 +109,7 @@ public class LinkedEntityBundleDataReaderTest {
 		DataReader dataReader = new MockedDataReader(columnNames, data);
 
 		Entity entity = entityRepository.getEntity(Person.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
 
 		List<Person> persons = (List<Person>)bundle.readData(this.entityRepository, dataReader);
 		assertEquals(1, persons.size());
@@ -128,7 +129,7 @@ public class LinkedEntityBundleDataReaderTest {
 		DataReader dataReader = new MockedDataReader(columnNames, data);
 
 		Entity entity = entityRepository.getEntity(Person.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
 		
 		List<Person> persons = (List<Person>)bundle.readData(this.entityRepository, dataReader);
 		
@@ -153,7 +154,7 @@ public class LinkedEntityBundleDataReaderTest {
 		DataReader dataReader = new MockedDataReader(columnNames, data);
 
 		Entity entity = entityRepository.getEntity(Room.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
 		
 		List<Room> rooms = (List<Room>)bundle.readData(this.entityRepository, dataReader);
 		
@@ -182,7 +183,7 @@ public class LinkedEntityBundleDataReaderTest {
 		DataReader dataReader = new MockedDataReader(columnNames, data);
 
 		Entity entity = entityRepository.getEntity(Room.class);
-		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Collections.EMPTY_LIST);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
 		
 		List<Room> rooms = (List<Room>)bundle.readData(this.entityRepository, dataReader);
 		

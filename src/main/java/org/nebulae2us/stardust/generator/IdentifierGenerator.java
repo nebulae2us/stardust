@@ -15,7 +15,7 @@
  */
 package org.nebulae2us.stardust.generator;
 
-import org.nebulae2us.stardust.dao.domain.JdbcHelper;
+import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
 import org.nebulae2us.stardust.dialect.Dialect;
 
 /**
@@ -30,6 +30,6 @@ public interface IdentifierGenerator {
 	 */
 	public boolean generationBeforeInsertion();
 	
-	public <T> T generateIdentifierValue(Class<T> expectedType, Dialect dialect, JdbcHelper jdbcHelper);
+	public <T> T generateIdentifierValue(Class<T> expectedType, Dialect dialect, JdbcExecutor jdbcExecutor);
 
 }

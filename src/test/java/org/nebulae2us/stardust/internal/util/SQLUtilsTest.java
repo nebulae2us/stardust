@@ -13,16 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.dao.domain;
+package org.nebulae2us.stardust.internal.util;
 
-import java.sql.Connection;
 import java.util.Arrays;
 import java.util.List;
 
 import org.junit.Test;
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.MapBuilder;
-import org.nebulae2us.stardust.dialect.DefaultDialect;
+import org.nebulae2us.stardust.internal.util.SQLUtils;
 
 import static org.junit.Assert.*;
 
@@ -30,21 +29,12 @@ import static org.junit.Assert.*;
  * @author Trung Phan
  *
  */
-public class JdbcOperation_transformSql_Test extends JdbcExecutor {
+public class SQLUtilsTest {
 
-	public JdbcOperation_transformSql_Test() {
-		super(new DefaultDialect(), new ConnectionProvider() {
-			public Connection getConnection() {
-				return null;
-			}
-		});
-	}
-	
-	
 	@Test
-	public void test1() {
+	public void deparameterizeSql() {
 
-		Pair<String, List<?>> result = transformSql("ddd ?, ?, :param1, ? =:param$_#2, :lastParam",
+		Pair<String, List<?>> result = SQLUtils.deparameterizeSql("ddd ?, ?, :param1, ? =:param$_#2, :lastParam",
 				new MapBuilder<String, Integer>()
 				.put("param1", 11)
 				.put("param$_#2", 12)

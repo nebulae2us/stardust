@@ -15,12 +15,10 @@
  */
 package org.nebulae2us.stardust.generator;
 
-import static org.nebulae2us.stardust.internal.util.BaseAssert.Assert;
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
-import org.nebulae2us.stardust.dao.domain.JdbcHelper;
+import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
 import org.nebulae2us.stardust.dialect.Dialect;
-import org.nebulae2us.stardust.dialect.H2Dialect;
-import org.nebulae2us.stardust.dialect.OracleDialect;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 
 /**
@@ -50,16 +48,13 @@ public class SequenceIdentifierGenerator implements IdentifierGenerator {
 		return true;
 	}
 
-	public <T> T generateIdentifierValue(Class<T> expectedType, Dialect dialect, JdbcHelper jdbcHelper) {
+	public <T> T generateIdentifierValue(Class<T> expectedType, Dialect dialect, JdbcExecutor jdbcExecutor) {
 		Assert.isTrue(Number.class.isAssignableFrom(expectedType), "Expected numeric type.");
 
 		String sql = dialect.getSqlToRetrieveNextSequenceValue(ObjectUtils.isEmpty(schema) ? sequenceName : schema + "." + sequenceName);
-		return jdbcHelper.queryFor(expectedType, sql);
+		return jdbcExecutor.queryFor(expectedType, sql);
 	}
 
-	/**
-	 * @return
-	 */
 	public String getName() {
 		return this.sequenceName;
 	}

@@ -17,7 +17,6 @@ package org.nebulae2us.stardust;
 
 import static org.junit.Assert.assertEquals;
 
-import java.sql.Statement;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -105,21 +104,16 @@ public class OneEntityWithSequence_IT extends BaseIntegrationTest {
 		
 		List<String> ddls = ddlGenerator.generateCreateSchemaObjectsDDL();
 		for (String ddl : ddls) {
-			System.out.println(ddl);
 			jdbcExecutor.execute(ddl);
 		}
+		
 	}
 	
 	@After
 	public void tearDown() throws Exception {
 		List<String> ddls = ddlGenerator.generateDropSchemaObjectsDDL();
 		for (String ddl : ddls) {
-			System.out.println(ddl);
 			jdbcExecutor.execute(ddl);
-		}
-
-		if (connection != null && !connection.isClosed()) {
-			connection.close();
 		}
 	}
 	

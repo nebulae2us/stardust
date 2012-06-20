@@ -58,7 +58,7 @@ public class GenericDataReader extends DataReader {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> T readObject(Class<T> valueType, int columnIndex) {
+	public <T> T read(Class<T> valueType, int columnIndex) {
 		
 		try {
 			if (valueType == String.class) {
@@ -179,9 +179,9 @@ public class GenericDataReader extends DataReader {
 	}
 
 	@Override
-	public <T> T readObject(Class<T> expectedClass, String columnName) {
+	public <T> T read(Class<T> expectedClass, String columnName) {
 		int i = findColumn(columnName);
-		return readObject(expectedClass, i);
+		return read(expectedClass, i);
 	}
 	
 	@Override

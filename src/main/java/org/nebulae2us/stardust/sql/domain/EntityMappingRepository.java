@@ -246,7 +246,7 @@ public class EntityMappingRepository {
 		int idCount = identifierAttributeMappings.size();
 		if (idCount == 1) {
 			ScalarAttributeMapping identifierAttributeMapping = identifierAttributeMappings.get(0);
-			Object idValue = dataReader.readObject(identifierAttributeMapping.getAttribute().getField().getType(), identifierAttributeMapping.getColumnIndex());
+			Object idValue = dataReader.read(identifierAttributeMapping.getAttribute().getField().getType(), identifierAttributeMapping.getColumnIndex());
 			return idValue;
 		}
 		else if (idCount > 1) {
@@ -254,7 +254,7 @@ public class EntityMappingRepository {
 			boolean isNull = true;
 			for (int i = 0; i < idCount; i++) {
 				ScalarAttributeMapping identifierAttributeMapping = identifierAttributeMappings.get(i);
-				Object idValue = dataReader.readObject(identifierAttributeMapping.getAttribute().getField().getType(), identifierAttributeMapping.getColumnIndex());
+				Object idValue = dataReader.read(identifierAttributeMapping.getAttribute().getField().getType(), identifierAttributeMapping.getColumnIndex());
 				if (idValue != null) {
 					isNull = false;
 				}
@@ -312,7 +312,7 @@ public class EntityMappingRepository {
 			
 			Class<?> discriminatorType = entity.getRootEntity().getEntityDiscriminator().getValue().getClass();
 
-			Object discriminatorValue = dataReader.readObject(discriminatorType, entityMapping.getDiscriminatorColumnIndex());
+			Object discriminatorValue = dataReader.read(discriminatorType, entityMapping.getDiscriminatorColumnIndex());
 			
 			AssertState.notNull(discriminatorValue, "Discriminator value read from the database is null for row number %d.", dataReader.getRowNumber());
 			AssertState.isTrue(discriminatorValues.containsKey(discriminatorValue), "Discriminiator value of %s cannot be mapped to any entity", discriminatorValue.toString());
@@ -336,7 +336,7 @@ public class EntityMappingRepository {
 			if (attributeMapping instanceof ScalarAttributeMapping) {
 				
 				ScalarAttributeMapping scalarAttributeMapping = (ScalarAttributeMapping)attributeMapping;
-				Object value = dataReader.readObject(scalarAttributeMapping.getAttribute().getField().getType(), scalarAttributeMapping.getColumnIndex());
+				Object value = dataReader.read(scalarAttributeMapping.getAttribute().getField().getType(), scalarAttributeMapping.getColumnIndex());
 				setValue(attributeMapping.getAttribute().getField(), result, value);
 			}
 			else if (attributeMapping instanceof ValueObjectAttributeMapping) {

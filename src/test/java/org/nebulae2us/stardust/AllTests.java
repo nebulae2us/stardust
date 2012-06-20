@@ -21,7 +21,6 @@ import org.junit.runners.Suite.SuiteClasses;
 import org.nebulae2us.stardust.api.BaseFilterBuilderTest;
 import org.nebulae2us.stardust.api.FilterBuilderTest;
 import org.nebulae2us.stardust.api.QueryTest;
-import org.nebulae2us.stardust.dao.domain.JdbcOperation_transformSql_Test;
 import org.nebulae2us.stardust.ddl.domain.H2DDLGeneratorTest;
 import org.nebulae2us.stardust.def.domain.AnnotationEntityDefinitionBuilderTest;
 import org.nebulae2us.stardust.def.domain.AnnotationValueObjectDefinitionBuilderTest;
@@ -30,6 +29,7 @@ import org.nebulae2us.stardust.def.domain.ValueObjectBuilderTest;
 import org.nebulae2us.stardust.expr.domain.ComparisonExpressionTest;
 import org.nebulae2us.stardust.expr.domain.InListExpressionTest;
 import org.nebulae2us.stardust.expr.domain.SelectorExpressionTest;
+import org.nebulae2us.stardust.internal.util.SQLUtilsTest;
 import org.nebulae2us.stardust.my.domain.Group1EntityRepositoryTest;
 import org.nebulae2us.stardust.sql.domain.*;
 import org.nebulae2us.stardust.translate.domain.AnyAllTranslatorTest;
@@ -64,7 +64,7 @@ import org.nebulae2us.stardust.translate.domain.TranslatorTest;
 	IsNullTranslatorTest.class,
 	LikeTranslatorTest.class,
 	H2DDLGeneratorTest.class,
-	JdbcOperation_transformSql_Test.class,
+	SQLUtilsTest.class,
 	AnnotationEntityDefinitionBuilderTest.class,
 	AnnotationValueObjectDefinitionBuilderTest.class,
 	EntityDefinitionBuilderTest.class,

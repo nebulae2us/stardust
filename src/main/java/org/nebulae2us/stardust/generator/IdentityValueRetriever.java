@@ -15,10 +15,8 @@
  */
 package org.nebulae2us.stardust.generator;
 
-import org.nebulae2us.stardust.dao.domain.JdbcHelper;
+import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
 import org.nebulae2us.stardust.dialect.Dialect;
-import org.nebulae2us.stardust.dialect.H2Dialect;
-import org.nebulae2us.stardust.dialect.OracleDialect;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -43,11 +41,11 @@ public class IdentityValueRetriever implements IdentifierGenerator {
 		return false;
 	}
 
-	public <T> T generateIdentifierValue(Class<T> expectedType, Dialect dialect, JdbcHelper jdbcHelper) {
+	public <T> T generateIdentifierValue(Class<T> expectedType, Dialect dialect, JdbcExecutor jdbcExecutor) {
 		Assert.isTrue(Number.class.isAssignableFrom(expectedType), "Expected numeric type.");
 		
 		String sql = dialect.getSqlToRetrieveIdentityValue();
-		return jdbcHelper.queryFor(expectedType, sql);
+		return jdbcExecutor.queryFor(expectedType, sql);
 	}
 
 }

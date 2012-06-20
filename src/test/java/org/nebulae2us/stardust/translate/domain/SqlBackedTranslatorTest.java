@@ -25,7 +25,6 @@ import org.nebulae2us.electron.Converter;
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.stardust.db.domain.JoinType;
-import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.expr.domain.PredicateExpression;
 import org.nebulae2us.stardust.jpa.group1.Person;
