@@ -16,7 +16,6 @@
 package org.nebulae2us.stardust.def.domain;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Entity;
@@ -57,7 +56,7 @@ public class DefinitionRepository {
 		return result;
 	}
 	
-	public SemiEntityDefinition getBaseEntityDefinition(Class<?> entityClass, Class<?> currentClass) {
+	public synchronized SemiEntityDefinition getBaseEntityDefinition(Class<?> entityClass, Class<?> currentClass) {
 		if (entityClass == currentClass) {
 			return getEntityDefinition(entityClass);
 		}
@@ -87,7 +86,6 @@ public class DefinitionRepository {
 	private static DefinitionRepository instance = new DefinitionRepository();
 	
 	public static DefinitionRepository getInstance() {
-		// TODO remove this static dependency.
 		return instance;
 	}
 

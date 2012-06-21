@@ -244,7 +244,7 @@ public class AnnotationEntityDefinitionBuilderTest {
 		EntityDefinition definition = new AnnotationEntityDefinitionBuilder(Student.class)
 		.toEntityDefinition();
 		
-		assertEquals(Arrays.asList("firstName", "lastName"), definition.getExcludedAttributes());
+		assertEquals(Arrays.asList("firstName", "lastName", "this$0"), definition.getExcludedAttributes());
 		
 	}
 	

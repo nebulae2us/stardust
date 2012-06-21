@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runners.Parameterized.Parameters;
 import org.nebulae2us.stardust.ddl.domain.DDLGenerator;
@@ -79,6 +80,15 @@ public class DaoManager_H2_IT extends BaseIntegrationTest {
 		DDLGenerator generator = new DDLGenerator(dialect, entityRepository);
 		List<String> ddlSqls = generator.generateCreateSchemaObjectsDDL();
 		
+		for (String ddlSql : ddlSqls) {
+			jdbcExecutor.execute(ddlSql);
+		}
+	}
+	
+	@After
+	public void tearDown() {
+		DDLGenerator generator = new DDLGenerator(dialect, entityRepository);
+		List<String> ddlSqls = generator.generateDropSchemaObjectsDDL();
 		for (String ddlSql : ddlSqls) {
 			jdbcExecutor.execute(ddlSql);
 		}

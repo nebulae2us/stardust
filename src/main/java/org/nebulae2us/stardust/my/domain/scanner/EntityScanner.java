@@ -261,6 +261,7 @@ public class EntityScanner {
 			SemiEntityDefinition relatedBaseEntityDefinition = DefinitionRepository.getInstance().getBaseEntityDefinition(entityClass, relatedClass);
 			
 			for (Field field : relatedClass.getDeclaredFields()) {
+				
 				if (relatedBaseEntityDefinition.getExcludedAttributes().contains(field.getName())) {
 					continue;
 				}
@@ -389,6 +390,7 @@ public class EntityScanner {
 		}
 		if (result.getEntityIdentifier() == null) {
 			result.entityIdentifier$begin()
+				.declaringClass(entityClass)
 				.attributes(Collections.EMPTY_LIST)
 			.end();
 		}

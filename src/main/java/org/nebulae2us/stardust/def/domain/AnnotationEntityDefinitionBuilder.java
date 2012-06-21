@@ -49,6 +49,8 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  */
 public class AnnotationEntityDefinitionBuilder extends AbstractAnnotationDefinitionBuilder {
 
+	private final static List<String> OUTER_CLASS_THIS_FIELD = new ListBuilder<String>().add("this$0", "this$1", "this$2", "this$3", "this$4", "this$5", "this$6", "this$7", "this$8", "this$9", "this$10", "this$11", "this$12").toList();
+	
 	private final Class<?> entityClass;
 	
 	public AnnotationEntityDefinitionBuilder(Class<?> entityClass) {
@@ -139,7 +141,8 @@ public class AnnotationEntityDefinitionBuilder extends AbstractAnnotationDefinit
 
 		
 		for (Field field : entityClass.getDeclaredFields()) {
-			if ((field.getModifiers() & Modifier.TRANSIENT) > 0 || field.getAnnotation(Transient.class) != null) {
+			if ((field.getModifiers() & Modifier.TRANSIENT) > 0 || field.getAnnotation(Transient.class) != null || (field.getModifiers() & Modifier.NATIVE) > 0 ||
+					(field.getModifiers() & Modifier.STATIC) > 0 || OUTER_CLASS_THIS_FIELD.contains(field.getName())) {
 				builder.excludeAttributes(field.getName());
 				continue;
 			}

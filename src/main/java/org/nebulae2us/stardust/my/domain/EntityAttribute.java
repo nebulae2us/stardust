@@ -21,6 +21,7 @@ import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.db.domain.Table;
+import org.nebulae2us.stardust.internal.util.ObjectUtils;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -97,10 +98,10 @@ public class EntityAttribute extends Attribute {
 	private void assertInvariant() {
 		Assert.notNull(this.entity, "entity cannot be null");
 		Assert.notNull(this.relationalType, "relationalType cannot be null");
-		Assert.notNull(this.joinType, "joinType cannot be null");
-		Assert.notEmpty(this.leftColumns, "leftColumns cannot be empty");
-		Assert.notEmpty(this.rightColumns, "rightColumns cannot be empty");
+		AssertSyntax.notEmpty(this.leftColumns, this.owningSide ? "Attribute \"%s\" cannot reference non-id entity." : "Attribute \"%s\" of non-id entity cannot participate in a %s relationship.", this.getFullName(), this.relationalType);
+		Assert.notEmpty(this.rightColumns, "rightColumns cannot be empty.");
 		Assert.isTrue(this.leftColumns.size() == this.rightColumns.size(), "size mismatch between leftColumns and rightColumns: %d vs. %d", this.leftColumns.size(), this.rightColumns.size());
+		Assert.notNull(this.joinType, "joinType cannot be null");
 		
 		if (this.junctionTable == null) {
 			Assert.empty(this.junctionLeftColumns, "junctionLeftColumns must be empty");

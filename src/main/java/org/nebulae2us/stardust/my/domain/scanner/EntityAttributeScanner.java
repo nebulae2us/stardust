@@ -84,7 +84,7 @@ public class EntityAttributeScanner {
 				relationalType = RelationalType.ONE_TO_MANY;
 			}
 			else if (Map.class.isAssignableFrom(field.getType())) {
-				throw new UnsupportedOperationException("Map is not supported for relational mapping for field: " + field.getName());
+				throw new UnsupportedOperationException("Map is not supported for relational mapping for field: " + field.getDeclaringClass() + '.' + field.getName());
 			}
 			else {
 				relationalType = RelationalType.MANY_TO_ONE;
@@ -163,7 +163,6 @@ public class EntityAttributeScanner {
 				}
 				AssertState.isTrue(field.getAnnotation(ManyToOne.class) != null || !Collection.class.isAssignableFrom(fieldEntityClass), "Failed to find corresponding definition by using mappedBy: %s", mappedBy);
 				
-				
 				EntityAttributeBuilder<?> foreignAttributeBuilder = new EntityAttributeScanner(this.fieldEntity, field, this.owningEntity).produce();
 				attributeBuilder
 						.joinType(JoinType.LEFT_JOIN)
@@ -175,6 +174,9 @@ public class EntityAttributeScanner {
 						.junctionRightColumns(foreignAttributeBuilder.getJunctionLeftColumns())
 						;
 					
+			}
+			else {
+				AssertSyntax.fail("Field \"%s.%s\": expected mappedBy value for the One-to-Many relationship.", field.getDeclaringClass().getSimpleName(), field.getName());
 			}
 			
 			break;
@@ -245,7 +247,6 @@ public class EntityAttributeScanner {
 				
 				
 			}
-			
 			
 			break;
 		}

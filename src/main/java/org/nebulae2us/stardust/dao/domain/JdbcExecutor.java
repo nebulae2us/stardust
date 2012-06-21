@@ -93,7 +93,7 @@ public class JdbcExecutor {
     	AssertState.notNull(connectionHolder, "Unit of work has not been started");
     	if (--connectionHolder.lock == 0) {
     		if (connectionHolder.connection != null) {
-    			closePhysicalConnection(connectionHolder.connection);
+    			closeConnection(connectionHolder.connection);
     		}
     		connectionHolders.set(null);
     	}
@@ -385,14 +385,18 @@ public class JdbcExecutor {
 		} catch (SQLException e) {}
 	}
 	
+	protected void closeConnection(Connection connection) {
+		if (dataSource instanceof ReleaseConnectionHandler) {
+			((ReleaseConnectionHandler)dataSource).releaseConnection(connection);
+		}
+		else {
+			closePhysicalConnection(connection);
+		}
+	}
+	
 	protected void releaseConnection(Connection connection) {
 		if (connectionHolders.get() == null) {
-			if (dataSource instanceof ReleaseConnectionHandler) {
-				((ReleaseConnectionHandler)dataSource).releaseConnection(connection);
-			}
-			else {
-				closePhysicalConnection(connection);
-			}
+			closeConnection(connection);
 		}
 	}
 	
