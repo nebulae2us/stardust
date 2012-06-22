@@ -141,16 +141,4 @@ public class Entity extends AttributeHolder {
 		return true;
 	}
 	
-	public ArrayWrapper extractIdentifierValue(Object entityInstance) {
-		List<ScalarAttribute> identifierScalarAttributes = entityIdentifier.getScalarAttributes();
-		Object[] ids = new Object[identifierScalarAttributes.size()];
-		
-		for (int i = 0; i < identifierScalarAttributes.size(); i++) {
-			ScalarAttribute identifierScalarAttribute = identifierScalarAttributes.get(i);
-			ids[i] = identifierScalarAttribute.extractAttributeValue(entityInstance);
-		}
-		
-		
-		return new ArrayWrapper(ids);
-	}
 }

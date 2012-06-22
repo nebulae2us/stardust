@@ -5,7 +5,6 @@ import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
 import org.nebulae2us.stardust.*;
-import org.nebulae2us.stardust.internal.util.Builders;
 
 @Builder(destination=Attribute.class)
 public class AttributeBuilder<P> implements Wrappable<Attribute> {

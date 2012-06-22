@@ -35,12 +35,15 @@ public class TranslatorContext {
 	
 	private final LinkedEntityBundle linkedEntityBundle;
 	
-	public TranslatorContext(Dialect dialect, TranslatorController translatorController, LinkedTableEntityBundle linkedTableEntityBundle, LinkedEntityBundle linkedEntityBundle, boolean externalSql) {
+	private final String defaultSchema;
+	
+	public TranslatorContext(Dialect dialect, TranslatorController translatorController, LinkedTableEntityBundle linkedTableEntityBundle, LinkedEntityBundle linkedEntityBundle, boolean externalSql, String defaultSchema) {
 		this.dialect = dialect;
 		this.translatorController = translatorController;
 		this.linkedTableEntityBundle = linkedTableEntityBundle;
 		this.linkedEntityBundle = linkedEntityBundle;
 		this.externalSql = externalSql;
+		this.defaultSchema = defaultSchema;
 	}
 
 	public boolean isExternalSql() {
@@ -61,6 +64,10 @@ public class TranslatorContext {
 
 	public final Dialect getDialect() {
 		return dialect;
+	}
+
+	public final String getDefaultSchema() {
+		return defaultSchema;
 	}
 	
 }

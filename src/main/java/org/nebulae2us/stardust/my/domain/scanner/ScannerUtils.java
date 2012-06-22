@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.PrimaryKeyJoinColumns;
@@ -41,6 +40,7 @@ import org.nebulae2us.stardust.db.domain.LinkedTableBundleBuilder;
 import org.nebulae2us.stardust.db.domain.TableBuilder;
 import org.nebulae2us.stardust.internal.util.ClassToRootClassIterable;
 import org.nebulae2us.stardust.internal.util.NameUtils;
+import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
@@ -195,15 +195,17 @@ public class ScannerUtils {
 		
 		javax.persistence.Table table = entityClassThatDefinePrimaryTable.getAnnotation(javax.persistence.Table.class);
 		
+		String defaultTableName = NameUtils.camelCaseToUpperCase(entityClassThatDefinePrimaryTable.getSimpleName());
+		
 		if (table != null) {
 			return table()
-						.name(table.name())
+						.name(ObjectUtils.evl(table.name(), defaultTableName))
 						.schemaName(table.schema())
 						.catalogName(table.catalog());
 		}
 		else {
 			return table()
-					.name(NameUtils.camelCaseToUpperCase(entityClassThatDefinePrimaryTable.getSimpleName()));
+					.name(defaultTableName);
 		}
 	}
 	

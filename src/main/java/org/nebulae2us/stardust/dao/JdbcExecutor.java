@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.dao.domain;
+package org.nebulae2us.stardust.dao;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -67,10 +67,10 @@ public class JdbcExecutor {
 	private static final ThreadLocal<ConnectionHolder> connectionHolders = new ThreadLocal<ConnectionHolder>();
 	
 	public JdbcExecutor(DataSource dataSource) {
-		this(new DefaultDialect(), dataSource);
+		this(dataSource, new DefaultDialect());
 	}
 	
-	public JdbcExecutor(Dialect dialect, DataSource dataSource) {
+	public JdbcExecutor(DataSource dataSource, Dialect dialect) {
 		this.dataSource = dataSource;
 		this.dialect = dialect;
 	}

@@ -15,7 +15,7 @@
  */
 package org.nebulae2us.stardust.generator;
 
-import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
+import org.nebulae2us.stardust.dao.JdbcExecutor;
 import org.nebulae2us.stardust.dialect.Dialect;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
@@ -25,7 +25,7 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  * @author Trung Phan
  *
  */
-public class IdentityValueRetriever implements IdentifierGenerator {
+public class IdentityValueRetriever implements ValueGenerator {
 
 	private static final IdentityValueRetriever instance = new IdentityValueRetriever();
 	
@@ -41,7 +41,7 @@ public class IdentityValueRetriever implements IdentifierGenerator {
 		return false;
 	}
 
-	public <T> T generateIdentifierValue(Class<T> expectedType, Dialect dialect, JdbcExecutor jdbcExecutor) {
+	public <T> T generateValue(Class<T> expectedType, Dialect dialect, JdbcExecutor jdbcExecutor) {
 		Assert.isTrue(Number.class.isAssignableFrom(expectedType), "Expected numeric type.");
 		
 		String sql = dialect.getSqlToRetrieveIdentityValue();

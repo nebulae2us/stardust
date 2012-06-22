@@ -15,8 +15,6 @@
  */
 package org.nebulae2us.stardust.api;
 
-import java.util.List;
-
 import org.junit.Test;
 import org.nebulae2us.stardust.Filter;
 import org.nebulae2us.stardust.FilterBuilder;

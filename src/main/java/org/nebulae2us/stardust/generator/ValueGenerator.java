@@ -13,30 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.dao.domain;
+package org.nebulae2us.stardust.generator;
 
-import org.nebulae2us.stardust.sql.domain.DataReader;
+import org.nebulae2us.stardust.dao.JdbcExecutor;
+import org.nebulae2us.stardust.dialect.Dialect;
 
 /**
  * @author Trung Phan
  *
  */
-public class NthColumnRecordMapper<T> extends RecordSetHandler<T> {
-
-	private final int columnIndex;
-	private final Class<T> valueType;
+public interface ValueGenerator {
 	
-	public NthColumnRecordMapper(Class<T> valueType, int columnIndex) {
-		super(RecordSetHandler.MODE_DATA_READER);
-		this.valueType = valueType;
-		this.columnIndex = columnIndex;
-	}
-
-	@Override
-	public T mapRecord(DataReader dataReader) {
-		return dataReader.read(valueType, columnIndex);
-	}
-
+	/**
+	 * If true, generateIdentifierValue is called before insertion.
+	 * @return
+	 */
+	public boolean generationBeforeInsertion();
 	
-	
+	public <T> T generateValue(Class<T> expectedType, Dialect dialect, JdbcExecutor jdbcExecutor);
+
 }

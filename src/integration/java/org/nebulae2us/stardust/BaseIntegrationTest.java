@@ -23,8 +23,8 @@ import java.util.Properties;
 import javax.sql.DataSource;
 
 import org.junit.After;
-import org.nebulae2us.stardust.dao.domain.DriverManagerDataSource;
-import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
+import org.nebulae2us.stardust.dao.DriverManagerDataSource;
+import org.nebulae2us.stardust.dao.JdbcExecutor;
 import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.dialect.MckoiDialect;
@@ -83,7 +83,7 @@ public class BaseIntegrationTest {
 			} catch (SQLException e) {}
 		}
 		
-		this.jdbcExecutor = new JdbcExecutor(dialect, dataSource);
+		this.jdbcExecutor = new JdbcExecutor(dataSource, dialect);
 		
 		if (dialect instanceof MckoiDialect) {
 			this.jdbcExecutor.beginUnitOfWork();

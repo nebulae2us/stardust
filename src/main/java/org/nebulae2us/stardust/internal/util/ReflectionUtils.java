@@ -15,6 +15,7 @@
  */
 package org.nebulae2us.stardust.internal.util;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 
 /**
@@ -31,6 +32,16 @@ public class ReflectionUtils {
 			if (objectClass.getSuperclass() != null) {
 				return findField(objectClass.getSuperclass(), fieldName);
 			}
+			return null;
+		}
+	}
+	
+	public static Constructor<?> findConstructor(Class<?> objectClass, Class<?> ... parameterTypes) {
+		try {
+			return objectClass.getDeclaredConstructor(parameterTypes);
+		} catch (SecurityException e) {
+			return null;
+		} catch (NoSuchMethodException e) {
 			return null;
 		}
 	}

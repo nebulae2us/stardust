@@ -34,6 +34,7 @@ import org.nebulae2us.stardust.db.domain.LinkedTableBuilder;
 import org.nebulae2us.stardust.def.domain.DefinitionRepository;
 import org.nebulae2us.stardust.def.domain.EntityDefinition;
 import org.nebulae2us.stardust.def.domain.SemiEntityDefinition;
+import org.nebulae2us.stardust.internal.util.NameUtils;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttributeBuilder;
@@ -219,7 +220,13 @@ public class EntityScanner {
 			.rootEntity(rootEntity)
 			;
 		
+		// fix table name
+		if (ObjectUtils.isEmpty(result.getLinkedTableBundle().getRoot().getTable().getName())) {
+			result.getLinkedTableBundle().getRoot().getTable().setName(NameUtils.camelCaseToUpperCase(inheritanceType == InheritanceType.JOINED ? entityClass.getSimpleName() : rootEntityClass.getSimpleName()));
+		}
+		
 		if (inheritanceType == InheritanceType.JOINED) {
+			
 			EntityDefinition rootEntityDefinition = DefinitionRepository.getInstance().getEntityDefinition(rootEntityClass);
 			EntityDefinition entityDefinition = DefinitionRepository.getInstance().getEntityDefinition(entityClass);
 			

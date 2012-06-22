@@ -23,13 +23,14 @@ import javax.sql.DataSource;
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
-import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
-import org.nebulae2us.stardust.dao.domain.RecordSetHandler;
+import org.nebulae2us.stardust.adapter.TypeAdapter;
+import org.nebulae2us.stardust.dao.JdbcExecutor;
+import org.nebulae2us.stardust.dao.RecordSetHandler;
 import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.dialect.OracleDialect;
 import org.nebulae2us.stardust.expr.domain.InsertEntityExpression;
 import org.nebulae2us.stardust.expr.domain.UpdateEntityExpression;
-import org.nebulae2us.stardust.generator.IdentifierGenerator;
+import org.nebulae2us.stardust.generator.ValueGenerator;
 import org.nebulae2us.stardust.internal.util.ReflectionUtils;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
@@ -63,18 +64,30 @@ public class DaoManager {
 	
 	private final Dialect dialect;
 	
+	private final String defaultSchema;
+	
 	public DaoManager(DataSource dataSource, Dialect dialect) {
-		this.jdbcExecutor = new JdbcExecutor(dialect, dataSource);
+		this(dataSource, dialect, "");
+	}
+	
+	public DaoManager(DataSource dataSource, Dialect dialect, String defaultSchema) {
+		this.jdbcExecutor = new JdbcExecutor(dataSource, dialect);
 		this.dialect = dialect;
 		this.entityRepository = new EntityRepository();
 		this.controller = resolveTranslatorController(dialect);
+		this.defaultSchema = defaultSchema;
+	}
+
+	public DaoManager(JdbcExecutor jdbcExecutor, EntityRepository entityRepository, TranslatorController controller, Dialect dialect) {
+		this(jdbcExecutor, entityRepository, controller, dialect, "");
 	}
 	
-	public DaoManager(JdbcExecutor jdbcExecutor, EntityRepository entityRepository, TranslatorController controller, Dialect dialect) {
+	public DaoManager(JdbcExecutor jdbcExecutor, EntityRepository entityRepository, TranslatorController controller, Dialect dialect, String defaultSchema) {
 		this.jdbcExecutor = jdbcExecutor;
 		this.entityRepository = entityRepository;
 		this.controller = controller;
 		this.dialect = dialect;
+		this.defaultSchema = defaultSchema;
 	}
 	
 	public void beginUnitOfWork() {
@@ -108,6 +121,10 @@ public class DaoManager {
 		return this.dialect;
 	}
 	
+	public final String getDefaultSchema() {
+		return defaultSchema;
+	}
+
 	public final JdbcExecutor getJdbcExecutor() {
 		return jdbcExecutor;
 	}
@@ -149,7 +166,7 @@ public class DaoManager {
 		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
 		
-		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
+		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false, defaultSchema);
 
 		jdbcExecutor.beginUnitOfWork();
 		try {
@@ -158,10 +175,13 @@ public class DaoManager {
 	
 				// populate identity values
 				for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
-					IdentifierGenerator generator = scalarAttribute.getValueGenerator();
+					ValueGenerator generator = scalarAttribute.getValueGenerator();
 					if (generator != null && generator.generationBeforeInsertion()) {
-						Object value = generator.generateIdentifierValue(scalarAttribute.getScalarType(), this.dialect, this.jdbcExecutor);
-						
+						Object value = generator.generateValue(scalarAttribute.getPersistenceType(), this.dialect, this.jdbcExecutor);
+						if (scalarAttribute.getTypeAdapter() != null) {
+							// TODO Simplify this code
+							value = ((TypeAdapter)scalarAttribute.getTypeAdapter()).toAttributeType(scalarAttribute.getScalarType(), value);
+						}
 						ReflectionUtils.setValue(scalarAttribute.getField(), object, value);
 					}
 				}
@@ -179,10 +199,12 @@ public class DaoManager {
 				
 				// retrieve identity values
 				for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
-					IdentifierGenerator generator = scalarAttribute.getValueGenerator();
+					ValueGenerator generator = scalarAttribute.getValueGenerator();
 					if (generator != null && !generator.generationBeforeInsertion()) {
-						Object value = generator.generateIdentifierValue(scalarAttribute.getScalarType(), this.dialect, this.jdbcExecutor);
-						
+						Object value = generator.generateValue(scalarAttribute.getPersistenceType(), this.dialect, this.jdbcExecutor);
+						if (scalarAttribute.getTypeAdapter() != null) {
+							value = ((TypeAdapter)scalarAttribute.getTypeAdapter()).toAttributeType(scalarAttribute.getScalarType(), value);
+						}
 						ReflectionUtils.setValue(scalarAttribute.getField(), object, value);
 					}
 				}
@@ -199,7 +221,7 @@ public class DaoManager {
 		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
 		
-		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false);
+		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false, defaultSchema);
 
 		jdbcExecutor.beginUnitOfWork();
 		try {

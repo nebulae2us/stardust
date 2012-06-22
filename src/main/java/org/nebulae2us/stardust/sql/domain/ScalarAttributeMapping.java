@@ -16,6 +16,7 @@
 package org.nebulae2us.stardust.sql.domain;
 
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 
 /**
  * 
@@ -40,5 +41,9 @@ public class ScalarAttributeMapping extends AttributeMapping {
 		return columnIndex;
 	}
 	
+	@Override
+	public ScalarAttribute getAttribute() {
+		return (ScalarAttribute)super.getAttribute();
+	}
 	
 }

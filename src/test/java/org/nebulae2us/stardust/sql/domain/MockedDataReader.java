@@ -15,6 +15,7 @@
  */
 package org.nebulae2us.stardust.sql.domain;
 
+import java.sql.Date;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +61,15 @@ public class MockedDataReader extends DataReader {
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> T read(Class<T> expectedClass, int columnIndex) {
-		return (T)this.data.get(currentPos)[columnIndex - 1];
+		Object result = this.data.get(currentPos)[columnIndex - 1];
+		if (expectedClass.isInstance(result)) {
+			return (T)result;
+		}
+		// TODO expand more scenarios
+		if (expectedClass == Date.class) {
+			return (T)new Date(((java.util.Date)result).getTime());
+		}
+		return (T)result;
 	}
 
 	@Override

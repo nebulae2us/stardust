@@ -5,10 +5,9 @@ import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
 import org.nebulae2us.stardust.*;
-import org.nebulae2us.stardust.api.*;
+import org.nebulae2us.stardust.adapter.*;
 import org.nebulae2us.stardust.db.domain.*;
-import org.nebulae2us.stardust.generator.IdentifierGenerator;
-import org.nebulae2us.stardust.internal.util.Builders;
+import org.nebulae2us.stardust.generator.*;
 
 @Builder(destination=ScalarAttribute.class)
 public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
@@ -67,6 +66,28 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	public ScalarAttributeBuilder<P> scalarType(Class<?> scalarType) {
 		verifyMutable();
 		this.scalarType = scalarType;
+		return this;
+	}
+
+	private TypeAdapter<?, ?> typeAdapter;
+	
+	public TypeAdapter<?, ?> getTypeAdapter() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.typeAdapter, TypeAdapter.class)) {
+			Object o = WrapHelper.getValue(this.$$$wrapped, ScalarAttribute.class, "typeAdapter");
+			this.typeAdapter = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(TypeAdapter.class);
+		}
+
+		return typeAdapter;
+	}
+
+	public void setTypeAdapter(TypeAdapter<?, ?> typeAdapter) {
+		verifyMutable();
+		this.typeAdapter = typeAdapter;
+	}
+
+	public ScalarAttributeBuilder<P> typeAdapter(TypeAdapter<?, ?> typeAdapter) {
+		verifyMutable();
+		this.typeAdapter = typeAdapter;
 		return this;
 	}
 
@@ -130,23 +151,23 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 		return result;
 	}
 
-	private IdentifierGenerator valueGenerator;
+	private ValueGenerator valueGenerator;
 	
-	public IdentifierGenerator getValueGenerator() {
-		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.valueGenerator, IdentifierGenerator.class)) {
+	public ValueGenerator getValueGenerator() {
+		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.valueGenerator, ValueGenerator.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, ScalarAttribute.class, "valueGenerator");
-			this.valueGenerator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(IdentifierGenerator.class);
+			this.valueGenerator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(ValueGenerator.class);
 		}
 
 		return valueGenerator;
 	}
 
-	public void setValueGenerator(IdentifierGenerator valueGenerator) {
+	public void setValueGenerator(ValueGenerator valueGenerator) {
 		verifyMutable();
 		this.valueGenerator = valueGenerator;
 	}
 
-	public ScalarAttributeBuilder<P> valueGenerator(IdentifierGenerator valueGenerator) {
+	public ScalarAttributeBuilder<P> valueGenerator(ValueGenerator valueGenerator) {
 		verifyMutable();
 		this.valueGenerator = valueGenerator;
 		return this;

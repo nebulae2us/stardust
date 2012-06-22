@@ -15,6 +15,8 @@
  */
 package org.nebulae2us.stardust.ddl.domain;
 
+import java.security.Timestamp;
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -28,7 +30,7 @@ import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.dialect.Dialect;
-import org.nebulae2us.stardust.generator.IdentifierGenerator;
+import org.nebulae2us.stardust.generator.ValueGenerator;
 import org.nebulae2us.stardust.generator.IdentityValueRetriever;
 import org.nebulae2us.stardust.generator.SequenceIdentifierGenerator;
 import org.nebulae2us.stardust.my.domain.Entity;
@@ -193,7 +195,7 @@ public class DDLGenerator {
 	private void prepareSequenceDDL(Class<?> entityClass) {
 		Entity entity = entityRepository.getEntity(entityClass);
 		for (ScalarAttribute scalarAttribute : entity.getScalarAttributes()) {
-			IdentifierGenerator generator = scalarAttribute.getValueGenerator();
+			ValueGenerator generator = scalarAttribute.getValueGenerator();
 			if (generator instanceof SequenceIdentifierGenerator) {
 				SequenceIdentifierGenerator sequenceGenerator = (SequenceIdentifierGenerator)generator;
 				String sequenceName = sequenceGenerator.getName();
@@ -375,7 +377,7 @@ public class DDLGenerator {
 	}
 	
 	protected CreateColumn newCreateColumn(ScalarAttribute scalarAttribute) {
-		return new CreateColumn(scalarAttribute.getColumn(), getColumnType(scalarAttribute.getScalarType(), 0),  scalarAttribute.getValueGenerator() instanceof IdentityValueRetriever);
+		return new CreateColumn(scalarAttribute.getColumn(), getColumnType(scalarAttribute.getPersistenceType(), 0),  scalarAttribute.getValueGenerator() instanceof IdentityValueRetriever);
 	}
 	
 	protected List<CreateColumn> newCreateColumns(EntityAttribute entityAttribute) {
@@ -386,7 +388,7 @@ public class DDLGenerator {
 		int numColumns = identifier.getScalarAttributes().size();
 		for (int i = 0; i < numColumns; i++) {
 			ScalarAttribute scalarAttribute = identifier.getScalarAttributes().get(i);
-			result.add(new CreateColumn(entityAttribute.getLeftColumns().get(i), getColumnType(scalarAttribute.getScalarType(), 0) , false));
+			result.add(new CreateColumn(entityAttribute.getLeftColumns().get(i), getColumnType(scalarAttribute.getPersistenceType(), 0) , false));
 		}
 		
 		return result;
@@ -400,6 +402,15 @@ public class DDLGenerator {
 		}
 		else if (javaType == Date.class) {
 			return new ColumnType("timestamp");
+		}
+		else if (javaType == java.sql.Date.class) {
+			return new ColumnType("date");
+		}
+		else if (javaType == Timestamp.class) {
+			return new ColumnType("timestamp");
+		}
+		else if (javaType == Time.class) {
+			return new ColumnType("time");
 		}
 		else if (javaType == Integer.class || javaType == int.class) {
 			return new ColumnType("int");

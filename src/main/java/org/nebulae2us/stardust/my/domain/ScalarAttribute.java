@@ -16,8 +16,9 @@
 package org.nebulae2us.stardust.my.domain;
 
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.stardust.adapter.TypeAdapter;
 import org.nebulae2us.stardust.db.domain.Column;
-import org.nebulae2us.stardust.generator.IdentifierGenerator;
+import org.nebulae2us.stardust.generator.ValueGenerator;
 
 /**
  * @author Trung Phan
@@ -27,9 +28,11 @@ public class ScalarAttribute extends Attribute {
 
 	private final Class<?> scalarType;
 	
+	private final TypeAdapter<?, ?> typeAdapter;
+	
 	private final Column column;
 	
-	private final IdentifierGenerator valueGenerator;
+	private final ValueGenerator valueGenerator;
 	
 	public ScalarAttribute(Mirror mirror) {
 		super(mirror);
@@ -37,7 +40,8 @@ public class ScalarAttribute extends Attribute {
 		
 		this.scalarType = mirror.to(Class.class, "scalarType");
 		this.column = mirror.to(Column.class, "column");
-		this.valueGenerator = mirror.to(IdentifierGenerator.class, "valueGenerator");
+		this.valueGenerator = mirror.to(ValueGenerator.class, "valueGenerator");
+		this.typeAdapter = mirror.to(TypeAdapter.class, "typeAdapter");
 	}
 
 	public Class<?> getScalarType() {
@@ -48,10 +52,25 @@ public class ScalarAttribute extends Attribute {
 		return column;
 	}
 
-	public final IdentifierGenerator getValueGenerator() {
+	public final ValueGenerator getValueGenerator() {
 		return valueGenerator;
 	}
+	
+	public final TypeAdapter<?, ?> getTypeAdapter() {
+		return typeAdapter;
+	}
+	
+	public Class<?> getPersistenceType() {
+		return typeAdapter == null ? scalarType : typeAdapter.getPersistenceType();
+	}
 
+	@SuppressWarnings("unchecked")
+	@Override
+	public Object extractValueForPersistence(Object object) {
+		Object result = super.extractValueForPersistence(object);
+		return typeAdapter == null ? result : ((TypeAdapter<Object, Object>)typeAdapter).toPersistenceType(result);
+	}
+	
 	@Override
 	public String toString() {
 		return this.getFullName() + ": " + this.getScalarType().getSimpleName();

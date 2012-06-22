@@ -24,7 +24,7 @@ import org.nebulae2us.electron.DefaultDestinationClassResolver;
 import org.nebulae2us.electron.DestinationClassResolver;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.NewEntityDetector;
-import org.nebulae2us.stardust.generator.IdentifierGenerator;
+import org.nebulae2us.stardust.generator.ValueGenerator;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;

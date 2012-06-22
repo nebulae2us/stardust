@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.nebulae2us.stardust.generator.IdentifierGenerator;
+import org.nebulae2us.stardust.generator.ValueGenerator;
 
 /**
  * @author Trung Phan
@@ -31,7 +31,7 @@ public class SemiEntityDefinitionBuilder<P> extends AttributeRelationshipHolderD
 	
 	private final List<String> identifiers = new ArrayList<String>();
 
-	private final Map<String, IdentifierGenerator> identifierGenerators = new HashMap<String, IdentifierGenerator>();
+	private final Map<String, ValueGenerator> identifierGenerators = new HashMap<String, ValueGenerator>();
 	
 	public P identifier(Object ... attributeLocators ) {
 		for (Object attributeLocator : attributeLocators) {
@@ -43,7 +43,7 @@ public class SemiEntityDefinitionBuilder<P> extends AttributeRelationshipHolderD
 		return (P)this;
 	}
 
-	public P identifierGenerator(String expression, IdentifierGenerator identifierGenerator) {
+	public P identifierGenerator(String expression, ValueGenerator identifierGenerator) {
 		this.identifierGenerators.put(expression, identifierGenerator);
 		return (P)this;
 	}

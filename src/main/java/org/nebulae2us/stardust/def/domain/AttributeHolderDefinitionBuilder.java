@@ -20,6 +20,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.nebulae2us.stardust.adapter.TimeAdapter;
+import org.nebulae2us.stardust.adapter.TimestampAdapter;
+import org.nebulae2us.stardust.adapter.TrueFalseAdapter;
+import org.nebulae2us.stardust.adapter.TypeAdapter;
+import org.nebulae2us.stardust.adapter.YesNoAdapter;
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+
 /**
  * @author Trung Phan
  *
@@ -28,6 +35,8 @@ public class AttributeHolderDefinitionBuilder<P> {
 
 	
 	protected final Map<String, String> scalarAttributeColumnNames = new HashMap<String, String>();
+	
+	protected final Map<String, TypeAdapter<?, ?>> scalarAttributeTypeAdapters = new HashMap<String, TypeAdapter<?,?>>();
 	
 	protected final List<String> embeddedAttributes = new ArrayList<String>();
 	
@@ -42,12 +51,13 @@ public class AttributeHolderDefinitionBuilder<P> {
 	public AttributeHolderDefinitionBuilder() {
 	}
 
+
 	public AttributeColumnBuilder mapAttribute(Object attributeLocator) {
 		return new AttributeColumnBuilder(attributeLocator.toString());
 	}
 	
 	public class AttributeColumnBuilder {
-		final String attributeName;
+		private final String attributeName;
 		
 		public AttributeColumnBuilder(String attributeName) {
 			this.attributeName = attributeName;
@@ -59,6 +69,42 @@ public class AttributeHolderDefinitionBuilder<P> {
 			return (P)AttributeHolderDefinitionBuilder.this;
 		}
 	}
+	
+	public AdapterBuilder adaptAttribute(Object attributeLocator) {
+		return new AdapterBuilder(attributeLocator.toString());
+	}
+	
+	public class AdapterBuilder {
+		private final String attributeName;
+		
+		public AdapterBuilder(String attributeName) {
+			this.attributeName = attributeName;
+		}
+		
+		public P with(TypeAdapter<?, ?> adapter) {
+			AssertSyntax.notNull(adapter, "Adapter for attribute \"%s\" cannot be null.", this.attributeName);
+			scalarAttributeTypeAdapters.put(attributeName, adapter);
+			return (P)AttributeHolderDefinitionBuilder.this;
+		}
+		
+		public P withYesNoAdapter() {
+			return with(new YesNoAdapter());
+		}
+
+		public P withTrueFalseAdapter() {
+			return with(new TrueFalseAdapter());
+		}
+		
+		public P withTimestampAdapter() {
+			return with(new TimestampAdapter());
+		}
+		
+		public P withTimeAdapter() {
+			return with(new TimeAdapter());
+		}
+	
+	}
+	
 
 	public P embedAttributes(Object ... attributeLocators) {
 		addAttributesToList(embeddedAttributes, attributeLocators);

@@ -42,9 +42,11 @@ public class QueryExpression extends Expression {
 	
 	private final List<OrderExpression> orders;
 	
+	private final String overridingSchema;
+	
 	public QueryExpression(String expression, String sql,
 			List<SelectExpression> selectors, List<PredicateExpression> filters, List<OrderExpression> orders,
-			boolean distinct, int firstResult, int maxResults, boolean count) {
+			String overridingSchema, boolean distinct, int firstResult, int maxResults, boolean count) {
 		
 		super(expression);
 		
@@ -52,6 +54,7 @@ public class QueryExpression extends Expression {
 		this.selectors = selectors;
 		this.filters = filters;
 		this.orders = orders;
+		this.overridingSchema = overridingSchema;
 		this.distinct = distinct;
 		this.firstResult = firstResult;
 		this.maxResults = maxResults;
@@ -68,6 +71,10 @@ public class QueryExpression extends Expression {
 
 	public List<OrderExpression> getOrders() {
 		return orders;
+	}
+
+	public final String getOverridingSchema() {
+		return overridingSchema;
 	}
 
 	public boolean isDistinct() {

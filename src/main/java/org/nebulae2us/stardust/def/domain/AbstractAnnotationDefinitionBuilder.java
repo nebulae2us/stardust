@@ -23,6 +23,8 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinColumns;
 import javax.persistence.JoinTable;
@@ -30,9 +32,17 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
 import org.nebulae2us.electron.util.ListBuilder;
+import org.nebulae2us.stardust.adapter.DateAdapter;
+import org.nebulae2us.stardust.adapter.NamedEnumAdapter;
+import org.nebulae2us.stardust.adapter.OrdinalEnumAdapter;
+import org.nebulae2us.stardust.adapter.TimeAdapter;
+import org.nebulae2us.stardust.adapter.TimestampAdapter;
+import org.nebulae2us.stardust.annotation.TypeAdapter;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 
 /**
@@ -74,6 +84,38 @@ public abstract class AbstractAnnotationDefinitionBuilder {
 			}
 		}
 		
+	}
+	
+	protected void scanFieldForAdapter(AttributeHolderDefinitionBuilder<?> builder, Field field) {
+		if (field.getAnnotation(TypeAdapter.class) != null) {
+			TypeAdapter typeAdapter = field.getAnnotation(TypeAdapter.class);
+			try {
+				builder.adaptAttribute(field.getName()).with(typeAdapter.value().newInstance());
+			} catch (Exception e) {
+				throw new IllegalStateException("Failed to instantiate adapter " + typeAdapter.value(), e);
+			}
+		}
+		else if (field.getAnnotation(Enumerated.class) != null) {
+			Enumerated enumerated = field.getAnnotation(Enumerated.class);
+			if (enumerated.value() == EnumType.ORDINAL) {
+				builder.adaptAttribute(field.getName()).with(new OrdinalEnumAdapter());
+			}
+			else {
+				builder.adaptAttribute(field.getName()).with(new NamedEnumAdapter());
+			}
+		}
+		else if (field.getAnnotation(Temporal.class) != null){
+			Temporal temporal = field.getAnnotation(Temporal.class);
+			if (temporal.value() == TemporalType.TIMESTAMP) {
+				builder.adaptAttribute(field.getName()).with(new TimestampAdapter());
+			}
+			else if (temporal.value() == TemporalType.TIME) {
+				builder.adaptAttribute(field.getName()).with(new TimeAdapter());
+			}
+			else {
+				builder.adaptAttribute(field.getName()).with(new DateAdapter());
+			}
+		}
 	}
 	
 	protected void scanFieldForRelationship(AttributeRelationshipHolderDefinitionBuilder<?> builder, Field field) {

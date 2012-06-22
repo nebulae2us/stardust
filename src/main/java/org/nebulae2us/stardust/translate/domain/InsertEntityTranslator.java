@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.nebulae2us.electron.Pair;
-import org.nebulae2us.stardust.dao.domain.NullObject;
+import org.nebulae2us.stardust.dao.NullObject;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.expr.domain.Expression;
@@ -88,12 +88,12 @@ public class InsertEntityTranslator implements Translator {
 					.append(", ");
 				wildcardBuilder.append("?, ");
 
-				Object value = identifierScalarAttribute.extractAttributeValue(entityToInsert);
+				Object value = identifierScalarAttribute.extractValueForPersistence(entityToInsert);
 				if (value != null) {
 					values.add(value);
 				}
 				else {
-					values.add(NullObject.valueOf(identifierScalarAttribute.getScalarType()));
+					values.add(NullObject.valueOf(identifierScalarAttribute.getPersistenceType()));
 				}
 			}
 		}
@@ -114,14 +114,14 @@ public class InsertEntityTranslator implements Translator {
 					.append(", ");
 				wildcardBuilder.append("?, ");
 				
-				Object value = attribute.extractAttributeValue(entityToInsert);
+				Object value = attribute.extractValueForPersistence(entityToInsert);
 				values.add(value != null ? value : NullObject.valueOf(scalarAttribute.getScalarType()));
 				
 			}
 			else if (attribute instanceof EntityAttribute) {
 				EntityAttribute entityAttribute = (EntityAttribute)attribute;
 				
-				Object friendObject = attribute.extractAttributeValue(entityToInsert);
+				Object friendObject = attribute.extractValueForPersistence(entityToInsert);
 				Entity friendEntity = entityAttribute.getEntity();
 				EntityIdentifier friendIdentifier = friendEntity.getEntityIdentifier();
 				List<ScalarAttribute> friendIdentifierAttributes = friendIdentifier.getScalarAttributes();
@@ -137,7 +137,7 @@ public class InsertEntityTranslator implements Translator {
 						values.add(null);
 					}
 					else {
-						Object value = friendIdentifierAttribute.extractAttributeValue(friendObject);
+						Object value = friendIdentifierAttribute.extractValueForPersistence(friendObject);
 						values.add(value);
 					}
 					

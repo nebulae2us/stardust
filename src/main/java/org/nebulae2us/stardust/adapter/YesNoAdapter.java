@@ -13,15 +13,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.dao.domain;
+package org.nebulae2us.stardust.adapter;
 
 /**
  * @author Trung Phan
  *
  */
-public final class FirstColumnRecordMapper<T> extends NthColumnRecordMapper<T> {
-	
-	public FirstColumnRecordMapper(Class<T> valueType) {
-		super(valueType, 1);
+public class YesNoAdapter extends TypeAdapter<String, Boolean> {
+
+	@Override
+	public Class<String> getPersistenceType() {
+		return String.class;
 	}
+
+	@Override
+	public String toPersistenceType(Boolean object) {
+		if (object == null) {
+			return null;
+		}
+		return object ? "Y" : "N";
+	}
+
+	@Override
+	public Boolean toAttributeType(Class<? extends Boolean> expectedType, String object) {
+		if (object == null) {
+			return null;
+		}
+		return "Y".equalsIgnoreCase(object);
+	}
+
 }

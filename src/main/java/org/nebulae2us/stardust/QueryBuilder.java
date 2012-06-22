@@ -54,6 +54,7 @@ public class QueryBuilder<T> {
 	
 	private final Class<?> entityClass;
 	private final List<AliasJoin> aliasJoins = new ArrayList<AliasJoin>();
+	private String overridingSchema = "";
 	private int firstResult;
 	private int maxResults;
 	private boolean distinct;
@@ -167,6 +168,12 @@ public class QueryBuilder<T> {
 		return this;
 	}
 	
+	public QueryBuilder<T> schema(String schemaName) {
+		AssertSyntax.notEmpty(schemaName, "Schema Name cannot be empty");
+		this.overridingSchema = schemaName;
+		return this;
+	}
+	
 	public QueryBuilder<T> firstResult(int firstResult) {
 		AssertSyntax.isTrue(firstResult >= 0, "firstResult of %s is a negative value.", firstResult);
 		this.firstResult = firstResult;
@@ -197,11 +204,11 @@ public class QueryBuilder<T> {
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 
-		TranslatorContext context = new TranslatorContext(daoManager.getDialect(), controller, linkedTableEntityBundle, linkedEntityBundle, sql.length() > 0);
+		TranslatorContext context = new TranslatorContext(daoManager.getDialect(), controller, linkedTableEntityBundle, linkedEntityBundle, sql.length() > 0, daoManager.getDefaultSchema());
 
 		QueryExpression queryExpression = new QueryExpression("query", sql,
 				this.selectorExpressions, this.predicateExpressions, this.orderExpressions, 
-				this.distinct, this.firstResult, this.maxResults,
+				this.overridingSchema, this.distinct, this.firstResult, this.maxResults,
 				false);
 		
 		ParamValues paramValues = new ParamValues(namedParamValues, 
@@ -218,11 +225,11 @@ public class QueryBuilder<T> {
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 
-		TranslatorContext context = new TranslatorContext(daoManager.getDialect(), controller, linkedTableEntityBundle, linkedEntityBundle, sql.length() > 0);
+		TranslatorContext context = new TranslatorContext(daoManager.getDialect(), controller, linkedTableEntityBundle, linkedEntityBundle, sql.length() > 0, daoManager.getDefaultSchema());
 
 		QueryExpression queryExpression = new QueryExpression("query", sql,
 				this.selectorExpressions, this.predicateExpressions, Immutables.emptyList(OrderExpression.class), 
-				this.distinct, 0, 0, true);
+				this.overridingSchema, this.distinct, 0, 0, true);
 		
 		ParamValues paramValues = new ParamValues(namedParamValues, 
 				new ListBuilder<Object>().add(selectWildcardValues).add(filterWildcardValues).toList());

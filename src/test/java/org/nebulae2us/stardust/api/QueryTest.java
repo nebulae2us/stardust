@@ -15,33 +15,26 @@
  */
 package org.nebulae2us.stardust.api;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
+
+import javax.persistence.Table;
 
 import mockit.Mocked;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.DaoManager;
-import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
+import org.nebulae2us.stardust.dao.JdbcExecutor;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.jpa.group1.House;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
-import org.nebulae2us.stardust.translate.domain.AttributeTranslator;
-import org.nebulae2us.stardust.translate.domain.BetweenTranslator;
 import org.nebulae2us.stardust.translate.domain.CommonTranslatorController;
-import org.nebulae2us.stardust.translate.domain.ComparisonTranslator;
-import org.nebulae2us.stardust.translate.domain.InListTranslator;
-import org.nebulae2us.stardust.translate.domain.IsNullTranslator;
-import org.nebulae2us.stardust.translate.domain.LogicalTranslator;
-import org.nebulae2us.stardust.translate.domain.NamedParamTranslator;
-import org.nebulae2us.stardust.translate.domain.OrderTranslator;
-import org.nebulae2us.stardust.translate.domain.QueryTranslator;
-import org.nebulae2us.stardust.translate.domain.Translator;
 import org.nebulae2us.stardust.translate.domain.TranslatorController;
-import org.nebulae2us.stardust.translate.domain.WildcardTranslator;
+
+import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.*;
 
 /**
  * @author Trung Phan
@@ -61,7 +54,7 @@ public class QueryTest {
 	public void setup() {
 		this.entityRepository = new EntityRepository();
 
-		this.controller = new CommonTranslatorController(Collections.EMPTY_LIST);
+		this.controller = new CommonTranslatorController();
 		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, controller, new H2Dialect());
 	}
 	
@@ -93,6 +86,68 @@ public class QueryTest {
 		.firstResult(10)
 		.maxResults(100)
 		.toQuery();
+	}
+	
+	@Test
+	public void from_clause_should_have_pre_defined_schema_name() {
+		
+		@Table(schema="MY_SCHEMA")
+		class Person {
+			String name;
+		}
+		
+		Pair<String, List<?>> translateResult = daoManager.newQuery(Person.class)
+			.toQuery()
+			.translate();
+		
+		assertThat(translateResult.getItem1(), equalToIgnoringWhiteSpace("select b.name as name from my_schema.person b"));
+	}
+	
+	@Test
+	public void from_clause_should_handle_empty_schema() {
+		@Table(name="MY_PERSON")
+		class Person {
+			String name;
+		}
+		
+		Pair<String, List<?>> translateResult = daoManager.newQuery(Person.class)
+			.toQuery()
+			.translate();
+		
+		assertThat(translateResult.getItem1(), equalToIgnoringWhiteSpace("select b.name as name from my_person b"));
+	}
+
+	
+	@Test
+	public void from_clause_should_handle_overriding_schema() {
+		@Table(name="MY_PERSON", schema="MY_SCHEMA")
+		class Person {
+			String name;
+		}
+		
+		Pair<String, List<?>> translateResult = daoManager.newQuery(Person.class)
+				.schema("MY_OTHER_SCHEMA")
+				.toQuery()
+				.translate();
+		
+		assertThat(translateResult.getItem1(), equalToIgnoringWhiteSpace("select b.name as name from my_other_schema.my_person b"));
+	}
+	
+	@Test
+	public void from_clause_should_handle_default_schema() {
+		this.daoManager = new DaoManager(jdbcExecutor, entityRepository, controller, new H2Dialect(), "DEFAULT_SCHEMA");
+
+		@Table(name="MY_PERSON")
+		class Person {
+			String name;
+		}
+		
+		Pair<String, List<?>> translateResult = daoManager.newQuery(Person.class)
+				.toQuery()
+				.translate();
+		
+		assertThat(translateResult.getItem1(), equalToIgnoringWhiteSpace("select b.name as name from default_schema.my_person b"));
+		
 	}
 	
 }

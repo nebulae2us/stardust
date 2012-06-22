@@ -118,7 +118,6 @@ public abstract class Attribute {
 	 * @return
 	 */
 	public Object extractAttributeValue(Object object) {
-		
 		Assert.notNull(object, "object cannot be null");
 		
 		Entity entity = this.owningEntity;
@@ -150,6 +149,18 @@ public abstract class Attribute {
 		}
 		
 		return result;
+	}
+	
+	/**
+	 * Similar to extractAttributeValue(object), but also adapt the value if the adapter exists.
+	 * @param object
+	 * @return
+	 * 
+	 * @see Attribute#extractAttributeValue(Object)
+	 * 
+	 */
+	public Object extractValueForPersistence(Object object) {
+		return extractAttributeValue(object);
 	}
 	
 	@Override

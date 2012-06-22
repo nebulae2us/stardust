@@ -179,6 +179,7 @@ public class AnnotationEntityDefinitionBuilder extends AbstractAnnotationDefinit
 			}
 			
 			scanFieldForColumnInfo(builder, field);
+			scanFieldForAdapter(builder, field);
 			scanFieldForRelationship(builder, field);
 		}
 		

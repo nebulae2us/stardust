@@ -24,6 +24,7 @@ import java.util.Set;
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
+import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.exception.IllegalSyntaxException;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.LogicalExpression;
@@ -33,6 +34,7 @@ import org.nebulae2us.stardust.expr.domain.QueryExpression;
 import org.nebulae2us.stardust.expr.domain.SelectAttributeExpression;
 import org.nebulae2us.stardust.expr.domain.SelectExpression;
 import org.nebulae2us.stardust.expr.domain.SelectorExpression;
+import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
@@ -257,13 +259,18 @@ public class QueryTranslator implements Translator {
 
 	}
 
-	protected Pair<String, List<?>> toFromClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
+	private String getTableName(String overridingSchema, String defaultSchema, Table table) {
+		String schemaName = ObjectUtils.coalesce(overridingSchema, table.getSchemaName(), table.getCatalogName(), defaultSchema);
+		return ObjectUtils.isEmpty(schemaName) ? table.getName() : schemaName + '.' + table.getName();
+	}
+	
+	protected Pair<String, List<?>> toFromClause(TranslatorContext context, QueryExpression expression, ParamValues paramValues) {
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = context.getLinkedTableEntityBundle();
 		
 		StringBuilder result = new StringBuilder();
 		
-		result.append(linkedTableEntityBundle.getRoot().getTable())
+		result.append(getTableName(expression.getOverridingSchema(), context.getDefaultSchema(), linkedTableEntityBundle.getRoot().getTable()))
 			.append(' ')
 			.append(linkedTableEntityBundle.getRoot().getTableAlias());
 		
@@ -271,7 +278,8 @@ public class QueryTranslator implements Translator {
 			result
 				.append("\n           ")
 				.append(linkedTableEntity.getJoinType() == JoinType.INNER_JOIN ? "inner join " : "left outer join ")
-				.append(linkedTableEntity.getTable()).append(' ')
+				.append(getTableName(expression.getOverridingSchema(), context.getDefaultSchema(), linkedTableEntity.getTable()))
+				.append(' ')
 				.append(linkedTableEntity.getTableAlias()).append("\n               on (")
 			;
 			

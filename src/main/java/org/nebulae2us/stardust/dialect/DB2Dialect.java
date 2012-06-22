@@ -39,23 +39,19 @@ public class DB2Dialect extends Dialect {
 
 	@Override
 	public Pair<String, List<?>> applyLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
-		String newSql = sql + "fetch first " + limitValue + " rows only";
+		String newSql = sql + " fetch first " + limitValue + " rows only";
 		return new Pair<String, List<?>>(newSql, values);
 	}
 
 	@Override
 	public Pair<String, List<?>> applyOffsetLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
-		AssertSyntax.notEmpty(orderBy, "Paging SQL requires ORDER BY clause for DB2 dialect.");
-
-		String newSql = "selct * from (select tmp_t.*, row_number() over(order by order of tmp_t) as tmp_rn from (" + sql + " fetch first " + (limitValue + offsetValue) + " rows only) as tmp_t) where tmp_rn > " + offsetValue + " order by tmp_rn";
+		String newSql = "selct * from (select tmp_t.*, row_number() over() as tmp_rn from (" + sql + " fetch first " + (limitValue + offsetValue) + " rows only) as tmp_t) where tmp_rn > " + offsetValue + " order by tmp_rn";
 		return new Pair<String, List<?>>(newSql, values);
 	}
 
 	@Override
 	public Pair<String, List<?>> applyOffset(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
-		AssertSyntax.notEmpty(orderBy, "Paging SQL requires ORDER BY clause for DB2 dialect.");
-
-		String newSql = "select tmp_t.* from (" + sql + ") as tmp_t where row_number() over(order by order of tmp_t) > " + offsetValue;
+		String newSql = "selct * from (select tmp_t.*, row_number() over() as tmp_rn from (" + sql + ") as tmp_t) where tmp_rn > " + offsetValue + " order by tmp_rn";
 		return new Pair<String, List<?>>(newSql, values);
 	}
 

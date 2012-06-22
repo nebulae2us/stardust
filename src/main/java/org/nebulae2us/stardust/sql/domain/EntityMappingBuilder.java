@@ -4,7 +4,6 @@ import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
 import org.nebulae2us.stardust.*;
-import org.nebulae2us.stardust.internal.util.Builders;
 import org.nebulae2us.stardust.my.domain.*;
 
 @Builder(destination=EntityMapping.class)

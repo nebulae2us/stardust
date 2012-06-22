@@ -79,7 +79,7 @@ public class TranslatorTest {
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 		
-		context = new TranslatorContext(new H2Dialect(), translatorController, linkedTableEntityBundle, linkedEntityBundle, false);
+		context = new TranslatorContext(new H2Dialect(), translatorController, linkedTableEntityBundle, linkedEntityBundle, false, "");
 	
 	
 	}

@@ -79,6 +79,7 @@ public class ScalarAttributeScanner {
 				.fullName(parentPath.length() > 0 ? parentPath + "." + field.getName() : field.getName())
 				.field(field)
 				.scalarType(field.getType())
+				.typeAdapter(attributeHolderDefinition.getScalarAttributeTypeAdapters().get(field.getName()))
 				.owningEntity(this.owningEntity)
 				.column$wrap(column)
 				.insertable( !this.attributeHolderDefinition.getNotInsertableAttributes().contains(field.getName()) )

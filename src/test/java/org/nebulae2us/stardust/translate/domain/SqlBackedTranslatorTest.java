@@ -70,7 +70,7 @@ public class SqlBackedTranslatorTest {
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, true);
 		
-		context = new TranslatorContext(new H2Dialect(), translatorController, linkedTableEntityBundle, linkedEntityBundle, true);
+		context = new TranslatorContext(new H2Dialect(), translatorController, linkedTableEntityBundle, linkedEntityBundle, true, "");
 	
 	
 	}

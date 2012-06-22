@@ -4,7 +4,6 @@ import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
 import org.nebulae2us.stardust.*;
-import org.nebulae2us.stardust.internal.util.Builders;
 
 @Builder(destination=LinkedTableBundle.class)
 public class LinkedTableBundleBuilder<P> implements Wrappable<LinkedTableBundle> {

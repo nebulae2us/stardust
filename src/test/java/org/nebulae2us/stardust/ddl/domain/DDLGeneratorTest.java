@@ -35,7 +35,7 @@ import org.nebulae2us.stardust.my.domain.EntityRepository;
  * @author Trung Phan
  *
  */
-public class H2DDLGeneratorTest {
+public class DDLGeneratorTest {
 
 	private EntityRepository entityRepository = new EntityRepository();
 	

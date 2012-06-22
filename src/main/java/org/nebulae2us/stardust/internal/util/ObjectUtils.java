@@ -82,6 +82,21 @@ public class ObjectUtils {
     public static String evl(String str1, String str2) {
         return str1 != null && str1.length() > 0 ? str1 : str2;
     }
+    
+    /**
+     * Return first non-empty string. If not, return ""
+     * @param strings
+     * @return
+     */
+    public static String coalesce(String ... strings) {
+    	for (int i = 0; i < strings.length; i++) {
+    		String string = strings[i];
+			if (string != null && string.length() > 0) {
+    			return string;
+    		}
+    	}
+    	return "";
+    }
 
     public static boolean isEmpty(Object object) {
         if (object == null) {

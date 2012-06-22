@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.nebulae2us.electron.Mirror;
-import org.nebulae2us.stardust.generator.IdentifierGenerator;
+import org.nebulae2us.stardust.generator.ValueGenerator;
 
 /**
  * @author Trung Phan
@@ -29,20 +29,20 @@ public class SemiEntityDefinition extends AttributeRelationshipHolderDefinition 
 
 	private final List<String> identifiers;
 
-	private final Map<String, IdentifierGenerator> identifierGenerators;
+	private final Map<String, ValueGenerator> identifierGenerators;
 
 	public SemiEntityDefinition(Mirror mirror) {
 		super(mirror);
 
 		this.identifiers = mirror.toListOf(String.class, "identifiers");
-		this.identifierGenerators = mirror.toMapOf(String.class, IdentifierGenerator.class, "identifierGenerators");
+		this.identifierGenerators = mirror.toMapOf(String.class, ValueGenerator.class, "identifierGenerators");
 	}
 
 	public final List<String> getIdentifiers() {
 		return identifiers;
 	}
 
-	public final Map<String, IdentifierGenerator> getIdentifierGenerators() {
+	public final Map<String, ValueGenerator> getIdentifierGenerators() {
 		return identifierGenerators;
 	}
 	

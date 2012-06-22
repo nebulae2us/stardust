@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.nebulae2us.electron.Mirror;
+import org.nebulae2us.stardust.adapter.TypeAdapter;
 
 /**
  * @author Trung Phan
@@ -27,6 +28,8 @@ import org.nebulae2us.electron.Mirror;
 public class AttributeHolderDefinition {
 	
 	private final Map<String, String> scalarAttributeColumnNames;
+	
+	private final Map<String, TypeAdapter<?, ?>> scalarAttributeTypeAdapters;
 	
 	private final List<String> embeddedAttributes;
 	
@@ -42,6 +45,7 @@ public class AttributeHolderDefinition {
 		mirror.bind(this);
 		
 		this.scalarAttributeColumnNames = mirror.toMapOf(String.class, String.class, "scalarAttributeColumnNames");
+		this.scalarAttributeTypeAdapters = (Map)mirror.toMapOf(String.class, TypeAdapter.class, "scalarAttributeTypeAdapters");
 		this.embeddedAttributes = mirror.toListOf(String.class, "embeddedAttributes");
 		this.notNullableAttributes = mirror.toListOf(String.class, "notNullableAttributes");
 		this.notInsertableAttributes = mirror.toListOf(String.class, "notInsertableAttributes");
@@ -51,6 +55,10 @@ public class AttributeHolderDefinition {
 
 	public final Map<String, String> getScalarAttributeColumnNames() {
 		return scalarAttributeColumnNames;
+	}
+	
+	public final Map<String, TypeAdapter<?, ?>> getScalarAttributeTypeAdapters() {
+		return scalarAttributeTypeAdapters;
 	}
 
 	public final List<String> getEmbeddedAttributes() {

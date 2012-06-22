@@ -225,4 +225,6 @@ public class OneEntity_IT extends BaseIntegrationTest {
 		assertEquals(Arrays.asList("First 4", "First 5", "First 6", "First 7", "First 8"), ObjectUtils.extractValues(Person.class, people, "firstName"));
 	}
 	
+	
+	
 }

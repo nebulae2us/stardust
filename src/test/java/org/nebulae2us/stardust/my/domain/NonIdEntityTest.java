@@ -15,7 +15,6 @@
  */
 package org.nebulae2us.stardust.my.domain;
 
-import java.lang.reflect.Constructor;
 import java.util.List;
 
 import javax.persistence.Id;
@@ -97,9 +96,7 @@ public class NonIdEntityTest {
 			Person owner;
 		}
 		
-		Entity house = this.entityRepository.getEntity(House.class);
-		
-		System.out.println(house);
+		this.entityRepository.getEntity(House.class);
 		
 	}
 	

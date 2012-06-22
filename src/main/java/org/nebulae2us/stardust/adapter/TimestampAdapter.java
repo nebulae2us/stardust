@@ -13,23 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.generator;
+package org.nebulae2us.stardust.adapter;
 
-import org.nebulae2us.stardust.dao.domain.JdbcExecutor;
-import org.nebulae2us.stardust.dialect.Dialect;
+import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * @author Trung Phan
  *
  */
-public interface IdentifierGenerator {
-	
-	/**
-	 * If true, generateIdentifierValue is called before insertion.
-	 * @return
-	 */
-	public boolean generationBeforeInsertion();
-	
-	public <T> T generateIdentifierValue(Class<T> expectedType, Dialect dialect, JdbcExecutor jdbcExecutor);
+public class TimestampAdapter extends TypeAdapter<Timestamp, Date> {
+
+	@Override
+	public Class<Timestamp> getPersistenceType() {
+		return Timestamp.class;
+	}
+
+	@Override
+	public Timestamp toPersistenceType(Date object) {
+		return object == null ? null : object instanceof Timestamp ? (Timestamp)object : new Timestamp(object.getTime());
+	}
+
+	@Override
+	public Date toAttributeType(Class<? extends Date> expectedType, Timestamp object) {
+		return new Date(object.getTime());
+	}
 
 }

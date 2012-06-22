@@ -15,7 +15,9 @@
  */
 package org.nebulae2us.stardust.sql.domain;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,8 +34,10 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.adapter.TypeAdapter;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
+import org.nebulae2us.stardust.internal.util.ReflectionUtils;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
@@ -336,7 +340,11 @@ public class EntityMappingRepository {
 			if (attributeMapping instanceof ScalarAttributeMapping) {
 				
 				ScalarAttributeMapping scalarAttributeMapping = (ScalarAttributeMapping)attributeMapping;
-				Object value = dataReader.read(scalarAttributeMapping.getAttribute().getField().getType(), scalarAttributeMapping.getColumnIndex());
+				ScalarAttribute scalarAttribute = scalarAttributeMapping.getAttribute();
+				Object value = dataReader.read(scalarAttribute.getPersistenceType(), scalarAttributeMapping.getColumnIndex());
+				if (scalarAttribute.getTypeAdapter() != null) {
+					value = ((TypeAdapter)scalarAttribute.getTypeAdapter()).toAttributeType(scalarAttribute.getScalarType(), value);
+				}
 				setValue(attributeMapping.getAttribute().getField(), result, value);
 			}
 			else if (attributeMapping instanceof ValueObjectAttributeMapping) {
@@ -367,11 +375,28 @@ public class EntityMappingRepository {
 	
 	private Object instantiateObject(Class<?> type) {
 		try {
-			return type.newInstance();
+			if (type.getEnclosingClass() != null && ReflectionUtils.findField(type, "this$0") != null) {
+				Constructor<?> constructor = ReflectionUtils.findConstructor(type, type.getEnclosingClass());
+				if (constructor != null) {
+					try {
+						return constructor.newInstance((Class<?>)null);
+					} catch (IllegalArgumentException e) {
+						throw new IllegalStateException(e);
+					} catch (InvocationTargetException e) {
+						throw new IllegalStateException(e);
+					}
+				}
+				else {
+					throw new IllegalStateException("Cannot instantiate " + type);
+				}
+			}
+			else {
+				return type.newInstance();
+			}
 		} catch (InstantiationException e) {
-			return null;
+			throw new IllegalStateException(e.getMessage(), e);
 		} catch (IllegalAccessException e) {
-			return null;
+			throw new IllegalStateException(e.getMessage(), e);
 		}
 	}
 	

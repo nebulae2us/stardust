@@ -86,14 +86,14 @@ public class UpdateEntityTranslator implements Translator {
 				updateSql.append(scalarAttribute.getColumn().getName())
 					.append(" = ?,\n");
 				
-				Object value = attribute.extractAttributeValue(entityToInsert);
+				Object value = attribute.extractValueForPersistence(entityToInsert);
 				values.add(value);
 				
 			}
 			else if (attribute instanceof EntityAttribute) {
 				EntityAttribute entityAttribute = (EntityAttribute)attribute;
 				
-				Object friendObject = attribute.extractAttributeValue(entityToInsert);
+				Object friendObject = attribute.extractValueForPersistence(entityToInsert);
 				Entity friendEntity = entityAttribute.getEntity();
 				List<ScalarAttribute> friendIdentifierAttributes = friendEntity.getIdentifierScalarAttributes();
 				
@@ -107,7 +107,7 @@ public class UpdateEntityTranslator implements Translator {
 						values.add(null);
 					}
 					else {
-						Object value = friendIdentifierAttribute.extractAttributeValue(friendObject);
+						Object value = friendIdentifierAttribute.extractValueForPersistence(friendObject);
 						values.add(value);
 					}
 					
@@ -130,7 +130,7 @@ public class UpdateEntityTranslator implements Translator {
 			updateSql.append(idColumn.getName())
 				.append(" = ? and ");
 	
-			Object value = identifierScalarAttribute.extractAttributeValue(entityToInsert);
+			Object value = identifierScalarAttribute.extractValueForPersistence(entityToInsert);
 			values.add(value);
 		}
 		
