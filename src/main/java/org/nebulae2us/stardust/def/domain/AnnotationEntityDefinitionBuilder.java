@@ -38,7 +38,7 @@ import javax.persistence.Transient;
 
 import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.stardust.generator.IdentityValueRetriever;
-import org.nebulae2us.stardust.generator.SequenceIdentifierGenerator;
+import org.nebulae2us.stardust.generator.SequenceValueGenerator;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
@@ -166,7 +166,7 @@ public class AnnotationEntityDefinitionBuilder extends AbstractAnnotationDefinit
 					SequenceGenerator sequenceGenerator = searchForSequenceGeneratorAnnot(generatedValue.generator(), entityClass);
 					AssertSyntax.notNull(sequenceGenerator, "Cannot find definition for sequence generator \"%s\". Hint: define @SequenceGenerator.", generatedValue.generator());
 					
-					builder.identifierGenerator(field.getName(), new SequenceIdentifierGenerator(sequenceGenerator.schema(), sequenceGenerator.sequenceName()));
+					builder.identifierGenerator(field.getName(), new SequenceValueGenerator(sequenceGenerator.schema(), sequenceGenerator.sequenceName()));
 					break;
 				default:
 					AssertSyntax.fail("Unsupported identifier generator strategy %s.", generatedValue.strategy().toString());

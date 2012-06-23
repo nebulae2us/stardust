@@ -32,7 +32,7 @@ import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.generator.ValueGenerator;
 import org.nebulae2us.stardust.generator.IdentityValueRetriever;
-import org.nebulae2us.stardust.generator.SequenceIdentifierGenerator;
+import org.nebulae2us.stardust.generator.SequenceValueGenerator;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
 import org.nebulae2us.stardust.my.domain.EntityIdentifier;
@@ -196,8 +196,8 @@ public class DDLGenerator {
 		Entity entity = entityRepository.getEntity(entityClass);
 		for (ScalarAttribute scalarAttribute : entity.getScalarAttributes()) {
 			ValueGenerator generator = scalarAttribute.getValueGenerator();
-			if (generator instanceof SequenceIdentifierGenerator) {
-				SequenceIdentifierGenerator sequenceGenerator = (SequenceIdentifierGenerator)generator;
+			if (generator instanceof SequenceValueGenerator) {
+				SequenceValueGenerator sequenceGenerator = (SequenceValueGenerator)generator;
 				String sequenceName = sequenceGenerator.getName();
 				
 				if (!this.ddlCreateSequences.containsKey(sequenceName)) {

@@ -20,7 +20,7 @@ import java.util.Arrays;
 import org.junit.Test;
 import org.nebulae2us.stardust.def.domain.EntityDefinition;
 import org.nebulae2us.stardust.def.domain.EntityDefinitionBuilder;
-import org.nebulae2us.stardust.generator.SequenceIdentifierGenerator;
+import org.nebulae2us.stardust.generator.SequenceValueGenerator;
 import org.nebulae2us.stardust.jpa.group1.House;
 import org.nebulae2us.stardust.jpa.group1.Passport;
 import org.nebulae2us.stardust.jpa.group1.Person;
@@ -181,10 +181,10 @@ public class EntityDefinitionBuilderTest {
 	public void entityDefinitionBuilder_should_be_able_to_define_id_generator() {
 		
 		EntityDefinition definition = new EntityDefinitionBuilder(House.class)
-			.identifierGenerator("houseId.houseId", new SequenceIdentifierGenerator("house_seq"))
+			.identifierGenerator("houseId.houseId", new SequenceValueGenerator("house_seq"))
 			.toEntityDefinition();
 		
-		assertTrue(definition.getIdentifierGenerators().get("houseId.houseId") instanceof SequenceIdentifierGenerator);
+		assertTrue(definition.getIdentifierGenerators().get("houseId.houseId") instanceof SequenceValueGenerator);
 		
 	}
 

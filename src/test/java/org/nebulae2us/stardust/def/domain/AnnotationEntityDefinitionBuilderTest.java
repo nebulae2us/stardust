@@ -42,7 +42,7 @@ import org.nebulae2us.stardust.def.domain.AnnotationEntityDefinitionBuilder;
 import org.nebulae2us.stardust.def.domain.EntityDefinition;
 import org.nebulae2us.stardust.def.domain.RelationshipDefinition;
 import org.nebulae2us.stardust.generator.IdentityValueRetriever;
-import org.nebulae2us.stardust.generator.SequenceIdentifierGenerator;
+import org.nebulae2us.stardust.generator.SequenceValueGenerator;
 import org.nebulae2us.stardust.my.domain.RelationalType;
 
 import static org.junit.Assert.*;
@@ -360,7 +360,7 @@ public class AnnotationEntityDefinitionBuilderTest {
 		.toEntityDefinition();
 
 		assertEquals(1, definition.getIdentifierGenerators().size());
-		SequenceIdentifierGenerator sequenceIdentifierGenerator = (SequenceIdentifierGenerator)definition.getIdentifierGenerators().get("id");
+		SequenceValueGenerator sequenceIdentifierGenerator = (SequenceValueGenerator)definition.getIdentifierGenerators().get("id");
 		assertEquals("person_seq", sequenceIdentifierGenerator.getName());
 	}
 
@@ -378,7 +378,7 @@ public class AnnotationEntityDefinitionBuilderTest {
 		.toEntityDefinition();
 
 		assertEquals(1, definition.getIdentifierGenerators().size());
-		SequenceIdentifierGenerator sequenceIdentifierGenerator = (SequenceIdentifierGenerator)definition.getIdentifierGenerators().get("id");
+		SequenceValueGenerator sequenceIdentifierGenerator = (SequenceValueGenerator)definition.getIdentifierGenerators().get("id");
 		assertEquals("person_seq", sequenceIdentifierGenerator.getName());
 	}
 	

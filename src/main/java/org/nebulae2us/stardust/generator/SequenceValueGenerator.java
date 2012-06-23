@@ -25,17 +25,17 @@ import org.nebulae2us.stardust.internal.util.ObjectUtils;
  * @author Trung Phan
  *
  */
-public class SequenceIdentifierGenerator implements ValueGenerator {
+public class SequenceValueGenerator implements ValueGenerator {
 
 	private final String schema;
 	
 	private final String sequenceName;
 	
-	public SequenceIdentifierGenerator(String sequenceName) {
+	public SequenceValueGenerator(String sequenceName) {
 		this("", sequenceName);
 	}
 	
-	public SequenceIdentifierGenerator(String schema, String sequenceName) {
+	public SequenceValueGenerator(String schema, String sequenceName) {
 		this.schema = schema;
 		this.sequenceName = sequenceName;
 	}
