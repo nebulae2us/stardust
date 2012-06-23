@@ -22,6 +22,11 @@ package org.nebulae2us.stardust.dialect;
 public class SQLServer2008Dialect extends SQLServerDialect {
 
 	@Override
+	public String getSqlToRetrieveNextSequenceValue(String sequenceName) {
+		throw new UnsupportedOperationException("SQL Server 2008 or earlier does not support sequence.");
+	}
+	
+	@Override
 	public String applyOffsetLimit(String sql, long offsetValue, long limitValue) {
 		String newSql = "select * from (select tmp_t.*, row_number() over () tmp_rn from (select top " + (limitValue + offsetValue) + sql.substring(6) + ") tmp_t) tmp_t2 where tmp_rn > " + offsetValue + " order by tmp_rn";
 		return newSql;
@@ -31,6 +36,16 @@ public class SQLServer2008Dialect extends SQLServerDialect {
 	public String applyOffset(String sql, long offsetValue) {
 		String newSql = "select * from (select tmp_t.*, row_number() over () tmp_rn from (" + sql + ") tmp_t) tmp_t2 where tmp_rn > " + offsetValue + " order by tmp_rn";
 		return newSql;
+	}
+	
+	@Override
+	public String getSqlToCreateSequence(String sequenceName) {
+		throw new UnsupportedOperationException("SQL Server 2008 or earlier does not support sequence.");
+	}
+
+	@Override
+	public String getSqlToDropSequence(String sequenceName) {
+		throw new UnsupportedOperationException("SQL Server 2008 or earlier does not support sequence.");
 	}
 
 }

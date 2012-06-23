@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.nebulae2us</groupId>
     <artifactId>stardust</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.0.RC1</version>
     <name>Stardust</name>
     <description>Java ORM framework</description>
 
@@ -56,7 +56,7 @@
     	<dependency>
     		<groupId>org.nebulae2us</groupId>
     		<artifactId>electron</artifactId>
-    		<version>1.0.0</version>
+    		<version>1.0.0.RC1</version>
     		<scope>runtime</scope>
     	</dependency>
     	<dependency>
