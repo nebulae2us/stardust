@@ -109,6 +109,14 @@ public class QueryBuilder<T> {
 		return _join(target, alias, JoinType.LEFT_JOIN);
 	}
 	
+	public QueryBuilder<T> filterBy(String expression, Object ...values) {
+		Filter filter = new FilterBuilder(expression, values).toFilter();
+		Pair<PredicateExpression, List<?>> result = filter.toExpression();
+		predicateExpressions.add(result.getItem1());
+		filterWildcardValues.addAll(result.getItem2());
+		return this;
+	}
+	
 	public ChainedFilterBuilder<QueryBuilder<T>> filterBy() {
 		return new ChainedFilterBuilder<QueryBuilder<T>>(this, new Procedure() {
 			public void execute(Object... arguments) {

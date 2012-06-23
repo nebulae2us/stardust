@@ -11,8 +11,8 @@ class Person {
 	private Long personId;
 
 	private String firstName;
-	
 	private String lastName;
+	
 	
 	// getters and setters;
 }
@@ -20,8 +20,29 @@ class Person {
 To get a list of people:
 
 ``` java
+
 DaoManager daoManager = new DaoManager(dataSource, OracleDialect.getInstance());
 
 List<Person> allPeople = daoManager.newQuery(Person.class).list();
+
+List<Person> children = daoManager.newQuery(Person.class)
+		.filterBy("age < ?", 18)
+		.list();
+
+List<Person> toddler = daoManager.newQuery(Person.class)
+		.filterBy("age between ? and ?", 1, 3)
+		.list();
+
+List<Person> first10Eldest = daoManager.newQuery(Person.class)
+		.maxResults(10)
+		.orderBy("age desc")
+		.list();
+
+List<Person> next10Eldest = daoManager.newQuery(Person.class)
+		.firstResult(10)
+		.maxResults(10)
+		.orderBy("age desc")
+		.list();
+
 ```
 

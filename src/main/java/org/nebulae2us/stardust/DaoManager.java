@@ -97,6 +97,10 @@ public class DaoManager {
 	public void endUnitOfWork() {
 		this.jdbcExecutor.endUnitOfWork();
 	}
+
+	public void setPackagesToScan(String packageName) {
+		this.entityRepository.scanPackage(packageName);
+	}
 	
 	private TranslatorController resolveTranslatorController(Dialect dialect) {
 		if (dialect instanceof OracleDialect) {
