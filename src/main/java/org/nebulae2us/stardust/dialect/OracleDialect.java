@@ -21,6 +21,12 @@ package org.nebulae2us.stardust.dialect;
  */
 public class OracleDialect extends Dialect {
 
+	private static OracleDialect instance = new OracleDialect();
+	
+	public static final OracleDialect getInstance() {
+		return instance;
+	}
+	
 	@Override
 	public String getSqlToRetrieveIdentityValue() {
 		throw new UnsupportedOperationException("Identity is unsupported in Oracle.");
