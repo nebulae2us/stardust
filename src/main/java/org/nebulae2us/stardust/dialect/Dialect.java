@@ -48,11 +48,11 @@ public abstract class Dialect {
 		return Integer.MAX_VALUE;
 	}
 
-	public abstract Pair<String, List<?>> applyLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues);
+	public abstract String applyLimit(String sql, long limitValue);
 	
-	public abstract Pair<String, List<?>> applyOffsetLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues);
+	public abstract String applyOffsetLimit(String sql, long offsetValue, long limitValue);
 	
-	public abstract Pair<String, List<?>> applyOffset(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues);
+	public abstract String applyOffset(String sql, long offsetValue);
 	
 	public abstract String getIdentityDeclare();
 	

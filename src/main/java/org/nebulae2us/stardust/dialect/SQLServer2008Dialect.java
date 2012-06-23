@@ -19,46 +19,18 @@ package org.nebulae2us.stardust.dialect;
  * @author Trung Phan
  *
  */
-public class DefaultDialect extends Dialect {
-
-	@Override
-	public String getSqlToRetrieveIdentityValue() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String getSqlToRetrieveNextSequenceValue(String sequenceName) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String applyLimit(String sql, long limitValue) {
-		throw new UnsupportedOperationException();
-	}
+public class SQLServer2008Dialect extends SQLServerDialect {
 
 	@Override
 	public String applyOffsetLimit(String sql, long offsetValue, long limitValue) {
-		throw new UnsupportedOperationException();
+		String newSql = "select * from (select tmp_t.*, row_number() over () tmp_rn from (select top " + (limitValue + offsetValue) + sql.substring(6) + ") tmp_t) tmp_t2 where tmp_rn > " + offsetValue + " order by tmp_rn";
+		return newSql;
 	}
 
 	@Override
 	public String applyOffset(String sql, long offsetValue) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String getIdentityDeclare() {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String getSqlToCreateSequence(String sequenceName) {
-		throw new UnsupportedOperationException();
-	}
-
-	@Override
-	public String getSqlToDropSequence(String sequenceName) {
-		throw new UnsupportedOperationException();
+		String newSql = "select * from (select tmp_t.*, row_number() over () tmp_rn from (" + sql + ") tmp_t) tmp_t2 where tmp_rn > " + offsetValue + " order by tmp_rn";
+		return newSql;
 	}
 
 }

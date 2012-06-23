@@ -103,21 +103,24 @@ public class QueryTranslator implements Translator {
 			}
 		}
 
+		String finalSql = sql.toString();
+
 		if (queryExpression.isCount() && queryExpression.isDistinct()) {
-			return new Pair<String, List<?>>("select count(*) from (" + sql.toString() + ") tmp", scalarValues);
+			finalSql = "select count(*) from (" + sql.toString() + ") tmp";
+		}
+		else if (!queryExpression.isCount()) {
+			if (queryExpression.getMaxResults() > 0 && queryExpression.getFirstResult() > 0) {
+				finalSql = context.getDialect().applyOffsetLimit(sql.toString(), queryExpression.getFirstResult(), queryExpression.getMaxResults());
+			}
+			else if (queryExpression.getMaxResults() > 0) {
+				finalSql = context.getDialect().applyLimit(sql.toString(), queryExpression.getMaxResults());
+			}
+			else if (queryExpression.getFirstResult() > 0) {
+				finalSql = context.getDialect().applyOffset(sql.toString(), queryExpression.getFirstResult());
+			}
 		}
 		
-		if (queryExpression.getMaxResults() > 0 && queryExpression.getFirstResult() > 0) {
-			return context.getDialect().applyOffsetLimit(sql.toString(), scalarValues, queryExpression.getFirstResult(), queryExpression.getMaxResults(), orderResult.getItem1(), orderResult.getItem2());
-		}
-		else if (queryExpression.getMaxResults() > 0) {
-			return context.getDialect().applyLimit(sql.toString(), scalarValues, queryExpression.getFirstResult(), queryExpression.getMaxResults(), orderResult.getItem1(), orderResult.getItem2());
-		}
-		else if (queryExpression.getFirstResult() > 0) {
-			return context.getDialect().applyOffset(sql.toString(), scalarValues, queryExpression.getFirstResult(), queryExpression.getMaxResults(), orderResult.getItem1(), orderResult.getItem2());
-		}
-		
-		return new Pair<String, List<?>>(sql.toString(), scalarValues);
+		return new Pair<String, List<?>>(finalSql, scalarValues);
 	}
 	
 	private Pair<String, List<?>> transformSql(String sql, ParamValues paramValues) {

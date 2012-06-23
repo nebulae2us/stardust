@@ -15,10 +15,6 @@
  */
 package org.nebulae2us.stardust.dialect;
 
-import java.util.List;
-
-import org.nebulae2us.electron.Pair;
-
 /**
  * @author Trung Phan
  *
@@ -36,21 +32,21 @@ public class DB2Dialect extends Dialect {
 	}
 
 	@Override
-	public Pair<String, List<?>> applyLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
+	public String applyLimit(String sql, long limitValue) {
 		String newSql = sql + " fetch first " + limitValue + " rows only";
-		return new Pair<String, List<?>>(newSql, values);
+		return newSql;
 	}
 
 	@Override
-	public Pair<String, List<?>> applyOffsetLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
+	public String applyOffsetLimit(String sql, long offsetValue, long limitValue) {
 		String newSql = "select * from (select tmp_t.*, row_number() over() as tmp_rn from (" + sql + " fetch first " + (limitValue + offsetValue) + " rows only) tmp_t) tmp_t2 where tmp_rn > " + offsetValue + " order by tmp_rn";
-		return new Pair<String, List<?>>(newSql, values);
+		return newSql;
 	}
 
 	@Override
-	public Pair<String, List<?>> applyOffset(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
+	public String applyOffset(String sql, long offsetValue) {
 		String newSql = "select * from (select tmp_t.*, row_number() over() as tmp_rn from (" + sql + ") tmp_t) tmp_t2 where tmp_rn > " + offsetValue + " order by tmp_rn";
-		return new Pair<String, List<?>>(newSql, values);
+		return newSql;
 	}
 
 	@Override

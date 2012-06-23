@@ -15,11 +15,6 @@
  */
 package org.nebulae2us.stardust.dialect;
 
-import java.util.List;
-
-import org.nebulae2us.electron.Pair;
-import org.nebulae2us.electron.util.ListBuilder;
-
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
@@ -39,36 +34,25 @@ public class SQLServerDialect extends Dialect {
 	}
 
 	@Override
-	public Pair<String, List<?>> applyLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
+	public String applyLimit(String sql, long limitValue) {
 		AssertState.isTrue("select".equalsIgnoreCase(sql.substring(0, 6)),"Unexpected sql: %s", sql);
 		
 		String newSql = "select top " + limitValue + sql.substring(6);
-		return new Pair<String, List<?>>(newSql, values);
+		return newSql;
 	}
 
 	@Override
-	public Pair<String, List<?>> applyOffsetLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
-		AssertSyntax.notEmpty(orderBy, "Paging SQL requires ORDER BY clause for SQLServer dialect.");
-		AssertState.isTrue("select".equalsIgnoreCase(sql.substring(0, 6)),"Unexpected sql: %s", sql);
-
-		List<?> newValues = orderByValues.size() == 0 ? values :
-			new ListBuilder<Object>().add(orderByValues).add(values).toList();
-		
-		String newSql = "select tmp_t.*, row_number() over (order by " + orderBy + ") tmp_rn from (select top " + (limitValue + offsetValue) + sql.substring(6) + ") tmp_t where tmp_rn > " + offsetValue;
-
-		return new Pair<String, List<?>>(newSql, newValues);
+	public String applyOffsetLimit(String sql, long offsetValue, long limitValue) {
+		AssertSyntax.isTrue(sql.indexOf("order by") > -1, "Query must have ORDER BY for pagination.");
+		String newSql = sql + " offset " + offsetValue + " rows fetch next " + limitValue + " rows only";
+		return newSql;
 	}
 
 	@Override
-	public Pair<String, List<?>> applyOffset(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
-		AssertSyntax.notEmpty(orderBy, "Paging SQL requires ORDER BY clause for SQLServer dialect.");
-
-		List<?> newValues = orderByValues.size() == 0 ? values :
-			new ListBuilder<Object>().add(orderByValues).add(values).toList();
-		
-		String newSql = "select tmp_t.*, row_number() over (order by " + orderBy + ") tmp_rn from (" + sql + ") tmp_t where tmp_rn > " + offsetValue;
-
-		return new Pair<String, List<?>>(newSql, newValues);
+	public String applyOffset(String sql, long offsetValue) {
+		AssertSyntax.isTrue(sql.indexOf("order by") > -1, "Query must have ORDER BY for pagination.");
+		String newSql = sql + " offset " + offsetValue + " rows";
+		return newSql;
 	}
 
 	@Override

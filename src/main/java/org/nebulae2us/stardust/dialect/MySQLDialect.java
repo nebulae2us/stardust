@@ -36,21 +36,21 @@ public class MySQLDialect extends Dialect {
 	}
 
 	@Override
-	public Pair<String, List<?>> applyLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
+	public String applyLimit(String sql, long limitValue) {
 		String newSql = sql + " limit " + limitValue;
-		return new Pair<String, List<?>>(newSql, values);
+		return newSql;
 	}
 
 	@Override
-	public Pair<String, List<?>> applyOffsetLimit(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
+	public String applyOffsetLimit(String sql, long offsetValue, long limitValue) {
 		String newSql = sql + " limit " + limitValue + " offset " + offsetValue;
-		return new Pair<String, List<?>>(newSql, values);
+		return newSql;
 	}
 
 	@Override
-	public Pair<String, List<?>> applyOffset(String sql, List<?> values, long offsetValue, long limitValue, String orderBy, List<?> orderByValues) {
+	public String applyOffset(String sql, long offsetValue) {
 		String newSql = sql + " offset " + offsetValue;
-		return new Pair<String, List<?>>(newSql, values);
+		return newSql;
 	}
 
 	@Override
