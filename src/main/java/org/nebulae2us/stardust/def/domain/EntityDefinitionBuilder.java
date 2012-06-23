@@ -21,10 +21,9 @@ import java.util.Map;
 
 import org.nebulae2us.electron.Converter;
 import org.nebulae2us.electron.DefaultDestinationClassResolver;
-import org.nebulae2us.electron.DestinationClassResolver;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.stardust.NewEntityDetector;
-import org.nebulae2us.stardust.generator.ValueGenerator;
+import org.nebulae2us.stardust.internal.util.Builders;
 import org.nebulae2us.stardust.my.domain.InheritanceType;
 
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
@@ -62,7 +61,7 @@ public class EntityDefinitionBuilder extends SemiEntityDefinitionBuilder<EntityD
 	}
 
 	public EntityDefinition toEntityDefinition() {
-		return new Converter(new DefaultDestinationClassResolver(), true).convert(this).to(EntityDefinition.class);
+		return new Converter(new DefaultDestinationClassResolver(), true, Builders.IGNORED_TYPES).convert(this).to(EntityDefinition.class);
 	}
 
 	public SecondaryTableBuilder joinSecondaryTable(String secondaryTableName) {

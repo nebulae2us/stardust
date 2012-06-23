@@ -3,7 +3,7 @@ package org.nebulae2us.stardust.sql.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 import org.nebulae2us.stardust.my.domain.*;
 
 @Builder(destination=AttributeMapping.class)
@@ -51,7 +51,7 @@ public class AttributeMappingBuilder<P> implements Wrappable<AttributeMapping> {
 	}
 
     public AttributeMapping toAttributeMapping() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(AttributeMapping.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(AttributeMapping.class);
     }
 
 
@@ -61,7 +61,7 @@ public class AttributeMappingBuilder<P> implements Wrappable<AttributeMapping> {
 	public AttributeBuilder<?> getAttribute() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.attribute, AttributeBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, AttributeMapping.class, "attribute");
-			this.attribute = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(AttributeBuilder.class);
+			this.attribute = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(AttributeBuilder.class);
 		}
 
 		return attribute;
@@ -80,7 +80,7 @@ public class AttributeMappingBuilder<P> implements Wrappable<AttributeMapping> {
 
     public AttributeMappingBuilder<P> attribute$wrap(Attribute attribute) {
     	verifyMutable();
-    	this.attribute = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(attribute).to(AttributeBuilder.class);
+    	this.attribute = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(attribute).to(AttributeBuilder.class);
         return this;
     }
     

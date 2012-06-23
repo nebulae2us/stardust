@@ -3,7 +3,7 @@ package org.nebulae2us.stardust.sql.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 import org.nebulae2us.stardust.my.domain.*;
 
 @Builder(destination=ValueObjectAttributeMapping.class)
@@ -33,13 +33,13 @@ public class ValueObjectAttributeMappingBuilder<P> extends AttributeMappingBuild
 	}
 
     public ValueObjectAttributeMapping toValueObjectAttributeMapping() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ValueObjectAttributeMapping.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(ValueObjectAttributeMapping.class);
     }
     
 
 	@Override
     public ValueObjectAttributeMapping toAttributeMapping() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ValueObjectAttributeMapping.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(ValueObjectAttributeMapping.class);
     }
     
 
@@ -49,7 +49,7 @@ public class ValueObjectAttributeMappingBuilder<P> extends AttributeMappingBuild
 	public List<AttributeMappingBuilder<?>> getAttributeMappings() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.attributeMappings, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, ValueObjectAttributeMapping.class, "attributeMappings");
-			this.attributeMappings = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.attributeMappings = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return attributeMappings;
@@ -193,7 +193,7 @@ public class ValueObjectAttributeMappingBuilder<P> extends AttributeMappingBuild
 		}
 		if (attributeMappings != null) {
 			for (AttributeMapping e : attributeMappings) {
-				AttributeMappingBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AttributeMappingBuilder.class);
+				AttributeMappingBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(AttributeMappingBuilder.class);
 				CollectionUtils.addItem(this.attributeMappings, wrapped);
 			}
 		}

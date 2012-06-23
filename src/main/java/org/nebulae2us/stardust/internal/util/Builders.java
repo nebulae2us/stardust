@@ -1,6 +1,7 @@
 
 package org.nebulae2us.stardust.internal.util;
 
+import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
 import org.nebulae2us.stardust.db.domain.Column;
@@ -52,6 +53,10 @@ import org.nebulae2us.stardust.sql.domain.ValueObjectAttributeMappingBuilder;
 
 public class Builders {
 
+	public static final List<Class<?>> IGNORED_TYPES = new ListBuilder<Class<?>>()
+			.add(org.nebulae2us.stardust.adapter.TypeAdapter.class)
+			.toList();
+
 	public static final DestinationClassResolver DESTINATION_CLASS_RESOLVER = new DestinationClassResolverByMap(
 			new MapBuilder<Class<?>, Class<?>> ()
 				.put(Column.class, ColumnBuilder.class)
@@ -81,7 +86,7 @@ public class Builders {
 			);
 
 	public static Converter converter() {
-		return new Converter(DESTINATION_CLASS_RESOLVER, true);
+		return new Converter(DESTINATION_CLASS_RESOLVER, true, IGNORED_TYPES);
 	}
 
     public static ColumnBuilder<?> column() {
@@ -93,12 +98,12 @@ public class Builders {
     }
 
     public static ColumnBuilder<?> column$copyFrom(Column column) {
-    	ColumnBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(column).to(ColumnBuilder.class);
+    	ColumnBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(column).to(ColumnBuilder.class);
     	return result;
     }
     
     public static ColumnBuilder<?> wrap(Column column) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(column).to(ColumnBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(column).to(ColumnBuilder.class);
     }
 
     public static LinkedTableBuilder<?> linkedTable() {
@@ -110,12 +115,12 @@ public class Builders {
     }
 
     public static LinkedTableBuilder<?> linkedTable$copyFrom(LinkedTable linkedTable) {
-    	LinkedTableBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(linkedTable).to(LinkedTableBuilder.class);
+    	LinkedTableBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(linkedTable).to(LinkedTableBuilder.class);
     	return result;
     }
     
     public static LinkedTableBuilder<?> wrap(LinkedTable linkedTable) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(linkedTable).to(LinkedTableBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(linkedTable).to(LinkedTableBuilder.class);
     }
 
     public static LinkedTableBundleBuilder<?> linkedTableBundle() {
@@ -127,12 +132,12 @@ public class Builders {
     }
 
     public static LinkedTableBundleBuilder<?> linkedTableBundle$copyFrom(LinkedTableBundle linkedTableBundle) {
-    	LinkedTableBundleBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(linkedTableBundle).to(LinkedTableBundleBuilder.class);
+    	LinkedTableBundleBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(linkedTableBundle).to(LinkedTableBundleBuilder.class);
     	return result;
     }
     
     public static LinkedTableBundleBuilder<?> wrap(LinkedTableBundle linkedTableBundle) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(linkedTableBundle).to(LinkedTableBundleBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(linkedTableBundle).to(LinkedTableBundleBuilder.class);
     }
 
     public static TableBuilder<?> table() {
@@ -144,12 +149,12 @@ public class Builders {
     }
 
     public static TableBuilder<?> table$copyFrom(Table table) {
-    	TableBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(table).to(TableBuilder.class);
+    	TableBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(table).to(TableBuilder.class);
     	return result;
     }
     
     public static TableBuilder<?> wrap(Table table) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(table).to(TableBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(table).to(TableBuilder.class);
     }
 
     public static AttributeBuilder<?> attribute() {
@@ -161,12 +166,12 @@ public class Builders {
     }
 
     public static AttributeBuilder<?> attribute$copyFrom(Attribute attribute) {
-    	AttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(attribute).to(AttributeBuilder.class);
+    	AttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(attribute).to(AttributeBuilder.class);
     	return result;
     }
     
     public static AttributeBuilder<?> wrap(Attribute attribute) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(attribute).to(AttributeBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(attribute).to(AttributeBuilder.class);
     }
 
     public static AttributeHolderBuilder<?> attributeHolder() {
@@ -178,12 +183,12 @@ public class Builders {
     }
 
     public static AttributeHolderBuilder<?> attributeHolder$copyFrom(AttributeHolder attributeHolder) {
-    	AttributeHolderBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(attributeHolder).to(AttributeHolderBuilder.class);
+    	AttributeHolderBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(attributeHolder).to(AttributeHolderBuilder.class);
     	return result;
     }
     
     public static AttributeHolderBuilder<?> wrap(AttributeHolder attributeHolder) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(attributeHolder).to(AttributeHolderBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(attributeHolder).to(AttributeHolderBuilder.class);
     }
 
     public static EntityDiscriminatorBuilder<?> entityDiscriminator() {
@@ -195,12 +200,12 @@ public class Builders {
     }
 
     public static EntityDiscriminatorBuilder<?> entityDiscriminator$copyFrom(EntityDiscriminator entityDiscriminator) {
-    	EntityDiscriminatorBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityDiscriminator).to(EntityDiscriminatorBuilder.class);
+    	EntityDiscriminatorBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(entityDiscriminator).to(EntityDiscriminatorBuilder.class);
     	return result;
     }
     
     public static EntityDiscriminatorBuilder<?> wrap(EntityDiscriminator entityDiscriminator) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(entityDiscriminator).to(EntityDiscriminatorBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(entityDiscriminator).to(EntityDiscriminatorBuilder.class);
     }
 
     public static AliasJoinBuilder<?> aliasJoin() {
@@ -212,12 +217,12 @@ public class Builders {
     }
 
     public static AliasJoinBuilder<?> aliasJoin$copyFrom(AliasJoin aliasJoin) {
-    	AliasJoinBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(aliasJoin).to(AliasJoinBuilder.class);
+    	AliasJoinBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(aliasJoin).to(AliasJoinBuilder.class);
     	return result;
     }
     
     public static AliasJoinBuilder<?> wrap(AliasJoin aliasJoin) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(aliasJoin).to(AliasJoinBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(aliasJoin).to(AliasJoinBuilder.class);
     }
 
     public static AttributeMappingBuilder<?> attributeMapping() {
@@ -229,12 +234,12 @@ public class Builders {
     }
 
     public static AttributeMappingBuilder<?> attributeMapping$copyFrom(AttributeMapping attributeMapping) {
-    	AttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(attributeMapping).to(AttributeMappingBuilder.class);
+    	AttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(attributeMapping).to(AttributeMappingBuilder.class);
     	return result;
     }
     
     public static AttributeMappingBuilder<?> wrap(AttributeMapping attributeMapping) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(attributeMapping).to(AttributeMappingBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(attributeMapping).to(AttributeMappingBuilder.class);
     }
 
     public static EntityMappingBuilder<?> entityMapping() {
@@ -246,12 +251,12 @@ public class Builders {
     }
 
     public static EntityMappingBuilder<?> entityMapping$copyFrom(EntityMapping entityMapping) {
-    	EntityMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityMapping).to(EntityMappingBuilder.class);
+    	EntityMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(entityMapping).to(EntityMappingBuilder.class);
     	return result;
     }
     
     public static EntityMappingBuilder<?> wrap(EntityMapping entityMapping) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(entityMapping).to(EntityMappingBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(entityMapping).to(EntityMappingBuilder.class);
     }
 
     public static LinkedEntityBuilder<?> linkedEntity() {
@@ -263,12 +268,12 @@ public class Builders {
     }
 
     public static LinkedEntityBuilder<?> linkedEntity$copyFrom(LinkedEntity linkedEntity) {
-    	LinkedEntityBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(linkedEntity).to(LinkedEntityBuilder.class);
+    	LinkedEntityBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(linkedEntity).to(LinkedEntityBuilder.class);
     	return result;
     }
     
     public static LinkedEntityBuilder<?> wrap(LinkedEntity linkedEntity) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(linkedEntity).to(LinkedEntityBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(linkedEntity).to(LinkedEntityBuilder.class);
     }
 
     public static LinkedEntityBundleBuilder<?> linkedEntityBundle() {
@@ -280,12 +285,12 @@ public class Builders {
     }
 
     public static LinkedEntityBundleBuilder<?> linkedEntityBundle$copyFrom(LinkedEntityBundle linkedEntityBundle) {
-    	LinkedEntityBundleBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(linkedEntityBundle).to(LinkedEntityBundleBuilder.class);
+    	LinkedEntityBundleBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(linkedEntityBundle).to(LinkedEntityBundleBuilder.class);
     	return result;
     }
     
     public static LinkedEntityBundleBuilder<?> wrap(LinkedEntityBundle linkedEntityBundle) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(linkedEntityBundle).to(LinkedEntityBundleBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(linkedEntityBundle).to(LinkedEntityBundleBuilder.class);
     }
 
     public static LinkedTableEntityBuilder<?> linkedTableEntity() {
@@ -297,12 +302,12 @@ public class Builders {
     }
 
     public static LinkedTableEntityBuilder<?> linkedTableEntity$copyFrom(LinkedTableEntity linkedTableEntity) {
-    	LinkedTableEntityBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(linkedTableEntity).to(LinkedTableEntityBuilder.class);
+    	LinkedTableEntityBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(linkedTableEntity).to(LinkedTableEntityBuilder.class);
     	return result;
     }
     
     public static LinkedTableEntityBuilder<?> wrap(LinkedTableEntity linkedTableEntity) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(linkedTableEntity).to(LinkedTableEntityBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(linkedTableEntity).to(LinkedTableEntityBuilder.class);
     }
 
     public static LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle() {
@@ -314,12 +319,12 @@ public class Builders {
     }
 
     public static LinkedTableEntityBundleBuilder<?> linkedTableEntityBundle$copyFrom(LinkedTableEntityBundle linkedTableEntityBundle) {
-    	LinkedTableEntityBundleBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(linkedTableEntityBundle).to(LinkedTableEntityBundleBuilder.class);
+    	LinkedTableEntityBundleBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(linkedTableEntityBundle).to(LinkedTableEntityBundleBuilder.class);
     	return result;
     }
     
     public static LinkedTableEntityBundleBuilder<?> wrap(LinkedTableEntityBundle linkedTableEntityBundle) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(linkedTableEntityBundle).to(LinkedTableEntityBundleBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(linkedTableEntityBundle).to(LinkedTableEntityBundleBuilder.class);
     }
 
     public static EntityBuilder<?> entity() {
@@ -331,12 +336,12 @@ public class Builders {
     }
 
     public static EntityBuilder<?> entity$copyFrom(Entity entity) {
-    	EntityBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entity).to(EntityBuilder.class);
+    	EntityBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(entity).to(EntityBuilder.class);
     	return result;
     }
     
     public static EntityBuilder<?> wrap(Entity entity) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(entity).to(EntityBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(entity).to(EntityBuilder.class);
     }
 
     public static EntityAttributeBuilder<?> entityAttribute() {
@@ -348,12 +353,12 @@ public class Builders {
     }
 
     public static EntityAttributeBuilder<?> entityAttribute$copyFrom(EntityAttribute entityAttribute) {
-    	EntityAttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityAttribute).to(EntityAttributeBuilder.class);
+    	EntityAttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(entityAttribute).to(EntityAttributeBuilder.class);
     	return result;
     }
     
     public static EntityAttributeBuilder<?> wrap(EntityAttribute entityAttribute) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(entityAttribute).to(EntityAttributeBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(entityAttribute).to(EntityAttributeBuilder.class);
     }
 
     public static EntityIdentifierBuilder<?> entityIdentifier() {
@@ -365,12 +370,12 @@ public class Builders {
     }
 
     public static EntityIdentifierBuilder<?> entityIdentifier$copyFrom(EntityIdentifier entityIdentifier) {
-    	EntityIdentifierBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityIdentifier).to(EntityIdentifierBuilder.class);
+    	EntityIdentifierBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(entityIdentifier).to(EntityIdentifierBuilder.class);
     	return result;
     }
     
     public static EntityIdentifierBuilder<?> wrap(EntityIdentifier entityIdentifier) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(entityIdentifier).to(EntityIdentifierBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(entityIdentifier).to(EntityIdentifierBuilder.class);
     }
 
     public static ScalarAttributeBuilder<?> scalarAttribute() {
@@ -382,12 +387,12 @@ public class Builders {
     }
 
     public static ScalarAttributeBuilder<?> scalarAttribute$copyFrom(ScalarAttribute scalarAttribute) {
-    	ScalarAttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(scalarAttribute).to(ScalarAttributeBuilder.class);
+    	ScalarAttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(scalarAttribute).to(ScalarAttributeBuilder.class);
     	return result;
     }
     
     public static ScalarAttributeBuilder<?> wrap(ScalarAttribute scalarAttribute) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(scalarAttribute).to(ScalarAttributeBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(scalarAttribute).to(ScalarAttributeBuilder.class);
     }
 
     public static ValueObjectBuilder<?> valueObject() {
@@ -399,12 +404,12 @@ public class Builders {
     }
 
     public static ValueObjectBuilder<?> valueObject$copyFrom(ValueObject valueObject) {
-    	ValueObjectBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(valueObject).to(ValueObjectBuilder.class);
+    	ValueObjectBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(valueObject).to(ValueObjectBuilder.class);
     	return result;
     }
     
     public static ValueObjectBuilder<?> wrap(ValueObject valueObject) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(valueObject).to(ValueObjectBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(valueObject).to(ValueObjectBuilder.class);
     }
 
     public static ValueObjectAttributeBuilder<?> valueObjectAttribute() {
@@ -416,12 +421,12 @@ public class Builders {
     }
 
     public static ValueObjectAttributeBuilder<?> valueObjectAttribute$copyFrom(ValueObjectAttribute valueObjectAttribute) {
-    	ValueObjectAttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(valueObjectAttribute).to(ValueObjectAttributeBuilder.class);
+    	ValueObjectAttributeBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(valueObjectAttribute).to(ValueObjectAttributeBuilder.class);
     	return result;
     }
     
     public static ValueObjectAttributeBuilder<?> wrap(ValueObjectAttribute valueObjectAttribute) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(valueObjectAttribute).to(ValueObjectAttributeBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(valueObjectAttribute).to(ValueObjectAttributeBuilder.class);
     }
 
     public static EntityAttributeMappingBuilder<?> entityAttributeMapping() {
@@ -433,12 +438,12 @@ public class Builders {
     }
 
     public static EntityAttributeMappingBuilder<?> entityAttributeMapping$copyFrom(EntityAttributeMapping entityAttributeMapping) {
-    	EntityAttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(entityAttributeMapping).to(EntityAttributeMappingBuilder.class);
+    	EntityAttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(entityAttributeMapping).to(EntityAttributeMappingBuilder.class);
     	return result;
     }
     
     public static EntityAttributeMappingBuilder<?> wrap(EntityAttributeMapping entityAttributeMapping) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(entityAttributeMapping).to(EntityAttributeMappingBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(entityAttributeMapping).to(EntityAttributeMappingBuilder.class);
     }
 
     public static ScalarAttributeMappingBuilder<?> scalarAttributeMapping() {
@@ -450,12 +455,12 @@ public class Builders {
     }
 
     public static ScalarAttributeMappingBuilder<?> scalarAttributeMapping$copyFrom(ScalarAttributeMapping scalarAttributeMapping) {
-    	ScalarAttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(scalarAttributeMapping).to(ScalarAttributeMappingBuilder.class);
+    	ScalarAttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(scalarAttributeMapping).to(ScalarAttributeMappingBuilder.class);
     	return result;
     }
     
     public static ScalarAttributeMappingBuilder<?> wrap(ScalarAttributeMapping scalarAttributeMapping) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(scalarAttributeMapping).to(ScalarAttributeMappingBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(scalarAttributeMapping).to(ScalarAttributeMappingBuilder.class);
     }
 
     public static ValueObjectAttributeMappingBuilder<?> valueObjectAttributeMapping() {
@@ -467,12 +472,12 @@ public class Builders {
     }
 
     public static ValueObjectAttributeMappingBuilder<?> valueObjectAttributeMapping$copyFrom(ValueObjectAttributeMapping valueObjectAttributeMapping) {
-    	ValueObjectAttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false).convert(valueObjectAttributeMapping).to(ValueObjectAttributeMappingBuilder.class);
+    	ValueObjectAttributeMappingBuilder<?> result = new Converter(DESTINATION_CLASS_RESOLVER, false, IGNORED_TYPES).convert(valueObjectAttributeMapping).to(ValueObjectAttributeMappingBuilder.class);
     	return result;
     }
     
     public static ValueObjectAttributeMappingBuilder<?> wrap(ValueObjectAttributeMapping valueObjectAttributeMapping) {
-    	return new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(valueObjectAttributeMapping).to(ValueObjectAttributeMappingBuilder.class);
+    	return new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(valueObjectAttributeMapping).to(ValueObjectAttributeMappingBuilder.class);
     }
 
     /* CUSTOM CODE *********************************

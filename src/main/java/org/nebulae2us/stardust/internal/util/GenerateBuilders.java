@@ -18,6 +18,7 @@ package org.nebulae2us.stardust.internal.util;
 import java.io.File;
 
 import org.nebulae2us.electron.BuilderGenerator;
+import org.nebulae2us.stardust.adapter.TypeAdapter;
 import org.nebulae2us.stardust.db.domain.*;
 import org.nebulae2us.stardust.expr.domain.*;
 import org.nebulae2us.stardust.my.domain.*;
@@ -35,8 +36,9 @@ public class GenerateBuilders {
 		
 		new BuilderGenerator()
 			.baseFolder(genFolder)
-			.buildersClassName("org.nebulae2us.stardust.Builders")
+			.buildersClassName("org.nebulae2us.stardust.internal.util.Builders")
 			.builderSuffix("Builder")
+			.ignoreTypes(TypeAdapter.class)
 			.generate(
 					Table.class,
 					Column.class,

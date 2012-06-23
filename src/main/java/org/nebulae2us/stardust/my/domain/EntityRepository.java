@@ -25,8 +25,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.nebulae2us.electron.Converter;
-import org.nebulae2us.stardust.def.domain.EntityDefinition;
 import org.nebulae2us.stardust.internal.util.Builders;
+import org.nebulae2us.stardust.internal.util.ReflectionUtils;
 import org.nebulae2us.stardust.my.domain.scanner.EntityScanner;
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
@@ -70,6 +70,25 @@ public class EntityRepository {
 		}
 	}
 	
+	public void scanPackage(String packageName) {
+		Assert.notNull(packageName, "packageName cannot be null");
+		
+		List<Class<?>> candidateClasses = ReflectionUtils.scanPackage(packageName);
+		
+		List<Class<?>> entityClasses = new ArrayList<Class<?>>();
+		
+		for (Class<?> candidateClass : candidateClasses) {
+			if (candidateClass.getAnnotation(javax.persistence.Entity.class) != null) {
+				entityClasses.add(candidateClass);
+			}
+		}
+		
+		for (Class<?> entityClass : entityClasses) {
+			getEntity(entityClass);
+		}
+		
+	}
+	
 	public List<Entity> getAllEntities() {
 		List<Entity> result = new ArrayList<Entity>();
 		result.addAll(entities.values());
@@ -107,7 +126,7 @@ public class EntityRepository {
 			
 			Map<Class<?>, EntityBuilder<?>> entityBuilders = scanner.getScannedEntityBuilders();
 			List<Entity> entities = 
-					new Converter(Builders.DESTINATION_CLASS_RESOLVER, true).convert(entityBuilders.values()).toListOf(Entity.class);
+					new Converter(Builders.DESTINATION_CLASS_RESOLVER, true, Builders.IGNORED_TYPES).convert(entityBuilders.values()).toListOf(Entity.class);
 			
 			for (Entity e : entities) {
 				if (!this.entities.containsKey(e.getDeclaringClass())) {

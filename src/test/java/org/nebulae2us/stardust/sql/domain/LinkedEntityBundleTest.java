@@ -54,7 +54,7 @@ public class LinkedEntityBundleTest {
 				aliasJoin().name("owners").alias("o").joinType(JoinType.INNER_JOIN)
 				});
 
-		List<AliasJoin> aliasJoins = new Converter(Builders.DESTINATION_CLASS_RESOLVER, true).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
+		List<AliasJoin> aliasJoins = new Converter(Builders.DESTINATION_CLASS_RESOLVER, true, Builders.IGNORED_TYPES).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
 		
 		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(house, "", aliasJoins);
 		
@@ -76,7 +76,7 @@ public class LinkedEntityBundleTest {
 				aliasJoin().name("h.owners").alias("o").joinType(JoinType.LEFT_JOIN)
 			).toList();
 		
-		List<AliasJoin> aliasJoins = new Converter(Builders.DESTINATION_CLASS_RESOLVER, true).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
+		List<AliasJoin> aliasJoins = new Converter(Builders.DESTINATION_CLASS_RESOLVER, true, Builders.IGNORED_TYPES).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
 		
 		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(person, "", aliasJoins);
 		

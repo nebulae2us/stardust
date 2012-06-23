@@ -3,8 +3,8 @@ package org.nebulae2us.stardust.my.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=EntityDiscriminator.class)
 public class EntityDiscriminatorBuilder<P> implements Wrappable<EntityDiscriminator> {
@@ -51,7 +51,7 @@ public class EntityDiscriminatorBuilder<P> implements Wrappable<EntityDiscrimina
 	}
 
     public EntityDiscriminator toEntityDiscriminator() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(EntityDiscriminator.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(EntityDiscriminator.class);
     }
 
 
@@ -61,7 +61,7 @@ public class EntityDiscriminatorBuilder<P> implements Wrappable<EntityDiscrimina
 	public ColumnBuilder<?> getColumn() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.column, ColumnBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, EntityDiscriminator.class, "column");
-			this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(ColumnBuilder.class);
+			this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(ColumnBuilder.class);
 		}
 
 		return column;
@@ -80,7 +80,7 @@ public class EntityDiscriminatorBuilder<P> implements Wrappable<EntityDiscrimina
 
     public EntityDiscriminatorBuilder<P> column$wrap(Column column) {
     	verifyMutable();
-    	this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(column).to(ColumnBuilder.class);
+    	this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(column).to(ColumnBuilder.class);
         return this;
     }
     
@@ -121,7 +121,7 @@ public class EntityDiscriminatorBuilder<P> implements Wrappable<EntityDiscrimina
 	public Object getValue() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.value, Object.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, EntityDiscriminator.class, "value");
-			this.value = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(Object.class);
+			this.value = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(Object.class);
 		}
 
 		return value;

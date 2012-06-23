@@ -18,6 +18,7 @@ package org.nebulae2us.stardust;
 import org.nebulae2us.electron.Converter;
 import org.nebulae2us.electron.DestinationClassResolverByAnnotation;
 import org.nebulae2us.electron.Procedure;
+import org.nebulae2us.stardust.internal.util.Builders;
 
 /**
  * @author Trung Phan
@@ -79,7 +80,7 @@ public class ChainedFilterBuilder<P> extends BaseFilterBuilder {
 		}
 		
 		public P endFilter() {
-			Filter filter = new Converter(new DestinationClassResolverByAnnotation(), true).convert(ChainedFilterBuilder.this).to(Filter.class);
+			Filter filter = new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(ChainedFilterBuilder.this).to(Filter.class);
 			ChainedFilterBuilder.this.callback.execute(filter);
 			return ChainedFilterBuilder.this.parent;
 		}

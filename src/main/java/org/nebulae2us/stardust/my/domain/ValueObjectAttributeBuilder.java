@@ -4,7 +4,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=ValueObjectAttribute.class)
 public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
@@ -33,13 +33,13 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
 	}
 
     public ValueObjectAttribute toValueObjectAttribute() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ValueObjectAttribute.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(ValueObjectAttribute.class);
     }
     
 
 	@Override
     public ValueObjectAttribute toAttribute() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ValueObjectAttribute.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(ValueObjectAttribute.class);
     }
     
 
@@ -49,7 +49,7 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
 	public ValueObjectBuilder<?> getValueObject() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.valueObject, ValueObjectBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, ValueObjectAttribute.class, "valueObject");
-			this.valueObject = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(ValueObjectBuilder.class);
+			this.valueObject = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(ValueObjectBuilder.class);
 		}
 
 		return valueObject;
@@ -68,7 +68,7 @@ public class ValueObjectAttributeBuilder<P> extends AttributeBuilder<P> {
 
     public ValueObjectAttributeBuilder<P> valueObject$wrap(ValueObject valueObject) {
     	verifyMutable();
-    	this.valueObject = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(valueObject).to(ValueObjectBuilder.class);
+    	this.valueObject = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(valueObject).to(ValueObjectBuilder.class);
         return this;
     }
     

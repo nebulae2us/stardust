@@ -3,7 +3,7 @@ package org.nebulae2us.stardust.db.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=Column.class)
 public class ColumnBuilder<P> implements Wrappable<Column> {
@@ -50,7 +50,7 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
 	}
 
     public Column toColumn() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(Column.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(Column.class);
     }
 
 
@@ -60,7 +60,7 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
 	public String getName() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.name, String.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Column.class, "name");
-			this.name = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+			this.name = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(String.class);
 		}
 
 		return name;
@@ -82,7 +82,7 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
 	public TableBuilder<?> getTable() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.table, TableBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Column.class, "table");
-			this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(TableBuilder.class);
+			this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(TableBuilder.class);
 		}
 
 		return table;
@@ -101,7 +101,7 @@ public class ColumnBuilder<P> implements Wrappable<Column> {
 
     public ColumnBuilder<P> table$wrap(Table table) {
     	verifyMutable();
-    	this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(table).to(TableBuilder.class);
+    	this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(table).to(TableBuilder.class);
         return this;
     }
     

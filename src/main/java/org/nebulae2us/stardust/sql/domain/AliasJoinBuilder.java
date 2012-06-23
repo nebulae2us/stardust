@@ -3,8 +3,8 @@ package org.nebulae2us.stardust.sql.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=AliasJoin.class)
 public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
@@ -51,7 +51,7 @@ public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
 	}
 
     public AliasJoin toAliasJoin() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(AliasJoin.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(AliasJoin.class);
     }
 
 
@@ -61,7 +61,7 @@ public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
 	public String getName() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.name, String.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, AliasJoin.class, "name");
-			this.name = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+			this.name = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(String.class);
 		}
 
 		return name;
@@ -83,7 +83,7 @@ public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
 	public String getAlias() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.alias, String.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, AliasJoin.class, "alias");
-			this.alias = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+			this.alias = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(String.class);
 		}
 
 		return alias;
@@ -105,7 +105,7 @@ public class AliasJoinBuilder<P> implements Wrappable<AliasJoin> {
 	public JoinType getJoinType() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.joinType, JoinType.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, AliasJoin.class, "joinType");
-			this.joinType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(JoinType.class);
+			this.joinType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(JoinType.class);
 		}
 
 		return joinType;

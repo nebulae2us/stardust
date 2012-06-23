@@ -3,7 +3,7 @@ package org.nebulae2us.stardust.my.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=EntityIdentifier.class)
 public class EntityIdentifierBuilder<P> extends AttributeHolderBuilder<P> {
@@ -32,13 +32,13 @@ public class EntityIdentifierBuilder<P> extends AttributeHolderBuilder<P> {
 	}
 
     public EntityIdentifier toEntityIdentifier() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(EntityIdentifier.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(EntityIdentifier.class);
     }
     
 
 	@Override
     public EntityIdentifier toAttributeHolder() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(EntityIdentifier.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(EntityIdentifier.class);
     }
     
 

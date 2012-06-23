@@ -64,7 +64,7 @@ public class SqlBackedTranslatorTest {
 				aliasJoin().name("h.owners").alias("o").joinType(JoinType.LEFT_JOIN)
 			).toList();
 		
-		List<AliasJoin> aliasJoins = new Converter(DESTINATION_CLASS_RESOLVER, true).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
+		List<AliasJoin> aliasJoins = new Converter(DESTINATION_CLASS_RESOLVER, true, IGNORED_TYPES).convert(aliasJoinBuilders).toListOf(AliasJoin.class);
 		
 		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(person, "", aliasJoins);
 		

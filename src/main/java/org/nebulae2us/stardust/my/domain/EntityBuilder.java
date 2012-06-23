@@ -3,8 +3,8 @@ package org.nebulae2us.stardust.my.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=Entity.class)
 public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
@@ -33,13 +33,13 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 	}
 
     public Entity toEntity() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(Entity.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(Entity.class);
     }
     
 
 	@Override
     public Entity toAttributeHolder() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(Entity.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(Entity.class);
     }
     
 
@@ -49,7 +49,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 	public LinkedTableBundleBuilder<?> getLinkedTableBundle() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.linkedTableBundle, LinkedTableBundleBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Entity.class, "linkedTableBundle");
-			this.linkedTableBundle = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(LinkedTableBundleBuilder.class);
+			this.linkedTableBundle = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(LinkedTableBundleBuilder.class);
 		}
 
 		return linkedTableBundle;
@@ -68,7 +68,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 
     public EntityBuilder<P> linkedTableBundle$wrap(LinkedTableBundle linkedTableBundle) {
     	verifyMutable();
-    	this.linkedTableBundle = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(linkedTableBundle).to(LinkedTableBundleBuilder.class);
+    	this.linkedTableBundle = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(linkedTableBundle).to(LinkedTableBundleBuilder.class);
         return this;
     }
     
@@ -109,7 +109,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 	public EntityIdentifierBuilder<?> getEntityIdentifier() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.entityIdentifier, EntityIdentifierBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Entity.class, "entityIdentifier");
-			this.entityIdentifier = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(EntityIdentifierBuilder.class);
+			this.entityIdentifier = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(EntityIdentifierBuilder.class);
 		}
 
 		return entityIdentifier;
@@ -128,7 +128,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 
     public EntityBuilder<P> entityIdentifier$wrap(EntityIdentifier entityIdentifier) {
     	verifyMutable();
-    	this.entityIdentifier = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(entityIdentifier).to(EntityIdentifierBuilder.class);
+    	this.entityIdentifier = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(entityIdentifier).to(EntityIdentifierBuilder.class);
         return this;
     }
     
@@ -169,7 +169,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 	public EntityBuilder<?> getRootEntity() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.rootEntity, EntityBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Entity.class, "rootEntity");
-			this.rootEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(EntityBuilder.class);
+			this.rootEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(EntityBuilder.class);
 		}
 
 		return rootEntity;
@@ -188,7 +188,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 
     public EntityBuilder<P> rootEntity$wrap(Entity rootEntity) {
     	verifyMutable();
-    	this.rootEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(rootEntity).to(EntityBuilder.class);
+    	this.rootEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(rootEntity).to(EntityBuilder.class);
         return this;
     }
     
@@ -229,7 +229,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 	public InheritanceType getInheritanceType() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.inheritanceType, InheritanceType.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Entity.class, "inheritanceType");
-			this.inheritanceType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(InheritanceType.class);
+			this.inheritanceType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(InheritanceType.class);
 		}
 
 		return inheritanceType;
@@ -251,7 +251,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 	public EntityDiscriminatorBuilder<?> getEntityDiscriminator() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.entityDiscriminator, EntityDiscriminatorBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Entity.class, "entityDiscriminator");
-			this.entityDiscriminator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(EntityDiscriminatorBuilder.class);
+			this.entityDiscriminator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(EntityDiscriminatorBuilder.class);
 		}
 
 		return entityDiscriminator;
@@ -270,7 +270,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 
     public EntityBuilder<P> entityDiscriminator$wrap(EntityDiscriminator entityDiscriminator) {
     	verifyMutable();
-    	this.entityDiscriminator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(entityDiscriminator).to(EntityDiscriminatorBuilder.class);
+    	this.entityDiscriminator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(entityDiscriminator).to(EntityDiscriminatorBuilder.class);
         return this;
     }
     
@@ -311,7 +311,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 	public ScalarAttributeBuilder<?> getVersion() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.version, ScalarAttributeBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Entity.class, "version");
-			this.version = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(ScalarAttributeBuilder.class);
+			this.version = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(ScalarAttributeBuilder.class);
 		}
 
 		return version;
@@ -330,7 +330,7 @@ public class EntityBuilder<P> extends AttributeHolderBuilder<P> {
 
     public EntityBuilder<P> version$wrap(ScalarAttribute version) {
     	verifyMutable();
-    	this.version = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(version).to(ScalarAttributeBuilder.class);
+    	this.version = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(version).to(ScalarAttributeBuilder.class);
         return this;
     }
     

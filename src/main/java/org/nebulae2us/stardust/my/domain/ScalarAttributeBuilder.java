@@ -4,10 +4,10 @@ import java.lang.reflect.*;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.adapter.*;
 import org.nebulae2us.stardust.db.domain.*;
 import org.nebulae2us.stardust.generator.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=ScalarAttribute.class)
 public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
@@ -36,13 +36,13 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	}
 
     public ScalarAttribute toScalarAttribute() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ScalarAttribute.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(ScalarAttribute.class);
     }
     
 
 	@Override
     public ScalarAttribute toAttribute() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ScalarAttribute.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(ScalarAttribute.class);
     }
     
 
@@ -52,7 +52,7 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	public Class<?> getScalarType() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.scalarType, Class.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, ScalarAttribute.class, "scalarType");
-			this.scalarType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(Class.class);
+			this.scalarType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(Class.class);
 		}
 
 		return scalarType;
@@ -74,7 +74,7 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	public TypeAdapter<?, ?> getTypeAdapter() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.typeAdapter, TypeAdapter.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, ScalarAttribute.class, "typeAdapter");
-			this.typeAdapter = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(TypeAdapter.class);
+			this.typeAdapter = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(TypeAdapter.class);
 		}
 
 		return typeAdapter;
@@ -96,7 +96,7 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	public ColumnBuilder<?> getColumn() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.column, ColumnBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, ScalarAttribute.class, "column");
-			this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(ColumnBuilder.class);
+			this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(ColumnBuilder.class);
 		}
 
 		return column;
@@ -115,7 +115,7 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 
     public ScalarAttributeBuilder<P> column$wrap(Column column) {
     	verifyMutable();
-    	this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(column).to(ColumnBuilder.class);
+    	this.column = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(column).to(ColumnBuilder.class);
         return this;
     }
     
@@ -156,7 +156,7 @@ public class ScalarAttributeBuilder<P> extends AttributeBuilder<P> {
 	public ValueGenerator getValueGenerator() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.valueGenerator, ValueGenerator.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, ScalarAttribute.class, "valueGenerator");
-			this.valueGenerator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(ValueGenerator.class);
+			this.valueGenerator = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(ValueGenerator.class);
 		}
 
 		return valueGenerator;

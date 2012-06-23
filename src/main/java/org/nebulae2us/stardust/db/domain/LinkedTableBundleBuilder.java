@@ -3,7 +3,7 @@ package org.nebulae2us.stardust.db.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=LinkedTableBundle.class)
 public class LinkedTableBundleBuilder<P> implements Wrappable<LinkedTableBundle> {
@@ -50,7 +50,7 @@ public class LinkedTableBundleBuilder<P> implements Wrappable<LinkedTableBundle>
 	}
 
     public LinkedTableBundle toLinkedTableBundle() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(LinkedTableBundle.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(LinkedTableBundle.class);
     }
 
 
@@ -60,7 +60,7 @@ public class LinkedTableBundleBuilder<P> implements Wrappable<LinkedTableBundle>
 	public List<LinkedTableBuilder<?>> getLinkedTables() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.linkedTables, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableBundle.class, "linkedTables");
-			this.linkedTables = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.linkedTables = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return linkedTables;
@@ -144,7 +144,7 @@ public class LinkedTableBundleBuilder<P> implements Wrappable<LinkedTableBundle>
 		}
 		if (linkedTables != null) {
 			for (LinkedTable e : linkedTables) {
-				LinkedTableBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(LinkedTableBuilder.class);
+				LinkedTableBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(LinkedTableBuilder.class);
 				CollectionUtils.addItem(this.linkedTables, wrapped);
 			}
 		}

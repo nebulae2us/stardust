@@ -3,7 +3,7 @@ package org.nebulae2us.stardust.sql.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=LinkedTableEntityBundle.class)
 public class LinkedTableEntityBundleBuilder<P> implements Wrappable<LinkedTableEntityBundle> {
@@ -50,7 +50,7 @@ public class LinkedTableEntityBundleBuilder<P> implements Wrappable<LinkedTableE
 	}
 
     public LinkedTableEntityBundle toLinkedTableEntityBundle() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(LinkedTableEntityBundle.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(LinkedTableEntityBundle.class);
     }
 
 
@@ -60,7 +60,7 @@ public class LinkedTableEntityBundleBuilder<P> implements Wrappable<LinkedTableE
 	public List<LinkedTableEntityBuilder<?>> getLinkedTableEntities() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.linkedTableEntities, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableEntityBundle.class, "linkedTableEntities");
-			this.linkedTableEntities = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.linkedTableEntities = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return linkedTableEntities;
@@ -144,7 +144,7 @@ public class LinkedTableEntityBundleBuilder<P> implements Wrappable<LinkedTableE
 		}
 		if (linkedTableEntities != null) {
 			for (LinkedTableEntity e : linkedTableEntities) {
-				LinkedTableEntityBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(LinkedTableEntityBuilder.class);
+				LinkedTableEntityBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(LinkedTableEntityBuilder.class);
 				CollectionUtils.addItem(this.linkedTableEntities, wrapped);
 			}
 		}

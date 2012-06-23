@@ -29,6 +29,7 @@ import org.nebulae2us.stardust.def.domain.ValueObjectBuilderTest;
 import org.nebulae2us.stardust.expr.domain.ComparisonExpressionTest;
 import org.nebulae2us.stardust.expr.domain.InListExpressionTest;
 import org.nebulae2us.stardust.expr.domain.SelectorExpressionTest;
+import org.nebulae2us.stardust.internal.util.ReflectionUtilsTest;
 import org.nebulae2us.stardust.internal.util.SQLUtilsTest;
 import org.nebulae2us.stardust.my.domain.Group1EntityRepositoryTest;
 import org.nebulae2us.stardust.sql.domain.*;
@@ -69,7 +70,8 @@ import org.nebulae2us.stardust.translate.domain.TranslatorTest;
 	AnnotationEntityDefinitionBuilderTest.class,
 	AnnotationValueObjectDefinitionBuilderTest.class,
 	EntityDefinitionBuilderTest.class,
-	ValueObjectBuilderTest.class
+	ValueObjectBuilderTest.class,
+	ReflectionUtilsTest.class
 	})
 public class AllTests {
 	

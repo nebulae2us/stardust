@@ -3,7 +3,7 @@ package org.nebulae2us.stardust.db.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=Table.class)
 public class TableBuilder<P> implements Wrappable<Table> {
@@ -50,7 +50,7 @@ public class TableBuilder<P> implements Wrappable<Table> {
 	}
 
     public Table toTable() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(Table.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(Table.class);
     }
 
 
@@ -60,7 +60,7 @@ public class TableBuilder<P> implements Wrappable<Table> {
 	public String getName() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.name, String.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Table.class, "name");
-			this.name = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+			this.name = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(String.class);
 		}
 
 		return name;
@@ -82,7 +82,7 @@ public class TableBuilder<P> implements Wrappable<Table> {
 	public String getSchemaName() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.schemaName, String.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Table.class, "schemaName");
-			this.schemaName = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+			this.schemaName = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(String.class);
 		}
 
 		return schemaName;
@@ -104,7 +104,7 @@ public class TableBuilder<P> implements Wrappable<Table> {
 	public String getCatalogName() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.catalogName, String.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Table.class, "catalogName");
-			this.catalogName = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+			this.catalogName = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(String.class);
 		}
 
 		return catalogName;

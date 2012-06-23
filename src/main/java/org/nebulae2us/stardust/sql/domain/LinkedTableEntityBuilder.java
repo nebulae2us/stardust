@@ -3,8 +3,8 @@ package org.nebulae2us.stardust.sql.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.*;
+import org.nebulae2us.stardust.internal.util.*;
 import org.nebulae2us.stardust.my.domain.*;
 
 @Builder(destination=LinkedTableEntity.class)
@@ -52,7 +52,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	}
 
     public LinkedTableEntity toLinkedTableEntity() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(LinkedTableEntity.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(LinkedTableEntity.class);
     }
 
 
@@ -62,7 +62,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	public LinkedTableEntityBuilder<?> getParent() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.parent, LinkedTableEntityBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableEntity.class, "parent");
-			this.parent = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(LinkedTableEntityBuilder.class);
+			this.parent = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(LinkedTableEntityBuilder.class);
 		}
 
 		return parent;
@@ -81,7 +81,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 
     public LinkedTableEntityBuilder<P> parent$wrap(LinkedTableEntity parent) {
     	verifyMutable();
-    	this.parent = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(parent).to(LinkedTableEntityBuilder.class);
+    	this.parent = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(parent).to(LinkedTableEntityBuilder.class);
         return this;
     }
     
@@ -122,7 +122,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	public TableBuilder<?> getTable() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.table, TableBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableEntity.class, "table");
-			this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(TableBuilder.class);
+			this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(TableBuilder.class);
 		}
 
 		return table;
@@ -141,7 +141,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 
     public LinkedTableEntityBuilder<P> table$wrap(Table table) {
     	verifyMutable();
-    	this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(table).to(TableBuilder.class);
+    	this.table = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(table).to(TableBuilder.class);
         return this;
     }
     
@@ -182,7 +182,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	public EntityBuilder<?> getEntity() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.entity, EntityBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableEntity.class, "entity");
-			this.entity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(EntityBuilder.class);
+			this.entity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(EntityBuilder.class);
 		}
 
 		return entity;
@@ -201,7 +201,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 
     public LinkedTableEntityBuilder<P> entity$wrap(Entity entity) {
     	verifyMutable();
-    	this.entity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(entity).to(EntityBuilder.class);
+    	this.entity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(entity).to(EntityBuilder.class);
         return this;
     }
     
@@ -242,7 +242,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	public String getAlias() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.alias, String.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableEntity.class, "alias");
-			this.alias = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+			this.alias = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(String.class);
 		}
 
 		return alias;
@@ -264,7 +264,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	public String getTableAlias() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.tableAlias, String.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableEntity.class, "tableAlias");
-			this.tableAlias = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+			this.tableAlias = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(String.class);
 		}
 
 		return tableAlias;
@@ -286,7 +286,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	public List<AttributeBuilder<?>> getOwningSideAttributes() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.owningSideAttributes, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableEntity.class, "owningSideAttributes");
-			this.owningSideAttributes = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.owningSideAttributes = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return owningSideAttributes;
@@ -430,7 +430,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 		}
 		if (owningSideAttributes != null) {
 			for (Attribute e : owningSideAttributes) {
-				AttributeBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AttributeBuilder.class);
+				AttributeBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(AttributeBuilder.class);
 				CollectionUtils.addItem(this.owningSideAttributes, wrapped);
 			}
 		}
@@ -479,7 +479,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	public List<ColumnBuilder<?>> getParentColumns() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.parentColumns, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableEntity.class, "parentColumns");
-			this.parentColumns = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.parentColumns = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return parentColumns;
@@ -563,7 +563,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 		}
 		if (parentColumns != null) {
 			for (Column e : parentColumns) {
-				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ColumnBuilder.class);
+				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(ColumnBuilder.class);
 				CollectionUtils.addItem(this.parentColumns, wrapped);
 			}
 		}
@@ -612,7 +612,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	public List<ColumnBuilder<?>> getColumns() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.columns, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableEntity.class, "columns");
-			this.columns = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.columns = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return columns;
@@ -696,7 +696,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 		}
 		if (columns != null) {
 			for (Column e : columns) {
-				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ColumnBuilder.class);
+				ColumnBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(ColumnBuilder.class);
 				CollectionUtils.addItem(this.columns, wrapped);
 			}
 		}
@@ -745,7 +745,7 @@ public class LinkedTableEntityBuilder<P> implements Wrappable<LinkedTableEntity>
 	public JoinType getJoinType() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.joinType, JoinType.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedTableEntity.class, "joinType");
-			this.joinType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(JoinType.class);
+			this.joinType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(JoinType.class);
 		}
 
 		return joinType;

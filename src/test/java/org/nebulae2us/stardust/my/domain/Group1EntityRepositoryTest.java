@@ -23,6 +23,7 @@ import org.junit.Test;
 import org.nebulae2us.electron.ElementContext;
 import org.nebulae2us.electron.Function1;
 import org.nebulae2us.stardust.db.domain.*;
+import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.jpa.group1.*;
 
 import static org.junit.Assert.*;
@@ -53,13 +54,32 @@ public class Group1EntityRepositoryTest {
 	}
 	
 	@Test
+	public void entityRepository_should_be_able_to_scan_package() {
+		String packageName = Person.class.getPackage().getName();
+		entityRepository.scanPackage(packageName);
+		
+		List<Entity> entities = entityRepository.getAllEntities();
+		List<Class<?>> entityClasses = (List<Class<?>>)ObjectUtils.extractValues(Entity.class, entities, "declaringClass");
+		
+		List<Class<?>> expectedClasses = Arrays.asList(new Class<?>[]{Person.class, House.class, BedRoom.class, Bungalow.class, Castle.class, CastleAssociation.class, Kitchen.class, Passport.class, Room.class});
+
+		assertTrue(entityClasses.containsAll(expectedClasses));
+
+		List<Class<?>> unexpectedClasses = Arrays.asList(new Class<?>[] {AbstractEntity.class, BasicName.class, Color.class, Gender.class, HouseId.class, RoomType.class, TranslucentColor.class});
+		for (Entity entity : entities) {
+			assertFalse(unexpectedClasses.contains(entity.getDeclaringClass()));
+		}
+		
+	}
+	
+	@Test
 	public void entityRepository_should_not_contain_value_objects() {
 		entityRepository.getEntity(Bungalow.class);
 		
-		List<Class<?>> unexpectedEntityClasses = Arrays.asList(new Class<?>[] {BasicName.class, Color.class, Gender.class, HouseId.class, RoomType.class, TranslucentColor.class});
+		List<Class<?>> unexpectedClasses = Arrays.asList(new Class<?>[] {BasicName.class, Color.class, Gender.class, HouseId.class, RoomType.class, TranslucentColor.class});
 
 		for (Entity entity : entityRepository.getAllEntities()) {
-			assertFalse(unexpectedEntityClasses.contains(entity.getDeclaringClass()));
+			assertFalse(unexpectedClasses.contains(entity.getDeclaringClass()));
 		}
 	}
 	

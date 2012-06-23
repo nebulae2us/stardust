@@ -3,7 +3,7 @@ package org.nebulae2us.stardust.sql.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 import org.nebulae2us.stardust.my.domain.*;
 
 @Builder(destination=ScalarAttributeMapping.class)
@@ -33,13 +33,13 @@ public class ScalarAttributeMappingBuilder<P> extends AttributeMappingBuilder<P>
 	}
 
     public ScalarAttributeMapping toScalarAttributeMapping() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ScalarAttributeMapping.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(ScalarAttributeMapping.class);
     }
     
 
 	@Override
     public ScalarAttributeMapping toAttributeMapping() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(ScalarAttributeMapping.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(ScalarAttributeMapping.class);
     }
     
 
@@ -49,7 +49,7 @@ public class ScalarAttributeMappingBuilder<P> extends AttributeMappingBuilder<P>
 	public int getColumnIndex() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.columnIndex, int.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, ScalarAttributeMapping.class, "columnIndex");
-			this.columnIndex = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(int.class);
+			this.columnIndex = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(int.class);
 		}
 
 		return columnIndex;

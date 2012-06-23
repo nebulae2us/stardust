@@ -3,8 +3,8 @@ package org.nebulae2us.stardust.my.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
 import org.nebulae2us.stardust.db.domain.ColumnBuilder;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=AttributeHolder.class)
 public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
@@ -51,7 +51,7 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 	}
 
     public AttributeHolder toAttributeHolder() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(AttributeHolder.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(AttributeHolder.class);
     }
 
 
@@ -61,7 +61,7 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 	public Class<?> getDeclaringClass() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.declaringClass, Class.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, AttributeHolder.class, "declaringClass");
-			this.declaringClass = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(Class.class);
+			this.declaringClass = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(Class.class);
 		}
 
 		return declaringClass;
@@ -83,7 +83,7 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 	public List<AttributeBuilder<?>> getAttributes() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.attributes, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, AttributeHolder.class, "attributes");
-			this.attributes = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.attributes = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return attributes;
@@ -227,7 +227,7 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
 		}
 		if (attributes != null) {
 			for (Attribute e : attributes) {
-				AttributeBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AttributeBuilder.class);
+				AttributeBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(AttributeBuilder.class);
 				CollectionUtils.addItem(this.attributes, wrapped);
 			}
 		}

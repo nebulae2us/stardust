@@ -3,7 +3,7 @@ package org.nebulae2us.stardust.sql.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=LinkedEntityBundle.class)
 public class LinkedEntityBundleBuilder<P> implements Wrappable<LinkedEntityBundle> {
@@ -50,7 +50,7 @@ public class LinkedEntityBundleBuilder<P> implements Wrappable<LinkedEntityBundl
 	}
 
     public LinkedEntityBundle toLinkedEntityBundle() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(LinkedEntityBundle.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(LinkedEntityBundle.class);
     }
 
 
@@ -60,7 +60,7 @@ public class LinkedEntityBundleBuilder<P> implements Wrappable<LinkedEntityBundl
 	public List<LinkedEntityBuilder<?>> getLinkedEntities() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.linkedEntities, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, LinkedEntityBundle.class, "linkedEntities");
-			this.linkedEntities = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.linkedEntities = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return linkedEntities;
@@ -144,7 +144,7 @@ public class LinkedEntityBundleBuilder<P> implements Wrappable<LinkedEntityBundl
 		}
 		if (linkedEntities != null) {
 			for (LinkedEntity e : linkedEntities) {
-				LinkedEntityBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(LinkedEntityBuilder.class);
+				LinkedEntityBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(LinkedEntityBuilder.class);
 				CollectionUtils.addItem(this.linkedEntities, wrapped);
 			}
 		}

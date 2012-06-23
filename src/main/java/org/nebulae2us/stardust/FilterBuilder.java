@@ -20,6 +20,7 @@ import java.util.List;
 import org.nebulae2us.electron.Converter;
 import org.nebulae2us.electron.DestinationClassResolverByAnnotation;
 import org.nebulae2us.electron.Procedure;
+import org.nebulae2us.stardust.internal.util.Builders;
 
 /**
  * @author Trung Phan
@@ -102,7 +103,7 @@ public class FilterBuilder extends BaseFilterBuilder {
 	}
 	
 	public Filter toFilter() {
-		return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(Filter.class);
+		return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(Filter.class);
 	}
 	
 	public class RootBuilder3 extends BaseFilterBuilder.RootBuilder {

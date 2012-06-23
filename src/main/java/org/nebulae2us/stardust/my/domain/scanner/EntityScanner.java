@@ -177,7 +177,7 @@ public class EntityScanner {
 		
 		if (scannedEntities.containsKey(entityClass)) {
 			Entity scannedEntity = scannedEntities.get(entityClass);
-			EntityBuilder<?> wrap = new WrapConverter(DESTINATION_CLASS_RESOLVER).convert(scannedEntity).to(EntityBuilder.class);
+			EntityBuilder<?> wrap = new WrapConverter(DESTINATION_CLASS_RESOLVER, IGNORED_TYPES).convert(scannedEntity).to(EntityBuilder.class);
 			return wrap;
 		}
 

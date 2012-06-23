@@ -3,7 +3,7 @@ package org.nebulae2us.stardust.sql.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 import org.nebulae2us.stardust.my.domain.*;
 
 @Builder(destination=EntityAttributeMapping.class)
@@ -33,13 +33,13 @@ public class EntityAttributeMappingBuilder<P> extends AttributeMappingBuilder<P>
 	}
 
     public EntityAttributeMapping toEntityAttributeMapping() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(EntityAttributeMapping.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(EntityAttributeMapping.class);
     }
     
 
 	@Override
     public EntityAttributeMapping toAttributeMapping() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(EntityAttributeMapping.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(EntityAttributeMapping.class);
     }
     
 
@@ -49,7 +49,7 @@ public class EntityAttributeMappingBuilder<P> extends AttributeMappingBuilder<P>
 	public List<ScalarAttributeMappingBuilder<?>> getIdentifierAttributeMappings() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.identifierAttributeMappings, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttributeMapping.class, "identifierAttributeMappings");
-			this.identifierAttributeMappings = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.identifierAttributeMappings = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return identifierAttributeMappings;
@@ -133,7 +133,7 @@ public class EntityAttributeMappingBuilder<P> extends AttributeMappingBuilder<P>
 		}
 		if (identifierAttributeMappings != null) {
 			for (ScalarAttributeMapping e : identifierAttributeMappings) {
-				ScalarAttributeMappingBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ScalarAttributeMappingBuilder.class);
+				ScalarAttributeMappingBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(ScalarAttributeMappingBuilder.class);
 				CollectionUtils.addItem(this.identifierAttributeMappings, wrapped);
 			}
 		}
@@ -182,7 +182,7 @@ public class EntityAttributeMappingBuilder<P> extends AttributeMappingBuilder<P>
 	public List<AttributeMappingBuilder<?>> getAttributeMappings() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.attributeMappings, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, EntityAttributeMapping.class, "attributeMappings");
-			this.attributeMappings = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.attributeMappings = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return attributeMappings;
@@ -326,7 +326,7 @@ public class EntityAttributeMappingBuilder<P> extends AttributeMappingBuilder<P>
 		}
 		if (attributeMappings != null) {
 			for (AttributeMapping e : attributeMappings) {
-				AttributeMappingBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AttributeMappingBuilder.class);
+				AttributeMappingBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(AttributeMappingBuilder.class);
 				CollectionUtils.addItem(this.attributeMappings, wrapped);
 			}
 		}

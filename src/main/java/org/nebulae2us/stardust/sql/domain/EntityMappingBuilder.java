@@ -3,7 +3,7 @@ package org.nebulae2us.stardust.sql.domain;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 import org.nebulae2us.stardust.my.domain.*;
 
 @Builder(destination=EntityMapping.class)
@@ -51,7 +51,7 @@ public class EntityMappingBuilder<P> implements Wrappable<EntityMapping> {
 	}
 
     public EntityMapping toEntityMapping() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(EntityMapping.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(EntityMapping.class);
     }
 
 
@@ -61,7 +61,7 @@ public class EntityMappingBuilder<P> implements Wrappable<EntityMapping> {
 	public EntityBuilder<?> getEntity() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.entity, EntityBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, EntityMapping.class, "entity");
-			this.entity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(EntityBuilder.class);
+			this.entity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(EntityBuilder.class);
 		}
 
 		return entity;
@@ -80,7 +80,7 @@ public class EntityMappingBuilder<P> implements Wrappable<EntityMapping> {
 
     public EntityMappingBuilder<P> entity$wrap(Entity entity) {
     	verifyMutable();
-    	this.entity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(entity).to(EntityBuilder.class);
+    	this.entity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(entity).to(EntityBuilder.class);
         return this;
     }
     
@@ -121,7 +121,7 @@ public class EntityMappingBuilder<P> implements Wrappable<EntityMapping> {
 	public int getDiscriminatorColumnIndex() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.discriminatorColumnIndex, int.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, EntityMapping.class, "discriminatorColumnIndex");
-			this.discriminatorColumnIndex = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(int.class);
+			this.discriminatorColumnIndex = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(int.class);
 		}
 
 		return discriminatorColumnIndex;
@@ -143,7 +143,7 @@ public class EntityMappingBuilder<P> implements Wrappable<EntityMapping> {
 	public List<ScalarAttributeMappingBuilder<?>> getIdentifierAttributeMappings() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.identifierAttributeMappings, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, EntityMapping.class, "identifierAttributeMappings");
-			this.identifierAttributeMappings = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.identifierAttributeMappings = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return identifierAttributeMappings;
@@ -227,7 +227,7 @@ public class EntityMappingBuilder<P> implements Wrappable<EntityMapping> {
 		}
 		if (identifierAttributeMappings != null) {
 			for (ScalarAttributeMapping e : identifierAttributeMappings) {
-				ScalarAttributeMappingBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(ScalarAttributeMappingBuilder.class);
+				ScalarAttributeMappingBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(ScalarAttributeMappingBuilder.class);
 				CollectionUtils.addItem(this.identifierAttributeMappings, wrapped);
 			}
 		}
@@ -276,7 +276,7 @@ public class EntityMappingBuilder<P> implements Wrappable<EntityMapping> {
 	public List<AttributeMappingBuilder<?>> getAttributeMappings() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.attributeMappings, List.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, EntityMapping.class, "attributeMappings");
-			this.attributeMappings = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(List.class);
+			this.attributeMappings = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(List.class);
 		}
 
 		return attributeMappings;
@@ -420,7 +420,7 @@ public class EntityMappingBuilder<P> implements Wrappable<EntityMapping> {
 		}
 		if (attributeMappings != null) {
 			for (AttributeMapping e : attributeMappings) {
-				AttributeMappingBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(e).to(AttributeMappingBuilder.class);
+				AttributeMappingBuilder<?> wrapped = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(e).to(AttributeMappingBuilder.class);
 				CollectionUtils.addItem(this.attributeMappings, wrapped);
 			}
 		}

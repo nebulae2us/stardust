@@ -4,7 +4,7 @@ import java.lang.reflect.*;
 import java.util.*;
 import org.nebulae2us.electron.*;
 import org.nebulae2us.electron.util.*;
-import org.nebulae2us.stardust.*;
+import org.nebulae2us.stardust.internal.util.*;
 
 @Builder(destination=Attribute.class)
 public class AttributeBuilder<P> implements Wrappable<Attribute> {
@@ -51,7 +51,7 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	}
 
     public Attribute toAttribute() {
-    	return new Converter(new DestinationClassResolverByAnnotation(), true).convert(this).to(Attribute.class);
+    	return new Converter(new DestinationClassResolverByAnnotation(), true, Builders.IGNORED_TYPES).convert(this).to(Attribute.class);
     }
 
 
@@ -61,7 +61,7 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	public String getFullName() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.fullName, String.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "fullName");
-			this.fullName = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(String.class);
+			this.fullName = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(String.class);
 		}
 
 		return fullName;
@@ -83,7 +83,7 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	public Field getField() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.field, Field.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "field");
-			this.field = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(Field.class);
+			this.field = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(Field.class);
 		}
 
 		return field;
@@ -105,7 +105,7 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	public EntityBuilder<?> getOwningEntity() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.owningEntity, EntityBuilder.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "owningEntity");
-			this.owningEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(EntityBuilder.class);
+			this.owningEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(EntityBuilder.class);
 		}
 
 		return owningEntity;
@@ -124,7 +124,7 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 
     public AttributeBuilder<P> owningEntity$wrap(Entity owningEntity) {
     	verifyMutable();
-    	this.owningEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(owningEntity).to(EntityBuilder.class);
+    	this.owningEntity = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(owningEntity).to(EntityBuilder.class);
         return this;
     }
     
@@ -165,7 +165,7 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	public boolean getInsertable() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.insertable, boolean.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "insertable");
-			this.insertable = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(boolean.class);
+			this.insertable = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(boolean.class);
 		}
 
 		return insertable;
@@ -187,7 +187,7 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	public boolean getUpdatable() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.updatable, boolean.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "updatable");
-			this.updatable = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(boolean.class);
+			this.updatable = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(boolean.class);
 		}
 
 		return updatable;
@@ -209,7 +209,7 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	public boolean getNullable() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.nullable, boolean.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "nullable");
-			this.nullable = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(boolean.class);
+			this.nullable = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(boolean.class);
 		}
 
 		return nullable;
@@ -231,7 +231,7 @@ public class AttributeBuilder<P> implements Wrappable<Attribute> {
 	public FetchType getFetchType() {
 		if (this.$$$wrapped != null && WrapHelper.valueNotSet(this.fetchType, FetchType.class)) {
 			Object o = WrapHelper.getValue(this.$$$wrapped, Attribute.class, "fetchType");
-			this.fetchType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER).convert(o).to(FetchType.class);
+			this.fetchType = new WrapConverter(Builders.DESTINATION_CLASS_RESOLVER, Builders.IGNORED_TYPES).convert(o).to(FetchType.class);
 		}
 
 		return fetchType;

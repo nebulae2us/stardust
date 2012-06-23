@@ -15,8 +15,17 @@
  */
 package org.nebulae2us.stardust.internal.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarFile;
 
 /**
  * @author Trung Phan
@@ -66,5 +75,66 @@ public class ReflectionUtils {
 		}
 	}
 	
+	public static List<Class<?>> scanPackage(final String packageName) {
+		
+		try {
+		    ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+
+		    List<Class<?>> result = new ArrayList<Class<?>>();
+
+		    String packagePath = packageName.replace('.', '/');
+		    
+		    URL packageURL = classLoader.getResource(packagePath);
+
+		    if (packageURL != null) {
+			    if(packageURL.getProtocol().equals("jar")){
+			        String jarFileName = URLDecoder.decode(packageURL.getPath(), "UTF-8");
+			        jarFileName = jarFileName.substring(5,jarFileName.indexOf("!"));
+
+			        JarFile jf = new JarFile(jarFileName);
+			        Enumeration<JarEntry> jarEntries = jf.entries();
+			        while(jarEntries.hasMoreElements()){
+			            String entryName = jarEntries.nextElement().getName();
+			            if(entryName.endsWith(".class") && entryName.startsWith(packagePath) && entryName.length()>packagePath.length()+5){
+			                entryName = entryName.substring(packagePath.length(), entryName.lastIndexOf('.'));
+			                if (entryName.startsWith("/")) {
+			                	entryName = entryName.substring(1);
+			                }
+			                if (entryName.indexOf('/') == -1 && !entryName.equals("package-info")) {
+				                result.add(nameToClass(packageName, entryName, classLoader));
+			                }
+			            }
+			        }
+
+			    }else{
+			    	File folder = new File(URLDecoder.decode(packageURL.getPath(), "UTF-8"));
+			        File[] files = folder.listFiles();
+			        if (files != null) {
+				        for(File file: files){
+				            String fileName = file.getName();
+				            if (fileName.endsWith(".class")) {
+					            fileName = fileName.substring(0, fileName.lastIndexOf('.'));
+				                result.add(nameToClass(packageName, fileName, classLoader));
+				            }
+				        }
+			        }
+			    }
+		    }
+		    return result;
+		}
+		catch (IOException e) {
+			throw new IllegalStateException("Failed to scan package " + packageName, e);
+		}
+		
+	}
+	
+	private static Class<?> nameToClass(String packageName, String entryName, ClassLoader classLoader) {
+        try {
+			String className = packageName.length() > 0 ? packageName + '.' + entryName : entryName;
+			return Class.forName(className, false, classLoader);
+		} catch (ClassNotFoundException e) {
+			throw new IllegalStateException(e);
+		}
+	}
 	
 }
