@@ -132,6 +132,16 @@ public class DaoManager {
 	public final JdbcExecutor getJdbcExecutor() {
 		return jdbcExecutor;
 	}
+	
+	public <T> T get(Class<T> entityClass, Object ... idValues) {
+		
+		Query<T> query = new QueryBuilder<T>(this, entityClass)
+				.filterById(idValues)
+				.toQuery();
+		
+		List<T> result = query(query);
+		return result.size() == 1 ? result.get(0) : null;
+	}
 
 	public <T> QueryBuilder<T> newQuery(Class<T> entityClass) {
 		return new QueryBuilder<T>(this, entityClass);

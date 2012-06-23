@@ -30,7 +30,11 @@ import org.nebulae2us.stardust.expr.domain.OrderExpression;
 import org.nebulae2us.stardust.expr.domain.PredicateExpression;
 import org.nebulae2us.stardust.expr.domain.QueryExpression;
 import org.nebulae2us.stardust.expr.domain.SelectExpression;
+import org.nebulae2us.stardust.my.domain.Attribute;
+import org.nebulae2us.stardust.my.domain.Entity;
+import org.nebulae2us.stardust.my.domain.EntityIdentifier;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
+import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 import org.nebulae2us.stardust.sql.domain.AliasJoin;
 import org.nebulae2us.stardust.sql.domain.LinkedEntityBundle;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
@@ -98,7 +102,7 @@ public class QueryBuilder<T> {
 	}
 	
 	public QueryBuilder<T> join(String target, String alias) {
-		return _join(target, alias, JoinType.DEFAULT_JOIN);
+		return _join(target, alias, JoinType.LEFT_JOIN);
 	}
 	
 	public QueryBuilder<T> innerJoin(String target, String alias) {
@@ -107,6 +111,33 @@ public class QueryBuilder<T> {
 	
 	public QueryBuilder<T> outerJoin(String target, String alias) {
 		return _join(target, alias, JoinType.LEFT_JOIN);
+	}
+	
+	public QueryBuilder<T> filterById(Object ... idValues) {
+
+		Entity entity = this.daoManager.getEntityRepository().getEntity(entityClass);
+		EntityIdentifier entityIdentifier = entity.getEntityIdentifier();
+		List<Attribute> attributes = entityIdentifier.getAttributes();
+
+		if (attributes.size() == 0) {
+			AssertSyntax.fail("Cannot filter by ID for non-id entity");
+		}
+		AssertSyntax.isTrue(attributes.size() == idValues.length, "Expected %d values for ID", attributes.size());
+
+		FilterBuilder filterBuilder = new FilterBuilder();
+		for (int i = 0; i < attributes.size(); i++) {
+			Attribute attribute = attributes.get(i);
+			AssertSyntax.isTrue(attribute instanceof ScalarAttribute, "Filter by composite id is not yet implemented.");
+			ScalarAttribute scalarAttribute = (ScalarAttribute)attribute;
+			filterBuilder.predicate(scalarAttribute.getFullName() + " = ?", idValues[i]);
+		}
+		
+		Filter filter = filterBuilder.toFilter();
+		Pair<PredicateExpression, List<?>> result = filter.toExpression();
+		predicateExpressions.add(result.getItem1());
+		filterWildcardValues.addAll(result.getItem2());
+		
+		return this;
 	}
 	
 	public QueryBuilder<T> filterBy(String expression, Object ...values) {

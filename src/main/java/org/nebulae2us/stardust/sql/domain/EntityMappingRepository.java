@@ -379,6 +379,7 @@ public class EntityMappingRepository {
 				Constructor<?> constructor = ReflectionUtils.findConstructor(type, type.getEnclosingClass());
 				if (constructor != null) {
 					try {
+						constructor.setAccessible(true);
 						return constructor.newInstance((Class<?>)null);
 					} catch (IllegalArgumentException e) {
 						throw new IllegalStateException(e);

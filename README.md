@@ -12,7 +12,7 @@ class Person {
 
 	private String firstName;
 	private String lastName;
-	
+	private Integer age;
 	
 	// getters and setters;
 }
@@ -20,7 +20,6 @@ class Person {
 To get a list of people:
 
 ``` java
-
 DaoManager daoManager = new DaoManager(dataSource, OracleDialect.getInstance());
 
 List<Person> allPeople = daoManager.newQuery(Person.class).list();
@@ -43,6 +42,19 @@ List<Person> next10Eldest = daoManager.newQuery(Person.class)
 		.maxResults(10)
 		.orderBy("age desc")
 		.list();
-
 ```
+
+To create a new Person:
+``` jav
+Person person = new Person(1L, "Michael", "Scott", 40);
+daoManager.save(person);
+```
+
+To update the person's name:
+``` java
+person = daoManager.get(Person.class, 1L);
+person.firstName = "Mike";
+daoManager.update(person);
+```
+
 

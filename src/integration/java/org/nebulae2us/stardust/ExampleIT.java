@@ -17,10 +17,14 @@ package org.nebulae2us.stardust;
 
 import java.util.List;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.nebulae2us.electron.generator.GeneratorHint;
 import org.nebulae2us.stardust.ddl.domain.DDLGenerator;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
 
@@ -46,6 +50,8 @@ public class ExampleIT extends BaseIntegrationTest {
 	
 	@Test
 	public void example1() {
+		
+
 		class Person {
 			@Id
 			private Long personId;
@@ -53,6 +59,17 @@ public class ExampleIT extends BaseIntegrationTest {
 			private String firstName;
 			private String lastName;
 			private Integer age;
+			
+			public Person() {
+				
+			}
+			
+			public Person(Long personId, String firstName, String lastName, Integer age) {
+				this.personId = personId;
+				this.firstName = firstName;
+				this.lastName = lastName;
+				this.age = age;
+			}
 		}
 		
 		this.daoManager.getEntityRepository().scanEntities(Person.class);
@@ -83,6 +100,15 @@ public class ExampleIT extends BaseIntegrationTest {
 				.orderBy("age desc")
 				.list();
 		
+		Person person = new Person(1L, "Michael", "Scott", 40);
+		daoManager.save(person);
+		
+		person = daoManager.get(Person.class, 1L);
+		person.firstName = "Mike";
+		daoManager.update(person);
+		
+		person = daoManager.get(Person.class, 1);
+		System.out.println(person.firstName);
 		
 		ddls = ddlGenerator.generateDropSchemaObjectsDDL();
 		for (String ddl : ddls) {
