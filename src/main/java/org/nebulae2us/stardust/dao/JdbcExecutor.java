@@ -314,7 +314,7 @@ public class JdbcExecutor {
 
 			int valuesListSize = valuesList.length;
 			for (int i = 0; i < size; i++) {
-				for (int j = 0; j < valuesListSize; i++ ) {
+				for (int j = 0; j < valuesListSize; j++ ) {
 					List<?> values = valuesList[j];
 					Object value = values.size() == 1 ? values.get(0) : values.get(i);
 					setParamValueForPreparedStatement(preparedStatement, j+1, value);

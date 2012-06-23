@@ -280,8 +280,9 @@ public class LinkedTableEntityBundle {
 
 		if (result == null) {
 			for (char c = 'a'; c  <= 'z'; c++) {
-				if (!usedAliases.contains(c)) {
-					result = String.valueOf(c);
+				String newAlias = String.valueOf(c);
+				if (!usedAliases.contains(newAlias)) {
+					result = newAlias;
 					break;
 				}
 			}

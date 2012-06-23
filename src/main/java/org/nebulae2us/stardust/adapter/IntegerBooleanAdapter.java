@@ -36,10 +36,7 @@ public class IntegerBooleanAdapter extends TypeAdapter<Integer, Boolean> {
 
 	@Override
 	public Boolean toAttributeType(Class<? extends Boolean> expectedType, Integer object) {
-		if (object == null) {
-			return null;
-		}
-		return object.intValue() == 1;
+		return object == null ? null : object.intValue() == 1;
 	}
 
 }

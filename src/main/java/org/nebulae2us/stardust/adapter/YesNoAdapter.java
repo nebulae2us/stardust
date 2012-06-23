@@ -36,10 +36,7 @@ public class YesNoAdapter extends TypeAdapter<String, Boolean> {
 
 	@Override
 	public Boolean toAttributeType(Class<? extends Boolean> expectedType, String object) {
-		if (object == null) {
-			return null;
-		}
-		return "Y".equalsIgnoreCase(object);
+		return object == null ? null : "Y".equalsIgnoreCase(object);
 	}
 
 }
