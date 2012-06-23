@@ -1,4 +1,4 @@
-The Stardust is a SQL-centric ORM framework for Java. It utilize JPA annotation 2.0 for defining entity and value objects.
+The Stardust is a SQL-centric ORM framework for Java. It utilizes JPA annotation 2.0 for defining entity and value objects.
 
 ##Quick Examples
 
@@ -42,10 +42,27 @@ List<Person> next10Eldest = daoManager.newQuery(Person.class)
 		.maxResults(10)
 		.orderBy("age desc")
 		.list();
+
+// Subquery
+Query<?> subQuery = daoManager.newQuery(Person.class)
+		.select("personId")
+		.filterBy("firstName like ?", "M%")
+		.toQuery();
+
+List<Person> result = daoManager.newQuery(Person.class)
+		.filterBy("personId in (?)", subQuery)
+		.list();
+
+String yourOwnSql = "select person_id, first_name, last_name from person";
+List<Person> mikes = daoManager.newQuery(Person.class)
+		.backedBySql(yourOwnSql)
+		.filterBy("firstName = ?", "Mike")
+		.list();
+
 ```
 
-To create a new Person:
-``` jav
+To create a new person:
+``` java
 Person person = new Person(1L, "Michael", "Scott", 40);
 daoManager.save(person);
 ```

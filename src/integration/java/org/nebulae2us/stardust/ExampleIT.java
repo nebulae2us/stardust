@@ -103,9 +103,29 @@ public class ExampleIT extends BaseIntegrationTest {
 		Person person = new Person(1L, "Michael", "Scott", 40);
 		daoManager.save(person);
 		
-		person = daoManager.get(Person.class, 1L);
+		person = daoManager.get(Person.class, 1);
 		person.firstName = "Mike";
 		daoManager.update(person);
+		
+		String complexSql = "select person_id, first_name, last_name from person";
+		
+		List<Person> mikes = daoManager.newQuery(Person.class)
+				.backedBySql(complexSql)
+				.filterBy("firstName = ?", "Mike")
+				.list();
+		
+		// Subquery
+		Query<?> subQuery = daoManager.newQuery(Person.class)
+				.select("personId")
+				.filterBy("firstName like ?", "M%")
+				.toQuery();
+		
+		List<Person> result = daoManager.newQuery(Person.class)
+				.filterBy("personId in (?)", subQuery)
+				.list();
+		
+		
+		System.out.println(mikes);
 		
 		person = daoManager.get(Person.class, 1);
 		System.out.println(person.firstName);
