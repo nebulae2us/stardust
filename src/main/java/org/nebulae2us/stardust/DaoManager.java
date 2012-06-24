@@ -77,6 +77,18 @@ public class DaoManager {
 		this.controller = resolveTranslatorController(dialect);
 		this.defaultSchema = defaultSchema;
 	}
+	
+	public DaoManager(JdbcExecutor jdbcExecutor) {
+		this(jdbcExecutor, "");
+	}
+	
+	public DaoManager(JdbcExecutor jdbcExecutor, String defaultSchema) {
+		this.jdbcExecutor = jdbcExecutor;
+		this.dialect = jdbcExecutor.getDialect();
+		this.entityRepository = new EntityRepository();
+		this.controller = resolveTranslatorController(dialect);
+		this.defaultSchema = defaultSchema;
+	}
 
 	public DaoManager(JdbcExecutor jdbcExecutor, EntityRepository entityRepository, TranslatorController controller, Dialect dialect) {
 		this(jdbcExecutor, entityRepository, controller, dialect, "");
