@@ -15,9 +15,7 @@
  */
 package org.nebulae2us.stardust.translate.domain;
 
-import java.util.List;
-
-import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.OrderExpression;
 
@@ -31,7 +29,7 @@ public class OrderTranslator implements Translator {
 		return expression instanceof OrderExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		TranslatorController controller = context.getTranslatorController();
@@ -39,10 +37,10 @@ public class OrderTranslator implements Translator {
 		OrderExpression orderExpression = (OrderExpression)expression;
 		
 		Translator translator = controller.findTranslator(orderExpression.getSelector(), paramValues);
-		Pair<String, List<?>> translationResult = translator.translate(context, orderExpression.getSelector(), paramValues);
+		SqlBundle translationResult = translator.translate(context, orderExpression.getSelector(), paramValues);
 		
-		return new Pair<String, List<?>>(orderExpression.getDirection().equals("desc") ? translationResult.getItem1() + " desc" : translationResult.getItem1(),
-				translationResult.getItem2());
+		return new SingleStatementSqlBundle(orderExpression.getDirection().equals("desc") ? translationResult.getSql() + " desc" : translationResult.getSql(),
+				translationResult.getParamValues());
 		
 	}
 

@@ -34,7 +34,6 @@ import java.util.TreeSet;
 import java.util.Vector;
 
 import org.nebulae2us.electron.Pair;
-import org.nebulae2us.stardust.adapter.TypeAdapter;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
 import org.nebulae2us.stardust.internal.util.ReflectionUtils;
@@ -342,9 +341,7 @@ public class EntityMappingRepository {
 				ScalarAttributeMapping scalarAttributeMapping = (ScalarAttributeMapping)attributeMapping;
 				ScalarAttribute scalarAttribute = scalarAttributeMapping.getAttribute();
 				Object value = dataReader.read(scalarAttribute.getPersistenceType(), scalarAttributeMapping.getColumnIndex());
-				if (scalarAttribute.getTypeAdapter() != null) {
-					value = ((TypeAdapter)scalarAttribute.getTypeAdapter()).toAttributeType(scalarAttribute.getScalarType(), value);
-				}
+				value = scalarAttribute.convertValueToAttributeType(value);
 				setValue(attributeMapping.getAttribute().getField(), result, value);
 			}
 			else if (attributeMapping instanceof ValueObjectAttributeMapping) {

@@ -24,8 +24,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.nebulae2us.electron.Converter;
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.ListBuilder;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.exception.IllegalSyntaxException;
@@ -85,14 +85,14 @@ public class TranslatorTest {
 	}
 
 	
-	private Pair<String, List<?>> filter(String expression, Object ... values) {
+	private SqlBundle filter(String expression, Object ... values) {
 		ParamValues paramValues = new ParamValues(new HashMap<String, Object>(), Arrays.asList(values));
 		
 		PredicateExpression expr = PredicateExpression.parse(expression, false);
 		
 		Translator translator = context.getTranslatorController().findTranslator(expr, paramValues);
 		
-		Pair<String, List<?>> result = translator.translate(context, expr, paramValues);
+		SqlBundle result = translator.translate(context, expr, paramValues);
 		
 		return result;
 	}
@@ -100,27 +100,27 @@ public class TranslatorTest {
 	@Test
 	public void in_list_expression_single_value() {
 
-		Pair<String, List<?>> pair = filter("name.firstName in (?)", "John");
-		assertEquals("b.FIRST_NAME in (?)", pair.getItem1());
-		assertEquals(Arrays.asList("John"), pair.getItem2());
+		SqlBundle pair = filter("name.firstName in (?)", "John");
+		assertEquals("b.FIRST_NAME in (?)", pair.getSql());
+		assertEquals(Arrays.asList("John"), pair.getParamValues());
 		
 	}
 
 	@Test
 	public void in_list_expression_two_values() {
 
-		Pair<String, List<?>> pair = filter("name.firstName in (?, ?)", "John", "Rob");
-		assertEquals("b.FIRST_NAME in (?,?)", pair.getItem1());
-		assertEquals(Arrays.asList("John", "Rob"), pair.getItem2());
+		SqlBundle pair = filter("name.firstName in (?, ?)", "John", "Rob");
+		assertEquals("b.FIRST_NAME in (?,?)", pair.getSql());
+		assertEquals(Arrays.asList("John", "Rob"), pair.getParamValues());
 		
 	}
 
 	@Test
 	public void in_list_expression_list_value() {
 
-		Pair<String, List<?>> pair = filter("name.firstName in (?)", Arrays.asList("John", "Rob"));
-		assertEquals("b.FIRST_NAME in (?,?)", pair.getItem1());
-		assertEquals(Arrays.asList("John", "Rob"), pair.getItem2());
+		SqlBundle pair = filter("name.firstName in (?)", Arrays.asList("John", "Rob"));
+		assertEquals("b.FIRST_NAME in (?,?)", pair.getSql());
+		assertEquals(Arrays.asList("John", "Rob"), pair.getParamValues());
 		
 	}
 	
@@ -134,24 +134,24 @@ public class TranslatorTest {
 	@Test
 	public void in_list_expression_selector_is_wildcard() {
 		
-		Pair<String, List<?>> pair = filter("? in (?)", "Mary", Arrays.asList("John", "Rob"));
-		assertEquals("? in (?,?)", pair.getItem1());
-		assertEquals(Arrays.asList("Mary", "John", "Rob"), pair.getItem2());
+		SqlBundle pair = filter("? in (?)", "Mary", Arrays.asList("John", "Rob"));
+		assertEquals("? in (?,?)", pair.getSql());
+		assertEquals(Arrays.asList("Mary", "John", "Rob"), pair.getParamValues());
 
 	}
 	
 	@Test
 	public void comparison_expression_scalar_value() {
-		Pair<String, List<?>> pair = filter("name.firstName = ?", "John");
-		assertEquals("b.FIRST_NAME = ?", pair.getItem1());
-		assertEquals(Arrays.asList("John"), pair.getItem2());
+		SqlBundle pair = filter("name.firstName = ?", "John");
+		assertEquals("b.FIRST_NAME = ?", pair.getSql());
+		assertEquals(Arrays.asList("John"), pair.getParamValues());
 	}
 
 	@Test
 	public void comparison_expression_two_attributes() {
-		Pair<String, List<?>> pair = filter("name.firstName ne name.lastName");
-		assertEquals("b.FIRST_NAME <> b.LAST_NAME", pair.getItem1());
-		assertEquals(Collections.emptyList(), pair.getItem2());
+		SqlBundle pair = filter("name.firstName ne name.lastName");
+		assertEquals("b.FIRST_NAME <> b.LAST_NAME", pair.getSql());
+		assertEquals(Collections.emptyList(), pair.getParamValues());
 	}
 	
 }

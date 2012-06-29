@@ -22,8 +22,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.nebulae2us.electron.Converter;
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.ListBuilder;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.expr.domain.PredicateExpression;
@@ -76,14 +76,14 @@ public class SqlBackedTranslatorTest {
 	}
 
 	
-	private Pair<String, List<?>> filter(String expression, Object ... values) {
+	private SqlBundle filter(String expression, Object ... values) {
 		ParamValues paramValues = new ParamValues(new HashMap<String, Object>(), Arrays.asList(values));
 		
 		PredicateExpression expr = PredicateExpression.parse(expression, false);
 		
 		Translator translator = context.getTranslatorController().findTranslator(expr, paramValues);
 		
-		Pair<String, List<?>> result = translator.translate(context, expr, paramValues);
+		SqlBundle result = translator.translate(context, expr, paramValues);
 		
 		return result;
 	}
@@ -91,18 +91,18 @@ public class SqlBackedTranslatorTest {
 	@Test
 	public void primary_attribute() {
 
-		Pair<String, List<?>> pair = filter("name.firstName in (?)", "John");
-		assertEquals("FIRST_NAME in (?)", pair.getItem1());
-		assertEquals(Arrays.asList("John"), pair.getItem2());
+		SqlBundle pair = filter("name.firstName in (?)", "John");
+		assertEquals("FIRST_NAME in (?)", pair.getSql());
+		assertEquals(Arrays.asList("John"), pair.getParamValues());
 		
 	}
 	
 	@Test
 	public void referenced_attribute() {
 
-		Pair<String, List<?>> pair = filter("h.color.red = ?", 12);
-		assertEquals("h_HOUSE_COLOR_RED = ?", pair.getItem1());
-		assertEquals(Arrays.asList(12), pair.getItem2());
+		SqlBundle pair = filter("h.color.red = ?", 12);
+		assertEquals("h_HOUSE_COLOR_RED = ?", pair.getSql());
+		assertEquals(Arrays.asList(12), pair.getParamValues());
 		
 	}
 	

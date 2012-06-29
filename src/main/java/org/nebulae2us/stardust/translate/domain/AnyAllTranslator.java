@@ -15,17 +15,16 @@
  */
 package org.nebulae2us.stardust.translate.domain;
 
-import static org.nebulae2us.stardust.internal.util.BaseAssert.AssertSyntax;
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.Query;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.AnyAllExpression;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.NamedParamExpression;
-import org.nebulae2us.stardust.expr.domain.SelectorExpression;
 import org.nebulae2us.stardust.expr.domain.WildcardExpression;
 import org.nebulae2us.stardust.internal.util.ScalarValueIterator;
 
@@ -39,7 +38,7 @@ public class AnyAllTranslator implements Translator {
 		return expression instanceof AnyAllExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 		
 		AnyAllExpression anyAllExpression = (AnyAllExpression)expression;
@@ -53,10 +52,10 @@ public class AnyAllTranslator implements Translator {
 
 		TranslatorController controller = context.getTranslatorController();
 		Translator translator = controller.findTranslator(anyAllExpression.getLeftOperand(), paramValues);
-		Pair<String, List<?>> selectorResult = translator.translate(context, anyAllExpression.getLeftOperand(), paramValues);
+		SqlBundle selectorResult = translator.translate(context, anyAllExpression.getLeftOperand(), paramValues);
 		
-		scalarValues.addAll(selectorResult.getItem2());
-		result.append(selectorResult.getItem1()).append(' ')
+		scalarValues.addAll(selectorResult.getParamValues());
+		result.append(selectorResult.getSql()).append(' ')
 			.append(anyAllExpression.getOperator()).append(' ')
 			.append(anyAllExpression.getQuantifier()).append(" (");
 		
@@ -72,35 +71,35 @@ public class AnyAllTranslator implements Translator {
 			}
 			else {
 				Translator paramTranslator = controller.findTranslator(param, paramValues);
-				Pair<String, List<?>> paramTranslationResult = paramTranslator.translate(context, param, paramValues);
-				scalarValues.addAll(paramTranslationResult.getItem2());
+				SqlBundle paramTranslationResult = paramTranslator.translate(context, param, paramValues);
+				scalarValues.addAll(paramTranslationResult.getParamValues());
 
 				if (count < maxInListSize) {
-					result.append(paramTranslationResult.getItem1()).append(',');
+					result.append(paramTranslationResult.getSql()).append(',');
 					count++;
 				}
 				else {
 					count = 1;
 					result.replace(result.length() - 1,  result.length(), ")");
 					result.append("all".equals(anyAllExpression.getQuantifier()) ? " and " : " or ")
-						.append(selectorResult.getItem1())
+						.append(selectorResult.getSql())
 						.append(' ').append(anyAllExpression.getOperator()).append(' ').append(anyAllExpression.getQuantifier()).append(" (");
 					
-					result.append(paramTranslationResult.getItem1()).append(',');
+					result.append(paramTranslationResult.getSql()).append(',');
 					
 					extended = true;
-					scalarValues.addAll(selectorResult.getItem2());
+					scalarValues.addAll(selectorResult.getParamValues());
 				}
 				
 				continue;
 			}
 			
 			if (value instanceof Query) {
-				Pair<String, List<?>> subQueryTranslationResult = ((Query)value).translate();
+				SqlBundle subQueryTranslationResult = ((Query<?>)value).translate();
 				AssertSyntax.isTrue(anyAllExpression.getParams().size() == 1, "Invalid in-list expression that has sub-query: %s", expression);
 				count++;
-				result.append(subQueryTranslationResult.getItem1()).append(',');
-				scalarValues.addAll(subQueryTranslationResult.getItem2());
+				result.append(subQueryTranslationResult.getSql()).append(',');
+				scalarValues.addAll(subQueryTranslationResult.getParamValues());
 				break;
 			}
 
@@ -114,10 +113,10 @@ public class AnyAllTranslator implements Translator {
 					count = 1;
 					result.replace(result.length() - 1,  result.length(), ")");
 					result.append("all".equals(anyAllExpression.getQuantifier()) ? " and " : " or ")
-						.append(selectorResult.getItem1())
+						.append(selectorResult.getSql())
 						.append(' ').append(anyAllExpression.getOperator()).append(' ').append(anyAllExpression.getQuantifier()).append(" (?,");
 					extended = true;
-					scalarValues.addAll(selectorResult.getItem2());
+					scalarValues.addAll(selectorResult.getParamValues());
 				}
 				scalarValues.add(scalarValue);
 			}
@@ -136,7 +135,7 @@ public class AnyAllTranslator implements Translator {
 			result.insert(0, "not (").append(')');
 		}
 		
-		return new Pair<String, List<?>>(result.toString(), scalarValues);		
+		return new SingleStatementSqlBundle(result.toString(), scalarValues);		
 
 	}
 

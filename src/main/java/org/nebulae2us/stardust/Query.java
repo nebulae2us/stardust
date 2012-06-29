@@ -15,9 +15,7 @@
  */
 package org.nebulae2us.stardust;
 
-import java.util.List;
-
-import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.QueryExpression;
 import org.nebulae2us.stardust.translate.domain.ParamValues;
 import org.nebulae2us.stardust.translate.domain.Translator;
@@ -42,7 +40,7 @@ public class Query<T> {
 		this.paramValues = paramValues;
 	}
 
-	public Pair<String, List<?>> translate() {
+	public SqlBundle translate() {
 		TranslatorController controller = translatorContext.getTranslatorController();
 		Translator translator = controller.findTranslator(this.queryExpression, this.paramValues);
 		return translator.translate(this.translatorContext, this.queryExpression, this.paramValues);

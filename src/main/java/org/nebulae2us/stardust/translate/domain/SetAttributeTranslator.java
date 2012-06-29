@@ -18,7 +18,7 @@ package org.nebulae2us.stardust.translate.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.SetAttributeExpression;
 
@@ -32,7 +32,7 @@ public class SetAttributeTranslator implements Translator {
 		return expression instanceof SetAttributeExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		TranslatorController controller = context.getTranslatorController();
@@ -40,18 +40,18 @@ public class SetAttributeTranslator implements Translator {
 		SetAttributeExpression setAttributeExpression = (SetAttributeExpression)expression;
 
 		Translator leftTranslator = controller.findTranslator(setAttributeExpression.getLeftOperandExpression(), paramValues);
-		Pair<String, List<?>> leftTranslationResult = leftTranslator.translate(context, setAttributeExpression.getLeftOperandExpression(), paramValues);
+		SqlBundle leftTranslationResult = leftTranslator.translate(context, setAttributeExpression.getLeftOperandExpression(), paramValues);
 
 		Translator rightTranslator = controller.findTranslator(setAttributeExpression.getRightOperandExpression(), paramValues);
-		Pair<String, List<?>> rightTranslationResult = rightTranslator.translate(context, setAttributeExpression.getRightOperandExpression(), paramValues);
+		SqlBundle rightTranslationResult = rightTranslator.translate(context, setAttributeExpression.getRightOperandExpression(), paramValues);
 
-		String sql = leftTranslationResult.getItem1() + " = " + rightTranslationResult.getItem1();
+		String sql = leftTranslationResult.getSql() + " = " + rightTranslationResult.getSql();
 		
 		List<Object> values = new ArrayList<Object>();
-		values.addAll(leftTranslationResult.getItem2());
-		values.addAll(rightTranslationResult.getItem2());
+		values.addAll(leftTranslationResult.getParamValues());
+		values.addAll(rightTranslationResult.getParamValues());
 
-		return new Pair<String, List<?>>(sql, values);
+		return new SingleStatementSqlBundle(sql, values);
 	}
 
 }

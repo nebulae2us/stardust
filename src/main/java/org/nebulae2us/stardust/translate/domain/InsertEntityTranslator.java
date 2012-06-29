@@ -18,8 +18,8 @@ package org.nebulae2us.stardust.translate.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.dao.NullObject;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.expr.domain.Expression;
@@ -44,112 +44,117 @@ public class InsertEntityTranslator implements Translator {
 		return expression instanceof InsertEntityExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 		
+		SqlBundle result = EmptySqlBundle.getInstance();
+		
 		InsertEntityExpression insertEntityExpression = (InsertEntityExpression)expression;
-		int tableIndex = insertEntityExpression.getTableIndex();
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = context.getLinkedTableEntityBundle();
-		
 		Entity entity = context.getLinkedEntityBundle().getRoot().getEntity();
-		
-		LinkedTable linkedTable = entity.getLinkedTableBundle().getLinkedTables().get(tableIndex);
-		
-		LinkedTableEntity linkedTableEntity = linkedTableEntityBundle.findLinkedTableEntity(linkedTable.getTable());
-
 		Object entityToInsert = paramValues.getNextWildcardValue();
 		
-		List<Object> values = new ArrayList<Object>();
-		
-		StringBuilder insertSql = new StringBuilder();
-		StringBuilder wildcardBuilder = new StringBuilder();
-		
-		insertSql.append("insert into " + linkedTableEntity.getTable()).append(" (");
-		wildcardBuilder.append("\n    values (");
-		
-		EntityDiscriminator entityDiscriminator = entity.getEntityDiscriminator();
-		if (tableIndex == 0 && entityDiscriminator != null) {
-			insertSql.append(entityDiscriminator.getColumn().getName()).append(", ");
-			wildcardBuilder.append("?, ");
-			Object value = entityDiscriminator.getValue();
-			values.add(value);
-		}
-		
-		if (!linkedTableEntity.isRoot()) {
-			EntityIdentifier identifier = entity.getEntityIdentifier();
-			List<ScalarAttribute> identifierScalarAttributes = identifier.getScalarAttributes();
+		for (int tableIndex = 0; tableIndex < linkedTableEntityBundle.getLinkedTableEntities().size(); tableIndex++) {
+			LinkedTable linkedTable = entity.getLinkedTableBundle().getLinkedTables().get(tableIndex);
 			
-			for (int i = 0; i < linkedTableEntity.getColumns().size(); i++) {
-				Column idColumn = linkedTableEntity.getColumns().get(i);
-				ScalarAttribute identifierScalarAttribute = identifierScalarAttributes.get(i);
+			LinkedTableEntity linkedTableEntity = linkedTableEntityBundle.findLinkedTableEntity(linkedTable.getTable());
 
-				insertSql.append(idColumn.getName())
-					.append(", ");
+			
+			List<Object> values = new ArrayList<Object>();
+			
+			StringBuilder insertSql = new StringBuilder();
+			StringBuilder wildcardBuilder = new StringBuilder();
+			
+			insertSql.append("insert into " + linkedTableEntity.getTable()).append(" (");
+			wildcardBuilder.append("\n    values (");
+			
+			EntityDiscriminator entityDiscriminator = entity.getEntityDiscriminator();
+			if (tableIndex == 0 && entityDiscriminator != null) {
+				insertSql.append(entityDiscriminator.getColumn().getName()).append(", ");
 				wildcardBuilder.append("?, ");
+				Object value = entityDiscriminator.getValue();
+				values.add(value);
+			}
+			
+			if (!linkedTableEntity.isRoot()) {
+				EntityIdentifier identifier = entity.getEntityIdentifier();
+				List<ScalarAttribute> identifierScalarAttributes = identifier.getScalarAttributes();
+				
+				for (int i = 0; i < linkedTableEntity.getColumns().size(); i++) {
+					Column idColumn = linkedTableEntity.getColumns().get(i);
+					ScalarAttribute identifierScalarAttribute = identifierScalarAttributes.get(i);
 
-				Object value = identifierScalarAttribute.extractValueForPersistence(entityToInsert);
-				if (value != null) {
-					values.add(value);
-				}
-				else {
-					values.add(NullObject.valueOf(identifierScalarAttribute.getPersistenceType()));
-				}
-			}
-		}
-		
-		for (Attribute attribute : linkedTableEntity.getOwningSideAttributes()) {
-			if (attribute instanceof ScalarAttribute) {
-				if (!attribute.isInsertable()) {
-					continue;
-				}
-				
-				ScalarAttribute scalarAttribute = (ScalarAttribute)attribute;
-				if (scalarAttribute.getValueGenerator() instanceof IdentityValueRetriever) {
-					continue;
-				}
-				
-				
-				insertSql.append(scalarAttribute.getColumn().getName())
-					.append(", ");
-				wildcardBuilder.append("?, ");
-				
-				Object value = attribute.extractValueForPersistence(entityToInsert);
-				values.add(value != null ? value : NullObject.valueOf(scalarAttribute.getScalarType()));
-				
-			}
-			else if (attribute instanceof EntityAttribute) {
-				EntityAttribute entityAttribute = (EntityAttribute)attribute;
-				
-				Object friendObject = attribute.extractValueForPersistence(entityToInsert);
-				Entity friendEntity = entityAttribute.getEntity();
-				EntityIdentifier friendIdentifier = friendEntity.getEntityIdentifier();
-				List<ScalarAttribute> friendIdentifierAttributes = friendIdentifier.getScalarAttributes();
-				
-				for (int i = 0; i < entityAttribute.getLeftColumns().size(); i++) {
-					Column leftColumn = entityAttribute.getLeftColumns().get(i);
-					ScalarAttribute friendIdentifierAttribute = friendIdentifierAttributes.get(i);
-					
-					insertSql.append(leftColumn.getName()).append(", ");
+					insertSql.append(idColumn.getName())
+						.append(", ");
 					wildcardBuilder.append("?, ");
-					
-					if (friendObject == null) {
-						values.add(null);
-					}
-					else {
-						Object value = friendIdentifierAttribute.extractValueForPersistence(friendObject);
+
+					Object value = identifierScalarAttribute.extractValueForPersistence(entityToInsert);
+					if (value != null) {
 						values.add(value);
 					}
-					
+					else {
+						values.add(NullObject.valueOf(identifierScalarAttribute.getPersistenceType()));
+					}
 				}
 			}
+			
+			for (Attribute attribute : linkedTableEntity.getOwningSideAttributes()) {
+				if (attribute instanceof ScalarAttribute) {
+					if (!attribute.isInsertable()) {
+						continue;
+					}
+					
+					ScalarAttribute scalarAttribute = (ScalarAttribute)attribute;
+					if (scalarAttribute.getValueGenerator() instanceof IdentityValueRetriever) {
+						continue;
+					}
+					
+					
+					insertSql.append(scalarAttribute.getColumn().getName())
+						.append(", ");
+					wildcardBuilder.append("?, ");
+					
+					Object value = attribute.extractValueForPersistence(entityToInsert);
+					values.add(value != null ? value : NullObject.valueOf(scalarAttribute.getScalarType()));
+					
+				}
+				else if (attribute instanceof EntityAttribute) {
+					EntityAttribute entityAttribute = (EntityAttribute)attribute;
+					
+					Object friendObject = attribute.extractValueForPersistence(entityToInsert);
+					Entity friendEntity = entityAttribute.getEntity();
+					EntityIdentifier friendIdentifier = friendEntity.getEntityIdentifier();
+					List<ScalarAttribute> friendIdentifierAttributes = friendIdentifier.getScalarAttributes();
+					
+					for (int i = 0; i < entityAttribute.getLeftColumns().size(); i++) {
+						Column leftColumn = entityAttribute.getLeftColumns().get(i);
+						ScalarAttribute friendIdentifierAttribute = friendIdentifierAttributes.get(i);
+						
+						insertSql.append(leftColumn.getName()).append(", ");
+						wildcardBuilder.append("?, ");
+						
+						if (friendObject == null) {
+							values.add(null);
+						}
+						else {
+							Object value = friendIdentifierAttribute.extractValueForPersistence(friendObject);
+							values.add(value);
+						}
+						
+					}
+				}
+			}
+			
+			wildcardBuilder.replace(wildcardBuilder.length() - 2, wildcardBuilder.length(), ")");
+			insertSql.setCharAt(insertSql.length() - 2, ')');
+			insertSql.append(wildcardBuilder);
+			
+			result = result.join(new SingleStatementSqlBundle(insertSql.toString(), values));
 		}
 		
-		wildcardBuilder.replace(wildcardBuilder.length() - 2, wildcardBuilder.length(), ")");
-		insertSql.setCharAt(insertSql.length() - 2, ')');
-		insertSql.append(wildcardBuilder);
 		
-		return new Pair<String, List<?>>(insertSql.toString(), values);
+		return result;
 	}
 
 }

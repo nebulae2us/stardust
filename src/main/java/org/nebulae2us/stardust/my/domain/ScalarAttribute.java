@@ -75,5 +75,9 @@ public class ScalarAttribute extends Attribute {
 	public String toString() {
 		return this.getFullName() + ": " + this.getScalarType().getSimpleName();
 	}
+	
+	public Object convertValueToAttributeType(Object value) {
+		return typeAdapter != null ? ((TypeAdapter)typeAdapter).toAttributeType(scalarType, value) : value;
+	}
 
 }

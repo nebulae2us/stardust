@@ -16,10 +16,9 @@
 package org.nebulae2us.stardust.translate.domain;
 
 import java.util.Collections;
-import java.util.List;
 
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.Query;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.NamedParamExpression;
 
@@ -33,18 +32,18 @@ public class NamedParamTranslator implements Translator {
 		return expression instanceof NamedParamExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		NamedParamExpression namedParamExpression = (NamedParamExpression)expression;
 		
 		Object value = paramValues.getParamValue(namedParamExpression.getParamName());
 		if (value instanceof Query) {
-			Pair<String, List<?>> subQueryTranslationResult = ((Query)value).translate();
-			return new Pair<String, List<?>>("(" + subQueryTranslationResult.getItem1() + ")", subQueryTranslationResult.getItem2());
+			SqlBundle subQueryTranslationResult = ((Query<?>)value).translate();
+			return new SingleStatementSqlBundle("(" + subQueryTranslationResult.getSql() + ")", subQueryTranslationResult.getParamValues());
 		}
 		
-		return new Pair<String, List<?>>("?", Collections.singletonList(value));
+		return new SingleStatementSqlBundle("?", Collections.singletonList(value));
 	}
 
 }

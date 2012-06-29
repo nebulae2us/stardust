@@ -15,17 +15,38 @@
  */
 package org.nebulae2us.stardust.translate.domain;
 
-import org.nebulae2us.stardust.dao.SqlBundle;
-import org.nebulae2us.stardust.expr.domain.Expression;
+import java.util.List;
 
 /**
  * @author Trung Phan
  *
  */
-public interface Translator {
+public class ExecutableSql {
 	
-	public boolean accept(Expression expression, ParamValues paramValues);
+	private final String sql;
 	
-	public SqlBundle translate(TranslatorContext context, Expression expression, ParamValues paramValues);
-
+	private final List<?> paramValues;
+	
+	public ExecutableSql(String sql, List<?> paramValues) {
+		this.sql = sql;
+		this.paramValues = paramValues;
+	}
+	
+	public String getSql(int index) {
+		if (index > 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		return sql;
+	}
+	
+	public List<?> getParamValues(int index) {
+		if (index > 0) {
+			throw new IndexOutOfBoundsException();
+		}
+		return paramValues;
+	}
+	
+	public int size() {
+		return 1;
+	}
 }

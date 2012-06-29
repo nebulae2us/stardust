@@ -15,15 +15,15 @@
  */
 package org.nebulae2us.stardust.translate.domain.oracle;
 
-import java.util.List;
 import java.util.Map;
 
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.MapBuilder;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.FunctionExpression;
 import org.nebulae2us.stardust.expr.domain.SelectorExpression;
 import org.nebulae2us.stardust.translate.domain.ParamValues;
+import org.nebulae2us.stardust.translate.domain.SingleStatementSqlBundle;
 import org.nebulae2us.stardust.translate.domain.Translator;
 import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 import org.nebulae2us.stardust.translate.domain.TranslatorController;
@@ -60,7 +60,7 @@ public class OracleFunctionTranslator implements Translator {
 		return expression instanceof FunctionExpression;
 	}
 	
-	public Pair<String, List<?>> translate(TranslatorContext context, Expression expression, ParamValues paramValues) {
+	public SqlBundle translate(TranslatorContext context, Expression expression, ParamValues paramValues) {
 		
 		TranslatorController controller = context.getTranslatorController();
 		
@@ -72,15 +72,15 @@ public class OracleFunctionTranslator implements Translator {
 			
 			SelectorExpression param = functionExpression.getParams().get(0);
 			Translator translator = controller.findTranslator(param, paramValues);
-			Pair<String, List<?>> paramResult = translator.translate(context, param, paramValues);
+			SqlBundle paramResult = translator.translate(context, param, paramValues);
 			
 			StringBuilder result = new StringBuilder();
 			result.append(SIMPLE_ONE_INPUT_FUNCTIONS.get(functionExpression.getFunctionName()))
 				.append('(')
-				.append(paramResult.getItem1())
+				.append(paramResult.getSql())
 				.append(')');
 			
-			return new Pair<String, List<?>>(result.toString(), paramResult.getItem2());
+			return new SingleStatementSqlBundle(result.toString(), paramResult.getParamValues());
 		}
 		
 		return null;

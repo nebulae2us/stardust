@@ -15,10 +15,8 @@
  */
 package org.nebulae2us.stardust.translate.domain;
 
-import java.util.List;
-
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.ListBuilder;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.BetweenExpression;
 import org.nebulae2us.stardust.expr.domain.Expression;
 
@@ -32,7 +30,7 @@ public class BetweenTranslator implements Translator {
 		return expression instanceof BetweenExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		TranslatorController controller = context.getTranslatorController();
@@ -40,25 +38,25 @@ public class BetweenTranslator implements Translator {
 		BetweenExpression betweenExpression = (BetweenExpression)expression;
 		
 		Translator selectorTranslator = controller.findTranslator(betweenExpression.getSelector(), paramValues);
-		Pair<String, List<?>> selectorTranslationResult = selectorTranslator.translate(context, betweenExpression.getSelector(), paramValues);
+		SqlBundle selectorTranslationResult = selectorTranslator.translate(context, betweenExpression.getSelector(), paramValues);
 
 		Translator lowerBoundTranslator = controller.findTranslator(betweenExpression.getLowerBound(), paramValues);
-		Pair<String, List<?>> lowerBoundTranslationResult = lowerBoundTranslator.translate(context, betweenExpression.getLowerBound(), paramValues);
+		SqlBundle lowerBoundTranslationResult = lowerBoundTranslator.translate(context, betweenExpression.getLowerBound(), paramValues);
 		
 		Translator higherBoundTranslator = controller.findTranslator(betweenExpression.getHigherBound(), paramValues);
-		Pair<String, List<?>> higherBoundTranslationResult = higherBoundTranslator.translate(context, betweenExpression.getHigherBound(), paramValues);
+		SqlBundle higherBoundTranslationResult = higherBoundTranslator.translate(context, betweenExpression.getHigherBound(), paramValues);
 		
 		StringBuilder result = new StringBuilder();
-		result.append(selectorTranslationResult.getItem1())
+		result.append(selectorTranslationResult.getSql())
 			.append(betweenExpression.isNegated() ? " not between " : " between ")
-			.append(lowerBoundTranslationResult.getItem1()).append(" and ")
-			.append(higherBoundTranslationResult.getItem1());
+			.append(lowerBoundTranslationResult.getSql()).append(" and ")
+			.append(higherBoundTranslationResult.getSql());
 		
-		return new Pair<String, List<?>>(result.toString(),
+		return new SingleStatementSqlBundle(result.toString(),
 				new ListBuilder<Object>()
-					.add(selectorTranslationResult.getItem2())
-					.add(lowerBoundTranslationResult.getItem2())
-					.add(higherBoundTranslationResult.getItem2())
+					.add(selectorTranslationResult.getParamValues())
+					.add(lowerBoundTranslationResult.getParamValues())
+					.add(higherBoundTranslationResult.getParamValues())
 					.toList());
 	}
 

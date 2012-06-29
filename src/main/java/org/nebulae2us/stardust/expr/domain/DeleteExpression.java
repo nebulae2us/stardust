@@ -13,19 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.translate.domain;
+package org.nebulae2us.stardust.expr.domain;
 
-import org.nebulae2us.stardust.dao.SqlBundle;
-import org.nebulae2us.stardust.expr.domain.Expression;
+import java.util.List;
 
 /**
  * @author Trung Phan
  *
  */
-public interface Translator {
-	
-	public boolean accept(Expression expression, ParamValues paramValues);
-	
-	public SqlBundle translate(TranslatorContext context, Expression expression, ParamValues paramValues);
+public class DeleteExpression extends Expression {
 
+	private final List<PredicateExpression> predicates;
+	
+	public DeleteExpression(String expression, List<PredicateExpression> predicates) {
+		super(expression);
+		
+		this.predicates = predicates;
+	}
+
+	public final List<PredicateExpression> getPredicates() {
+		return predicates;
+	}
+	
+	
 }

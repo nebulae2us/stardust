@@ -13,19 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.translate.domain;
+package org.nebulae2us.stardust.dao;
 
-import org.nebulae2us.stardust.dao.SqlBundle;
-import org.nebulae2us.stardust.expr.domain.Expression;
+import java.util.List;
 
 /**
  * @author Trung Phan
  *
  */
-public interface Translator {
-	
-	public boolean accept(Expression expression, ParamValues paramValues);
-	
-	public SqlBundle translate(TranslatorContext context, Expression expression, ParamValues paramValues);
+public abstract class SqlBundle {
 
+	public abstract int size();
+	
+	public abstract String getSql();
+	
+	public abstract String getSql(int index);
+	
+	public abstract List<?> getParamValues();
+	
+	public abstract List<?> getParamValues(int index);
+
+	public abstract SqlBundle join(SqlBundle ... sqlBundles);
+	
 }

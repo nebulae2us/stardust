@@ -20,14 +20,14 @@ import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
-import org.nebulae2us.stardust.adapter.TypeAdapter;
 import org.nebulae2us.stardust.dao.JdbcExecutor;
 import org.nebulae2us.stardust.dao.RecordSetHandler;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.dialect.OracleDialect;
+import org.nebulae2us.stardust.expr.domain.DeleteEntityExpression;
 import org.nebulae2us.stardust.expr.domain.InsertEntityExpression;
 import org.nebulae2us.stardust.expr.domain.UpdateEntityExpression;
 import org.nebulae2us.stardust.generator.ValueGenerator;
@@ -46,6 +46,7 @@ import org.nebulae2us.stardust.translate.domain.Translator;
 import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 import org.nebulae2us.stardust.translate.domain.TranslatorController;
 import org.nebulae2us.stardust.translate.domain.oracle.OracleFunctionTranslator;
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * 
@@ -110,7 +111,7 @@ public class DaoManager {
 		this.jdbcExecutor.endUnitOfWork();
 	}
 
-	public void setPackagesToScan(String packageName) {
+	public void setPackageToScan(String packageName) {
 		this.entityRepository.scanPackage(packageName);
 	}
 	
@@ -162,10 +163,10 @@ public class DaoManager {
 	public <T> List<T> query(Query<T> query) {
 		final TranslatorContext context = query.getTranslatorContext();
 
-		Pair<String, List<?>> translateResult = query.translate();
+		SqlBundle translateResult = query.translate();
 		
-		String sql = translateResult.getItem1();
-		List<?> values = translateResult.getItem2();
+		String sql = translateResult.getSql();
+		List<?> values = translateResult.getParamValues();
 
 		final List<T>[] result = new List[1];
 
@@ -193,44 +194,39 @@ public class DaoManager {
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
 		
 		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false, defaultSchema);
-
+		
 		jdbcExecutor.beginUnitOfWork();
 		try {
-			for (int i = 0; i < linkedTableEntityBundle.getLinkedTableEntities().size(); i++) {
-				LinkedTableEntity linkedTableEntity = linkedTableEntityBundle.getLinkedTableEntities().get(i);
-	
-				// populate identity values
-				for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
-					ValueGenerator generator = scalarAttribute.getValueGenerator();
-					if (generator != null && generator.generationBeforeInsertion()) {
-						Object value = generator.generateValue(scalarAttribute.getPersistenceType(), this.dialect, this.jdbcExecutor);
-						if (scalarAttribute.getTypeAdapter() != null) {
-							// TODO Simplify this code
-							value = ((TypeAdapter)scalarAttribute.getTypeAdapter()).toAttributeType(scalarAttribute.getScalarType(), value);
-						}
-						ReflectionUtils.setValue(scalarAttribute.getField(), object, value);
-					}
+			LinkedTableEntity linkedTableEntity = linkedTableEntityBundle.getLinkedTableEntities().get(0);
+
+			// populate identity values
+			for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
+				ValueGenerator generator = scalarAttribute.getValueGenerator();
+				if (generator != null && generator.generationBeforeInsertion()) {
+					Object value = generator.generateValue(scalarAttribute.getPersistenceType(), this.dialect, this.jdbcExecutor);
+					value = scalarAttribute.convertValueToAttributeType(value);
+					ReflectionUtils.setValue(scalarAttribute.getField(), object, value);
 				}
+			}
+			
+			InsertEntityExpression insertEntityExpression = new InsertEntityExpression("insert");
+			
+			ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
+			Translator translator = controller.findTranslator(insertEntityExpression, paramValues);
+			SqlBundle translateResult = translator.translate(context, insertEntityExpression, paramValues);
+			
+			for (int i = 0; i < translateResult.size(); i++) {
+				String sql = translateResult.getSql(i);
+				List<?> values = translateResult.getParamValues(i);
 				
-				InsertEntityExpression insertEntityExpression = new InsertEntityExpression("insert", i);
-				
-				ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
-				Translator translator = controller.findTranslator(insertEntityExpression, paramValues);
-				Pair<String, List<?>> translateResult = translator.translate(context, insertEntityExpression, paramValues);
-				
-				String sql = translateResult.getItem1();
-				List<?> values = translateResult.getItem2();
-				
-				int rowsInserted = jdbcExecutor.update(sql, values);
+				jdbcExecutor.update(sql, values);
 				
 				// retrieve identity values
 				for (ScalarAttribute scalarAttribute : linkedTableEntity.getScalarAttributes()) {
 					ValueGenerator generator = scalarAttribute.getValueGenerator();
 					if (generator != null && !generator.generationBeforeInsertion()) {
 						Object value = generator.generateValue(scalarAttribute.getPersistenceType(), this.dialect, this.jdbcExecutor);
-						if (scalarAttribute.getTypeAdapter() != null) {
-							value = ((TypeAdapter)scalarAttribute.getTypeAdapter()).toAttributeType(scalarAttribute.getScalarType(), value);
-						}
+						value = scalarAttribute.convertValueToAttributeType(value);
 						ReflectionUtils.setValue(scalarAttribute.getField(), object, value);
 					}
 				}
@@ -251,22 +247,53 @@ public class DaoManager {
 
 		jdbcExecutor.beginUnitOfWork();
 		try {
-			for (int i = 0; i < linkedTableEntityBundle.getLinkedTableEntities().size(); i++) {
-				UpdateEntityExpression updateEntityExpression = new UpdateEntityExpression("insert", i);
-				
-				ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
-				Translator translator = controller.findTranslator(updateEntityExpression, paramValues);
-				Pair<String, List<?>> translateResult = translator.translate(context, updateEntityExpression, paramValues);
-				
-				String sql = translateResult.getItem1();
-				List<?> values = translateResult.getItem2();
-				
-				int rowsUpdated = jdbcExecutor.update(sql, values);
+			UpdateEntityExpression updateEntityExpression = new UpdateEntityExpression("update");
+			
+			ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
+			Translator translator = controller.findTranslator(updateEntityExpression, paramValues);
+			SqlBundle translateResult = translator.translate(context, updateEntityExpression, paramValues);
+			
+			AssertState.isTrue(translateResult.size() > 0, "translated result is empty");
+			
+			for (int i = 0; i < translateResult.size(); i++) {
+				String sql = translateResult.getSql(i);
+				List<?> values = translateResult.getParamValues(i);
+				jdbcExecutor.update(sql, values);
+			}
+			
+		}
+		finally {
+			jdbcExecutor.endUnitOfWork();
+		}
+	}
+	
+	public void delete(Object object) {
+		Entity entity = entityRepository.getEntity(object.getClass());
+		LinkedEntityBundle linkedEntityBundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
+		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
+		
+		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false, defaultSchema);
+
+		jdbcExecutor.beginUnitOfWork();
+		try {
+			DeleteEntityExpression deleteEntityExpression = new DeleteEntityExpression("delete");
+			
+			ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
+			Translator translator = controller.findTranslator(deleteEntityExpression, paramValues);
+			SqlBundle translateResult = translator.translate(context, deleteEntityExpression, paramValues);
+			
+			AssertState.isTrue(translateResult.size() > 0, "translated result is empty");
+			
+			for (int i = 0; i < translateResult.size(); i++) {
+				String sql = translateResult.getSql(i);
+				List<?> values = translateResult.getParamValues(i);
+				jdbcExecutor.update(sql, values);
 			}
 		}
 		finally {
 			jdbcExecutor.endUnitOfWork();
 		}
+		
 	}
 
 }

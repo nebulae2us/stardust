@@ -18,7 +18,7 @@ package org.nebulae2us.stardust.translate.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.LogicalExpression;
 import org.nebulae2us.stardust.expr.domain.PredicateExpression;
@@ -33,7 +33,7 @@ public class LogicalTranslator implements Translator {
 		return expression instanceof LogicalExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		TranslatorController controller = context.getTranslatorController();
@@ -48,7 +48,7 @@ public class LogicalTranslator implements Translator {
 		for (PredicateExpression subExpression : logicalExpression.getExpressions()) {
 			
 			Translator translator = controller.findTranslator(subExpression, paramValues);
-			Pair<String, List<?>> subResult = translator.translate(context, subExpression, paramValues);
+			SqlBundle subResult = translator.translate(context, subExpression, paramValues);
 			
 			if (firstExpression) {
 				firstExpression = false;
@@ -56,13 +56,13 @@ public class LogicalTranslator implements Translator {
 			else {
 				sqlBuilder.append(' ').append(logicalExpression.getOperator()).append(' ');
 			}
-			sqlBuilder.append(subResult.getItem1());
-			scalarValues.addAll(subResult.getItem2());
+			sqlBuilder.append(subResult.getSql());
+			scalarValues.addAll(subResult.getParamValues());
 		}
 		
 		sqlBuilder.append(')');
 		
-		return new Pair<String, List<?>>(sqlBuilder.toString(), scalarValues);
+		return new SingleStatementSqlBundle(sqlBuilder.toString(), scalarValues);
 	}
 
 }

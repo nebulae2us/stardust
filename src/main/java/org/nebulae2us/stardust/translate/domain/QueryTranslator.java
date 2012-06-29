@@ -21,7 +21,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.db.domain.Table;
@@ -49,13 +49,13 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  */
 public class QueryTranslator implements Translator {
 
-	private static final Pair<String, List<?>> EMPTY_RESULT = new Pair<String, List<?>>("", Collections.emptyList());
+	private static final SqlBundle EMPTY_RESULT = EmptySqlBundle.getInstance();
 	
 	public boolean accept(Expression expression, ParamValues paramValues) {
 		return expression instanceof QueryExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		QueryExpression queryExpression = (QueryExpression)expression;
@@ -63,44 +63,42 @@ public class QueryTranslator implements Translator {
 		StringBuilder sql = new StringBuilder();
 		List<Object> scalarValues = new ArrayList<Object>();
 
-		Pair<String, List<?>> selectResult = toSelectClause(context, queryExpression, paramValues);
+		SqlBundle selectResult = toSelectClause(context, queryExpression, paramValues);
 		
 		if (!queryExpression.isCount() || queryExpression.isDistinct()) {
 			sql.append("select ");
 			if (queryExpression.isDistinct()) {
 				sql.append("distinct ");
 			}
-			sql.append(selectResult.getItem1());
-			scalarValues.addAll(selectResult.getItem2());
+			sql.append(selectResult.getSql());
+			scalarValues.addAll(selectResult.getParamValues());
 		}
 		else {
 			sql.append("select count(*)");
 		}
 		
 		if (queryExpression.isBackedBySql()) {
-			Pair<String, List<?>> fromResult = transformSql(queryExpression.getSql(), paramValues);
-			sql.append("\n from (").append(fromResult.getItem1()).append(") tmp_in");
-			scalarValues.addAll(fromResult.getItem2());
+			SqlBundle fromResult = transformSql(queryExpression.getSql(), paramValues);
+			sql.append("\n from (").append(fromResult.getSql()).append(") tmp_in");
+			scalarValues.addAll(fromResult.getParamValues());
 		}
 		else {
-			Pair<String, List<?>> fromResult = toFromClause(context, queryExpression, paramValues);
-			sql.append("\n  from ").append(fromResult.getItem1());
-			scalarValues.addAll(fromResult.getItem2());
+			SqlBundle fromResult = toFromClause(context, queryExpression, paramValues);
+			sql.append("\n  from ").append(fromResult.getSql());
+			scalarValues.addAll(fromResult.getParamValues());
 		}
 		
-		Pair<String, List<?>> whereResult = toWhereClause(context, queryExpression, paramValues);
-		if (whereResult.getItem1().length() > 0) {
-			sql.append("\n where ").append(whereResult.getItem1());
-			scalarValues.addAll(whereResult.getItem2());
+		SqlBundle whereResult = toWhereClause(context, queryExpression, paramValues);
+		if (whereResult != EMPTY_RESULT) {
+			sql.append("\n where ").append(whereResult.getSql());
+			scalarValues.addAll(whereResult.getParamValues());
 		}
 
-		Pair<String, List<?>> orderResult = toOrderClause(context, queryExpression, paramValues);
+		SqlBundle orderResult = toOrderClause(context, queryExpression, paramValues);
 		
-		if (!queryExpression.isCount()) {
-			if (orderResult.getItem1().length() > 0) {
-				sql.append("\n order by ").append(orderResult.getItem1());
-				scalarValues.addAll(orderResult.getItem2());
-			}
+		if (!queryExpression.isCount() && orderResult != EMPTY_RESULT) {
+			sql.append("\n order by ").append(orderResult.getSql());
+			scalarValues.addAll(orderResult.getParamValues());
 		}
 
 		String finalSql = sql.toString();
@@ -120,10 +118,10 @@ public class QueryTranslator implements Translator {
 			}
 		}
 		
-		return new Pair<String, List<?>>(finalSql, scalarValues);
+		return new SingleStatementSqlBundle(finalSql, scalarValues);
 	}
 	
-	private Pair<String, List<?>> transformSql(String sql, ParamValues paramValues) {
+	private SqlBundle transformSql(String sql, ParamValues paramValues) {
 		List<Object> values = new ArrayList<Object>();
 		StringBuilder newSql = new StringBuilder();
 		
@@ -168,7 +166,7 @@ public class QueryTranslator implements Translator {
 
 		newSql.deleteCharAt(newSql.length() - 1);
 		
-		return new Pair<String, List<?>>(newSql.toString(), values);
+		return new SingleStatementSqlBundle(newSql.toString(), values);
 	}	
 
 	private List<ColumnHolder> extractAllColumns(TranslatorContext context) {
@@ -211,7 +209,7 @@ public class QueryTranslator implements Translator {
 		return result;
 	}
 
-	protected Pair<String, List<?>> toSelectClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
+	protected SqlBundle toSelectClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
 		
 		TranslatorController controller = context.getTranslatorController();
 		
@@ -245,11 +243,11 @@ public class QueryTranslator implements Translator {
 					SelectorExpression selector = selectAttributeExpression.getSelector();
 					
 					Translator translator = controller.findTranslator(selector, paramValues);
-					Pair<String, List<?>> selectorTranslationResult = translator.translate(context, selector, paramValues);
+					SqlBundle selectorTranslationResult = translator.translate(context, selector, paramValues);
 					
-					scalarValues.addAll(selectorTranslationResult.getItem2());
+					scalarValues.addAll(selectorTranslationResult.getParamValues());
 					
-					result.append(selectorTranslationResult.getItem1())
+					result.append(selectorTranslationResult.getSql())
 						.append(",\n       ");
 				}
 				
@@ -258,7 +256,7 @@ public class QueryTranslator implements Translator {
 			
 		}
 
-		return new Pair<String, List<?>>(result.toString(), scalarValues);
+		return new SingleStatementSqlBundle(result.toString(), scalarValues);
 
 	}
 
@@ -267,7 +265,7 @@ public class QueryTranslator implements Translator {
 		return ObjectUtils.isEmpty(schemaName) ? table.getName() : schemaName + '.' + table.getName();
 	}
 	
-	protected Pair<String, List<?>> toFromClause(TranslatorContext context, QueryExpression expression, ParamValues paramValues) {
+	protected SqlBundle toFromClause(TranslatorContext context, QueryExpression expression, ParamValues paramValues) {
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = context.getLinkedTableEntityBundle();
 		
@@ -304,10 +302,10 @@ public class QueryTranslator implements Translator {
 			result.append(")");
 		}
 		
-		return new Pair<String, List<?>>(result.toString(), Collections.emptyList());
+		return new SingleStatementSqlBundle(result.toString(), Collections.emptyList());
 	}
 	
-	protected Pair<String, List<?>> toWhereClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
+	protected SqlBundle toWhereClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
 		TranslatorController controller = context.getTranslatorController();
 		
 		QueryExpression queryExpression = (QueryExpression)expression;
@@ -329,7 +327,7 @@ public class QueryTranslator implements Translator {
 		return translator.translate(context, whereExpression, paramValues);
 	}
 
-	protected Pair<String, List<?>> toOrderClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
+	protected SqlBundle toOrderClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
 		TranslatorController controller = context.getTranslatorController();
 		
 		QueryExpression queryExpression = (QueryExpression)expression;
@@ -345,16 +343,16 @@ public class QueryTranslator implements Translator {
 			Translator translator = controller.findTranslator(orderExpression, paramValues);
 			AssertSyntax.notNull(translator, "Unrecognized expression: %s.", orderExpression.getExpression());
 			
-			Pair<String, List<?>> translationResult = translator.translate(context, orderExpression, paramValues);
+			SqlBundle translationResult = translator.translate(context, orderExpression, paramValues);
 
 			if (sql.length() > 0) {
 				sql.append(", ");
 			}
-			sql.append(translationResult.getItem1());
-			scalarValues.addAll(translationResult.getItem2());
+			sql.append(translationResult.getSql());
+			scalarValues.addAll(translationResult.getParamValues());
 		}
 		
-		return new Pair<String, List<?>>(sql.toString(), scalarValues);
+		return new SingleStatementSqlBundle(sql.toString(), scalarValues);
 	}
 
 	

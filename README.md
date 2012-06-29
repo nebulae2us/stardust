@@ -77,7 +77,7 @@ daoManager.update(person);
 ##Why Stardust
 __SQL centric__: Stardust's DaoManager not only automatically generates SQL for you, but also let you plugs your own SQL. Moreover, its JdbcExecutor let you execute SQL at ease.
 
-__Clean POJO object___: Objects are not proxied. No error like Hibernate's `LazyInitializationException`.
+__Clean POJO object__: Objects are not proxied. No error like Hibernate's `LazyInitializationException`.
 
 
 ##Getting Started
@@ -88,7 +88,7 @@ Required  JAR:
 
 The heart of Stardust are JdbcExecutor and DaoManager. JdbcExecutor helps you execute SQL. DaoManagers help you to map relational data to java objects. DaoManager contains 2 engines behind the scene. The first engine translate query requirement into SQL. It then uses JdbcExecutor to execute the SQL. The second engine is to translate the SQL's result into java objects. As the 2 engines are separate, you can plugs your own SQL and utilize the second engine to convert data into java objects.
 
-#JdbcExecutor
+###JdbcExecutor
 
 To create JdbcExecutor:
 ``` java
@@ -100,7 +100,7 @@ Let's execute some SQLs:
 Long one = jdbcExecutor.queryForLong("select 1 from dual");
 ```
 
-To execute any SQL, JdbcExecutor will get `Connection` out of the `DataSource` and will release the connection. To release the connection, if the dataSource implements `ReleaseConnectionHandler` interface, it will call `releaseConnection(connection)`, otherwise, it will close the connection using `connection.close()`.
+To execute any SQL, JdbcExecutor will get a `Connection` out of the `DataSource` and will release the connection. To release the connection, if the dataSource implements `ReleaseConnectionHandler` interface, it will call `releaseConnection(connection)`, otherwise, it will close the connection using `connection.close()`.
 
 If most cases, closing connection is desirable. For example, if you use `ConnectionPoolDataSource`, closing connection will return the connection back to the pool to make it available for other threads. If you have `TransactionManager` (which will be discussed later), the TransactionManager will take care of the transaction for you even though connection is closed on every SQL executed.
 
@@ -115,7 +115,14 @@ finally {
 	jdbcExecutor.endUnitOfWork();
 }
 ```
-When jdbcExecutor.beginUnitOfWork() is called, it increases a lock. Each SQL execution within the unit of work will not close the connection. When endUnitOfWork() is called, the lock is decreased. If the locked is reduced to 0, jdbcExecutor will call method `releaseConnection()`. JbdcExecutor.endUnitOfWork() needs to be in finally block to make sure it release the lock, otherwise, connection leak will surely happen.
+When `jdbcExecutor.beginUnitOfWork()` is called, it increases a lock. Each SQL execution within the unit of work will not close the connection. When `endUnitOfWork()` is called, the lock value is decreased. If the lock value is reduced to 0, the `JdbcExecutor` will call method `JdbcExecutor.releaseConnection(Connection)`. `JbdcExecutor.endUnitOfWork()` needs to be in finally block to make sure it release the lock, otherwise, connection leak will surely happen.
 
 The second option is when you implements your own DataSource. This DataSource needs to implement the interface `ReleaseConnectionHandler`. Every time the connection is released, it actually call the releaseConnection() method of the DataSource. As you implement the method releaseConnection, it's in your control to decide if you want to close the connection or not.
+
+###DaoManager
+To instantiate DaoManager:
+``` java
+DaoManager daoManager = new DaoManager(jdbcExecutor);
+```
+
 

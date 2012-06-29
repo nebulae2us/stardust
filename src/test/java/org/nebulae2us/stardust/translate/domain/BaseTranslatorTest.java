@@ -26,8 +26,8 @@ import mockit.Expectations;
 import mockit.NonStrict;
 
 import org.junit.Before;
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.Query;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.dialect.Dialect;
 import org.nebulae2us.stardust.expr.domain.AttributeExpression;
 import org.nebulae2us.stardust.expr.domain.Expression;
@@ -80,8 +80,8 @@ public class BaseTranslatorTest {
 		};
 		
 		mockedAttributeTranslator = new Translator() {
-			public Pair<String, List<?>> translate(TranslatorContext context, Expression expression, ParamValues paramValues) {
-				return new Pair<String, List<?>>("mockedAttribute_" + expression.getExpression(), Collections.emptyList());
+			public SqlBundle translate(TranslatorContext context, Expression expression, ParamValues paramValues) {
+				return new SingleStatementSqlBundle("mockedAttribute_" + expression.getExpression(), Collections.emptyList());
 			}
 			public boolean accept(Expression expression, ParamValues paramValues) {
 				return expression instanceof AttributeExpression;
@@ -90,7 +90,7 @@ public class BaseTranslatorTest {
 
 		new Expectations() {{
 			mockedSubQuery.translate();
-			result = new Pair<String, List<?>>("select ? from mockedSubQuery", Collections.singletonList("mockedSubQueryValue"));
+			result = new SingleStatementSqlBundle("select ? from mockedSubQuery", Collections.singletonList("mockedSubQueryValue"));
 			
 			context.getTranslatorController();
 			result = translatorController;
@@ -115,7 +115,7 @@ public class BaseTranslatorTest {
 	public class TestCase {
 		
 		private Translator translatorInTest;
-		private Pair<String, List<?>> result;
+		private SqlBundle result;
 		
 		public TestCase withTranslator(Translator translatorInTest) {
 			this.translatorInTest = translatorInTest;
@@ -152,12 +152,12 @@ public class BaseTranslatorTest {
 		}
 		
 		public TestCase expectResult(String expectedResult) {
-			assertEquals(expectedResult, result.getItem1());
+			assertEquals(expectedResult, result.getSql());
 			return this;
 		}
 		
 		public TestCase expectValues(Object ... expectedValues) {
-			assertEquals( Arrays.asList(expectedValues), result.getItem2());
+			assertEquals( Arrays.asList(expectedValues), result.getParamValues());
 			return this;
 		}
 	}

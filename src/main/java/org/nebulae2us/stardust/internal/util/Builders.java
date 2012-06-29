@@ -55,6 +55,7 @@ public class Builders {
 
 	public static final List<Class<?>> IGNORED_TYPES = new ListBuilder<Class<?>>()
 			.add(org.nebulae2us.stardust.adapter.TypeAdapter.class)
+			.add(org.nebulae2us.stardust.dao.SqlBundle.class)
 			.add(org.nebulae2us.stardust.Query.class)
 			.toList();
 

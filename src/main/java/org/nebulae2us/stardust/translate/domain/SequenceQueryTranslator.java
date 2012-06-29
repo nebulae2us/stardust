@@ -15,10 +15,8 @@
  */
 package org.nebulae2us.stardust.translate.domain;
 
-import java.util.List;
-
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.Immutables;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.SequenceQueryExpression;
 
@@ -32,14 +30,14 @@ public class SequenceQueryTranslator implements Translator {
 		return expression instanceof SequenceQueryExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		SequenceQueryExpression sequenceExpression = (SequenceQueryExpression)expression;
 		
 		String sql = context.getDialect().getSqlToRetrieveNextSequenceValue(sequenceExpression.getSequenceName());
 
-		return new Pair<String, List<?>>(sql, Immutables.emptyList());
+		return new SingleStatementSqlBundle(sql, Immutables.emptyList());
 	}
 
 }

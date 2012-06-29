@@ -18,8 +18,8 @@ package org.nebulae2us.stardust.translate.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.Query;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.InListExpression;
 import org.nebulae2us.stardust.expr.domain.NamedParamExpression;
@@ -38,7 +38,7 @@ public class InListTranslator implements Translator {
 		return expression instanceof InListExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		InListExpression inListExpression = (InListExpression)expression;
@@ -52,10 +52,10 @@ public class InListTranslator implements Translator {
 
 		TranslatorController controller = context.getTranslatorController();
 		Translator translator = controller.findTranslator(inListExpression.getSelectorExpression(), paramValues);
-		Pair<String, List<?>> selectorResult = translator.translate(context, inListExpression.getSelectorExpression(), paramValues);
+		SqlBundle selectorResult = translator.translate(context, inListExpression.getSelectorExpression(), paramValues);
 		
-		scalarValues.addAll(selectorResult.getItem2());
-		result.append(selectorResult.getItem1())
+		scalarValues.addAll(selectorResult.getParamValues());
+		result.append(selectorResult.getSql())
 			.append(inListExpression.isNegated() ? " not in (" : " in (");
 		
 		for (Expression param : inListExpression.getParams()) {
@@ -70,35 +70,35 @@ public class InListTranslator implements Translator {
 			}
 			else {
 				Translator paramTranslator = controller.findTranslator(param, paramValues);
-				Pair<String, List<?>> paramTranslationResult = paramTranslator.translate(context, param, paramValues);
-				scalarValues.addAll(paramTranslationResult.getItem2());
+				SqlBundle paramTranslationResult = paramTranslator.translate(context, param, paramValues);
+				scalarValues.addAll(paramTranslationResult.getParamValues());
 
 				if (count < maxInListSize) {
-					result.append(paramTranslationResult.getItem1()).append(',');
+					result.append(paramTranslationResult.getSql()).append(',');
 					count++;
 				}
 				else {
 					count = 1;
 					result.replace(result.length() - 1,  result.length(), ")");
 					result.append(inListExpression.isNegated() ? " and " : " or ")
-						.append(selectorResult.getItem1())
+						.append(selectorResult.getSql())
 						.append(' ').append(inListExpression.isNegated() ? "not in" : "in").append(" (");
 					
-					result.append(paramTranslationResult.getItem1()).append(',');
+					result.append(paramTranslationResult.getSql()).append(',');
 					
 					extended = true;
-					scalarValues.addAll(selectorResult.getItem2());
+					scalarValues.addAll(selectorResult.getParamValues());
 				}
 				
 				continue;
 			}
 			
 			if (value instanceof Query) {
-				Pair<String, List<?>> subQueryTranslationResult = ((Query)value).translate();
+				SqlBundle subQueryTranslationResult = ((Query<?>)value).translate();
 				AssertSyntax.isTrue(inListExpression.getParams().size() == 1, "Invalid in-list expression that has sub-query: %s", expression);
 				count++;
-				result.append(subQueryTranslationResult.getItem1()).append(',');
-				scalarValues.addAll(subQueryTranslationResult.getItem2());
+				result.append(subQueryTranslationResult.getSql()).append(',');
+				scalarValues.addAll(subQueryTranslationResult.getParamValues());
 				break;
 			}
 
@@ -112,10 +112,10 @@ public class InListTranslator implements Translator {
 					count = 1;
 					result.replace(result.length() - 1,  result.length(), ")");
 					result.append(inListExpression.isNegated() ? " and " : " or ")
-						.append(selectorResult.getItem1())
+						.append(selectorResult.getSql())
 						.append(' ').append(inListExpression.isNegated() ? "not in" : "in").append(" (?,");
 					extended = true;
-					scalarValues.addAll(selectorResult.getItem2());
+					scalarValues.addAll(selectorResult.getParamValues());
 				}
 				scalarValues.add(scalarValue);
 			}
@@ -130,6 +130,6 @@ public class InListTranslator implements Translator {
 			result.append(')');
 		}
 		
-		return new Pair<String, List<?>>(result.toString(), scalarValues);
+		return new SingleStatementSqlBundle(result.toString(), scalarValues);
 	}
 }

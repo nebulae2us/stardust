@@ -16,9 +16,9 @@
 package org.nebulae2us.stardust.translate.domain;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.AttributeExpression;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
@@ -37,7 +37,7 @@ public class AttributeTranslator implements Translator {
 		return expression instanceof AttributeExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		AttributeExpression attributeExpression = (AttributeExpression)expression;
@@ -61,10 +61,10 @@ public class AttributeTranslator implements Translator {
 			
 		if (context.isExternalSql()) {
 			String _alias = result.getItem1().getAlias();
-			return new Pair<String, List<?>>((_alias.length() > 0 ? _alias + "_" : "") + result.getItem2().getColumn().getName(), Collections.emptyList());
+			return new SingleStatementSqlBundle((_alias.length() > 0 ? _alias + "_" : "") + result.getItem2().getColumn().getName(), Collections.emptyList());
 		}
 		else {
-			return new Pair<String, List<?>>(result.getItem1().getTableAlias() + "." + result.getItem2().getColumn().getName(), Collections.emptyList());
+			return new SingleStatementSqlBundle(result.getItem1().getTableAlias() + "." + result.getItem2().getColumn().getName(), Collections.emptyList());
 		}
 	}
 

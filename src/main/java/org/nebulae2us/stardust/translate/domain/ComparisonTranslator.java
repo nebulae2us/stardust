@@ -18,7 +18,7 @@ package org.nebulae2us.stardust.translate.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.ComparisonExpression;
 import org.nebulae2us.stardust.expr.domain.Expression;
 
@@ -32,7 +32,7 @@ public class ComparisonTranslator implements Translator {
 		return expression instanceof ComparisonExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		ComparisonExpression comparisonExpression = (ComparisonExpression)expression;
@@ -40,21 +40,21 @@ public class ComparisonTranslator implements Translator {
 		List<Object> scalarValues = new ArrayList<Object>();
 		
 		Translator translator1 = context.getTranslatorController().findTranslator(comparisonExpression.getLeftOperandExpression(), paramValues);
-		Pair<String, List<?>> selectorResult1 = translator1.translate(context, comparisonExpression.getLeftOperandExpression(), paramValues);
+		SqlBundle selectorResult1 = translator1.translate(context, comparisonExpression.getLeftOperandExpression(), paramValues);
 		
-		scalarValues.addAll(selectorResult1.getItem2());
+		scalarValues.addAll(selectorResult1.getParamValues());
 		
 		Translator translator2 = context.getTranslatorController().findTranslator(comparisonExpression.getRightOperandExpression(), paramValues);
-		Pair<String, List<?>> selectorResult2 = translator2.translate(context, comparisonExpression.getRightOperandExpression(), paramValues);
+		SqlBundle selectorResult2 = translator2.translate(context, comparisonExpression.getRightOperandExpression(), paramValues);
 
-		scalarValues.addAll(selectorResult2.getItem2());
+		scalarValues.addAll(selectorResult2.getParamValues());
 		
 		StringBuilder result = new StringBuilder();
-		result.append(selectorResult1.getItem1()).append(' ').append(comparisonExpression.getOperator())
-			.append(' ').append(selectorResult2.getItem1());
+		result.append(selectorResult1.getSql()).append(' ').append(comparisonExpression.getOperator())
+			.append(' ').append(selectorResult2.getSql());
 		
 		
-		return new Pair<String, List<?>>(result.toString(), scalarValues);
+		return new SingleStatementSqlBundle(result.toString(), scalarValues);
 	}
 
 }

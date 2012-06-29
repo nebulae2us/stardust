@@ -21,25 +21,23 @@ import java.util.List;
 import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
+import org.nebulae2us.stardust.expr.domain.DeleteEntityExpression;
 import org.nebulae2us.stardust.expr.domain.Expression;
-import org.nebulae2us.stardust.expr.domain.UpdateEntityExpression;
-import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
-import org.nebulae2us.stardust.my.domain.EntityAttribute;
-import org.nebulae2us.stardust.my.domain.EntityDiscriminator;
 import org.nebulae2us.stardust.my.domain.EntityIdentifier;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntity;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
  * @author Trung Phan
  *
  */
-public class UpdateEntityTranslator implements Translator {
+public class DeleteEntityTranslator implements Translator {
 
 	public boolean accept(Expression expression, ParamValues paramValues) {
-		return expression instanceof UpdateEntityExpression;
+		return expression instanceof DeleteEntityExpression;
 	}
 
 	public SqlBundle translate(TranslatorContext context, Expression expression, ParamValues paramValues) {
@@ -60,87 +58,35 @@ public class UpdateEntityTranslator implements Translator {
 	
 			List<Object> values = new ArrayList<Object>();
 			
-			StringBuilder updateSql = new StringBuilder();
+			StringBuilder deleteSql = new StringBuilder();
 			
-			updateSql.append("update " + linkedTableEntity.getTable()).append("\n  set ");
+			deleteSql.append("delete " + linkedTableEntity.getTable()).append("\n  where ");
 			
-			EntityDiscriminator entityDiscriminator = entity.getEntityDiscriminator();
-			if (tableIndex == 0 && entityDiscriminator != null) {
-				updateSql.append(entityDiscriminator.getColumn().getName()).append(" = ?,\n");
-				Object value = entityDiscriminator.getValue();
-				values.add(value);
-			}
-			
-			for (Attribute attribute : linkedTableEntity.getOwningSideAttributes()) {
-				if (attribute instanceof ScalarAttribute) {
-					if (!attribute.isUpdatable()) {
-						continue;
-					}
-					
-					ScalarAttribute scalarAttribute = (ScalarAttribute)attribute;
-					
-					if (entity.getEntityIdentifier().containsColumn(scalarAttribute.getColumn())) {
-						continue;
-					}
-					
-					updateSql.append(scalarAttribute.getColumn().getName())
-						.append(" = ?,\n");
-					
-					Object value = attribute.extractValueForPersistence(entityToInsert);
-					values.add(value);
-					
-				}
-				else if (attribute instanceof EntityAttribute) {
-					EntityAttribute entityAttribute = (EntityAttribute)attribute;
-					
-					Object friendObject = attribute.extractValueForPersistence(entityToInsert);
-					Entity friendEntity = entityAttribute.getEntity();
-					List<ScalarAttribute> friendIdentifierAttributes = friendEntity.getIdentifierScalarAttributes();
-					
-					for (int i = 0; i < entityAttribute.getLeftColumns().size(); i++) {
-						Column leftColumn = entityAttribute.getLeftColumns().get(i);
-						ScalarAttribute friendIdentifierAttribute = friendIdentifierAttributes.get(i);
-						
-						updateSql.append(leftColumn.getName()).append(" = ?,\n");
-						
-						if (friendObject == null) {
-							values.add(null);
-						}
-						else {
-							Object value = friendIdentifierAttribute.extractValueForPersistence(friendObject);
-							values.add(value);
-						}
-						
-					}
-				}
-			}
-	
-			updateSql.setCharAt(updateSql.length() - 2, ' ');
-			
-			updateSql.append("where ");
-	
 			EntityIdentifier identifier = entity.getEntityIdentifier();
+			
+			
 			List<ScalarAttribute> identifierScalarAttributes = identifier.getScalarAttributes();
+			AssertSyntax.isTrue(identifierScalarAttributes.size() > 0, "Cannot delete non-id entity");
+			
 			for (int i = 0; i < identifierScalarAttributes.size(); i++) {
 				ScalarAttribute identifierScalarAttribute = identifierScalarAttributes.get(i);
 				Column idColumn = identifierScalarAttribute.getColumn();
 				if (!linkedTableEntity.isRoot()) {
 					idColumn = linkedTableEntity.getColumns().get(i);
 				}
-				updateSql.append(idColumn.getName())
+				deleteSql.append(idColumn.getName())
 					.append(" = ? and ");
 		
 				Object value = identifierScalarAttribute.extractValueForPersistence(entityToInsert);
 				values.add(value);
 			}
 			
-			updateSql.replace(updateSql.length() - 5, updateSql.length(), "");
+			deleteSql.replace(deleteSql.length() - 5, deleteSql.length(), "");
 	
-			result = result.join(new SingleStatementSqlBundle(updateSql.toString(), values));
+			result = result.join(new SingleStatementSqlBundle(deleteSql.toString(), values));
 		}
-
-		return result;
 		
+		return result;
 	}
 
 }

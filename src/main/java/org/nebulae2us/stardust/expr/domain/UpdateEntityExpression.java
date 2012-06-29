@@ -15,27 +15,14 @@
  */
 package org.nebulae2us.stardust.expr.domain;
 
-import java.util.Collections;
-
 /**
  * @author Trung Phan
  *
  */
-public class UpdateEntityExpression extends UpdateExpression {
+public class UpdateEntityExpression extends Expression {
 
-	/**
-	 * In normal case, tableIndex = 0. However, some entity also defines secondary table, so the index here to tell which table is interested in.
-	 */
-	private final int tableIndex;
-	
-	public UpdateEntityExpression(String expression, int tableIndex) {
-		super(expression, Collections.EMPTY_LIST, Collections.EMPTY_LIST);
-
-		this.tableIndex = tableIndex;
-	}
-
-	public int getTableIndex() {
-		return tableIndex;
+	public UpdateEntityExpression(String expression) {
+		super(expression);
 	}
 
 }

@@ -20,8 +20,8 @@ import java.io.File;
 import org.nebulae2us.electron.BuilderGenerator;
 import org.nebulae2us.stardust.Query;
 import org.nebulae2us.stardust.adapter.TypeAdapter;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.db.domain.*;
-import org.nebulae2us.stardust.expr.domain.*;
 import org.nebulae2us.stardust.my.domain.*;
 import org.nebulae2us.stardust.sql.domain.*;
 
@@ -39,7 +39,7 @@ public class GenerateBuilders {
 			.baseFolder(genFolder)
 			.buildersClassName("org.nebulae2us.stardust.internal.util.Builders")
 			.builderSuffix("Builder")
-			.ignoreTypes(TypeAdapter.class, Query.class)
+			.ignoreTypes(TypeAdapter.class, SqlBundle.class, Query.class)
 			.generate(
 					Table.class,
 					Column.class,

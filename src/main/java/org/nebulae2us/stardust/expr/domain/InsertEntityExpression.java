@@ -21,23 +21,10 @@ import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
  * @author Trung Phan
  *
  */
-public class InsertEntityExpression extends InsertExpression {
+public class InsertEntityExpression extends Expression {
 
-	/**
-	 * In normal case, tableIndex = 0. However, some entity also defines secondary table, so the index here to tell which table is interested in.
-	 */
-	private final int tableIndex;
-	
-	public InsertEntityExpression(String expression, int tableIndex) {
+	public InsertEntityExpression(String expression) {
 		super(expression);
-
-		this.tableIndex = tableIndex;
-		
 	}
-
-	public int getTableIndex() {
-		return tableIndex;
-	}
-
 
 }

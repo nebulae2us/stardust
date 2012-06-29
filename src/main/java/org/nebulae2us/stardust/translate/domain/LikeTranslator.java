@@ -18,7 +18,7 @@ package org.nebulae2us.stardust.translate.domain;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.LikeExpression;
 
@@ -32,7 +32,7 @@ public class LikeTranslator implements Translator {
 		return expression instanceof LikeExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		TranslatorController controller = context.getTranslatorController();
@@ -40,20 +40,20 @@ public class LikeTranslator implements Translator {
 		LikeExpression likeExpression = (LikeExpression)expression;
 		
 		Translator leftOperandTranslator = controller.findTranslator(likeExpression.getLeftOperand(), paramValues);
-		Pair<String, List<?>> leftOperandTranslationResult = leftOperandTranslator.translate(context, likeExpression.getLeftOperand(), paramValues);
+		SqlBundle leftOperandTranslationResult = leftOperandTranslator.translate(context, likeExpression.getLeftOperand(), paramValues);
 		
 		Translator rightOperandTranslator = controller.findTranslator(likeExpression.getRightOperand(), paramValues);
-		Pair<String, List<?>> rightOperandTranslationResult = rightOperandTranslator.translate(context, likeExpression.getRightOperand(), paramValues);
+		SqlBundle rightOperandTranslationResult = rightOperandTranslator.translate(context, likeExpression.getRightOperand(), paramValues);
 
 		StringBuilder sql = new StringBuilder()
-		    .append(leftOperandTranslationResult.getItem1()).append(likeExpression.isNegated() ? " not like " : " like ")
-			.append(rightOperandTranslationResult.getItem1());
+		    .append(leftOperandTranslationResult.getSql()).append(likeExpression.isNegated() ? " not like " : " like ")
+			.append(rightOperandTranslationResult.getSql());
 		
 		List<Object> scalarValues = new ArrayList<Object>();
-		scalarValues.addAll(leftOperandTranslationResult.getItem2());
-		scalarValues.addAll(rightOperandTranslationResult.getItem2());
+		scalarValues.addAll(leftOperandTranslationResult.getParamValues());
+		scalarValues.addAll(rightOperandTranslationResult.getParamValues());
 		
-		return new Pair<String, List<?>>(sql.toString(), scalarValues);
+		return new SingleStatementSqlBundle(sql.toString(), scalarValues);
 	}
 
 }

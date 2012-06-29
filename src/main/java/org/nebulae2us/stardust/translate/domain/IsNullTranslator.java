@@ -15,9 +15,7 @@
  */
 package org.nebulae2us.stardust.translate.domain;
 
-import java.util.List;
-
-import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.IsNullExpression;
 
@@ -31,7 +29,7 @@ public class IsNullTranslator implements Translator {
 		return expression instanceof IsNullExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		TranslatorController controller = context.getTranslatorController();
@@ -39,10 +37,10 @@ public class IsNullTranslator implements Translator {
 		IsNullExpression isNullExpression = (IsNullExpression)expression;
 		
 		Translator translator = controller.findTranslator(isNullExpression.getSelector(), paramValues);
-		Pair<String, List<?>> translationResult = translator.translate(context, isNullExpression.getSelector(), paramValues);
+		SqlBundle translationResult = translator.translate(context, isNullExpression.getSelector(), paramValues);
 		
-		return new Pair<String, List<?>>(translationResult.getItem1() + (isNullExpression.isNegated() ? " is not null" : " is null"),
-				translationResult.getItem2());
+		return new SingleStatementSqlBundle(translationResult.getSql() + (isNullExpression.isNegated() ? " is not null" : " is null"),
+				translationResult.getParamValues());
 		
 	}
 

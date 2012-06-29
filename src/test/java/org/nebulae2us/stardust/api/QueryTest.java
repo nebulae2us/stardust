@@ -16,17 +16,15 @@
 package org.nebulae2us.stardust.api;
 
 import java.util.Arrays;
-import java.util.List;
-
 import javax.persistence.Table;
 
 import mockit.Mocked;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.DaoManager;
 import org.nebulae2us.stardust.dao.JdbcExecutor;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.dialect.H2Dialect;
 import org.nebulae2us.stardust.jpa.group1.House;
 import org.nebulae2us.stardust.my.domain.EntityRepository;
@@ -96,11 +94,11 @@ public class QueryTest {
 			String name;
 		}
 		
-		Pair<String, List<?>> translateResult = daoManager.newQuery(Person.class)
+		SqlBundle translateResult = daoManager.newQuery(Person.class)
 			.toQuery()
 			.translate();
 		
-		assertThat(translateResult.getItem1(), equalToIgnoringWhiteSpace("select b.name as name from my_schema.person b"));
+		assertThat(translateResult.getSql(), equalToIgnoringWhiteSpace("select b.name as name from my_schema.person b"));
 	}
 	
 	@Test
@@ -110,11 +108,11 @@ public class QueryTest {
 			String name;
 		}
 		
-		Pair<String, List<?>> translateResult = daoManager.newQuery(Person.class)
+		SqlBundle translateResult = daoManager.newQuery(Person.class)
 			.toQuery()
 			.translate();
 		
-		assertThat(translateResult.getItem1(), equalToIgnoringWhiteSpace("select b.name as name from my_person b"));
+		assertThat(translateResult.getSql(), equalToIgnoringWhiteSpace("select b.name as name from my_person b"));
 	}
 
 	
@@ -125,12 +123,12 @@ public class QueryTest {
 			String name;
 		}
 		
-		Pair<String, List<?>> translateResult = daoManager.newQuery(Person.class)
+		SqlBundle translateResult = daoManager.newQuery(Person.class)
 				.schema("MY_OTHER_SCHEMA")
 				.toQuery()
 				.translate();
 		
-		assertThat(translateResult.getItem1(), equalToIgnoringWhiteSpace("select b.name as name from my_other_schema.my_person b"));
+		assertThat(translateResult.getSql(), equalToIgnoringWhiteSpace("select b.name as name from my_other_schema.my_person b"));
 	}
 	
 	@Test
@@ -142,11 +140,11 @@ public class QueryTest {
 			String name;
 		}
 		
-		Pair<String, List<?>> translateResult = daoManager.newQuery(Person.class)
+		SqlBundle translateResult = daoManager.newQuery(Person.class)
 				.toQuery()
 				.translate();
 		
-		assertThat(translateResult.getItem1(), equalToIgnoringWhiteSpace("select b.name as name from default_schema.my_person b"));
+		assertThat(translateResult.getSql(), equalToIgnoringWhiteSpace("select b.name as name from default_schema.my_person b"));
 		
 	}
 	

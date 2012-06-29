@@ -25,6 +25,7 @@ import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.Procedure;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.expr.domain.OrderExpression;
 import org.nebulae2us.stardust.expr.domain.PredicateExpression;
@@ -292,10 +293,10 @@ public class QueryBuilder<T> {
 	
 	public long count() {
 		Query<T> query = toCountQuery();
-		Pair<String, List<?>> translateResult = query.translate();
+		SqlBundle translateResult = query.translate();
 		
-		String sql = translateResult.getItem1();
-		List<?> values = translateResult.getItem2();
+		String sql = translateResult.getSql();
+		List<?> values = translateResult.getParamValues();
 		
 		long result = daoManager.getJdbcExecutor().queryForLong(sql, values);
 		return result;

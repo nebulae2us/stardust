@@ -15,10 +15,8 @@
  */
 package org.nebulae2us.stardust.translate.domain;
 
-import java.util.List;
-
-import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.util.Immutables;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.LastIdentityQueryExpression;
 
@@ -32,10 +30,10 @@ public class LastIdentityQueryTranslator implements Translator {
 		return expression instanceof LastIdentityQueryExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
-		return new Pair<String, List<?>>(context.getDialect().getSqlToRetrieveIdentityValue(), Immutables.emptyList());
+		return new SingleStatementSqlBundle(context.getDialect().getSqlToRetrieveIdentityValue(), Immutables.emptyList());
 	}
 
 }

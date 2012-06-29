@@ -15,19 +15,18 @@
  */
 package org.nebulae2us.stardust.translate.domain;
 
-import static org.nebulae2us.stardust.internal.util.BaseAssert.AssertSyntax;
+import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.LogicalExpression;
 import org.nebulae2us.stardust.expr.domain.PredicateExpression;
-import org.nebulae2us.stardust.expr.domain.QueryExpression;
 import org.nebulae2us.stardust.expr.domain.SetExpression;
 import org.nebulae2us.stardust.expr.domain.UpdateExpression;
 import org.nebulae2us.stardust.sql.domain.LinkedTableEntity;
@@ -39,13 +38,13 @@ import org.nebulae2us.stardust.sql.domain.LinkedTableEntityBundle;
  */
 public class UpdateTranslator implements Translator {
 
-	private static final Pair<String, List<?>> EMPTY_RESULT = new Pair<String, List<?>>("", Collections.emptyList());
+	private static final SqlBundle EMPTY_RESULT = EmptySqlBundle.getInstance();
 	
 	public boolean accept(Expression expression, ParamValues paramValues) {
 		return expression instanceof UpdateExpression;
 	}
 
-	public Pair<String, List<?>> translate(TranslatorContext context,
+	public SqlBundle translate(TranslatorContext context,
 			Expression expression, ParamValues paramValues) {
 
 		TranslatorController controller = context.getTranslatorController();
@@ -57,32 +56,32 @@ public class UpdateTranslator implements Translator {
 		
 		sql.append("update ");
 		
-		Pair<String, List<?>> joinTranslationResult = toJoinClause(context, updateExpression, paramValues);
-		sql.append(joinTranslationResult.getItem1()).append(' ');
-		values.addAll(joinTranslationResult.getItem2());
+		SqlBundle joinTranslationResult = toJoinClause(context, updateExpression, paramValues);
+		sql.append(joinTranslationResult.getSql()).append(' ');
+		values.addAll(joinTranslationResult.getParamValues());
 		
 		for (SetExpression setExpression : updateExpression.getSetExpressions()) {
 			Translator setTranslator = controller.findTranslator(setExpression, paramValues);
-			Pair<String, List<?>> setTranslationResult = setTranslator.translate(context, setExpression, paramValues);
+			SqlBundle setTranslationResult = setTranslator.translate(context, setExpression, paramValues);
 			
-			sql.append(setTranslationResult.getItem1()).append(", ");
-			values.addAll(setTranslationResult.getItem2());
+			sql.append(setTranslationResult.getSql()).append(", ");
+			values.addAll(setTranslationResult.getParamValues());
 		}
 		
 		sql.setCharAt(sql.length() - 2, ' ');
 		
-		Pair<String, List<?>> whereTranslationResult = toWhereClause(context, updateExpression, paramValues);
+		SqlBundle whereTranslationResult = toWhereClause(context, updateExpression, paramValues);
 		
 		if (whereTranslationResult != EMPTY_RESULT) {
-			sql.append(" where ").append(whereTranslationResult.getItem1());
-			values.addAll(whereTranslationResult.getItem2());
+			sql.append(" where ").append(whereTranslationResult.getSql());
+			values.addAll(whereTranslationResult.getParamValues());
 		}
 		
-		return new Pair<String, List<?>>(sql.toString(), values);
+		return new SingleStatementSqlBundle(sql.toString(), values);
 	}
 
 	
-	protected Pair<String, List<?>> toJoinClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
+	protected SqlBundle toJoinClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = context.getLinkedTableEntityBundle();
 		
@@ -118,10 +117,10 @@ public class UpdateTranslator implements Translator {
 			result.append(")");
 		}
 		
-		return new Pair<String, List<?>>(result.toString(), Collections.emptyList());
+		return new SingleStatementSqlBundle(result.toString(), Collections.emptyList());
 	}
 	
-	protected Pair<String, List<?>> toWhereClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
+	protected SqlBundle toWhereClause(TranslatorContext context, Expression expression, ParamValues paramValues) {
 		TranslatorController controller = context.getTranslatorController();
 		
 		UpdateExpression queryExpression = (UpdateExpression)expression;
