@@ -23,6 +23,7 @@ import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.expr.domain.DeleteEntityExpression;
 import org.nebulae2us.stardust.expr.domain.Expression;
+import org.nebulae2us.stardust.internal.util.SQLUtils;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityIdentifier;
 import org.nebulae2us.stardust.my.domain.ScalarAttribute;
@@ -48,6 +49,8 @@ public class DeleteEntityTranslator implements Translator {
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = context.getLinkedTableEntityBundle();
 		
+		DeleteEntityExpression deleteExpression = (DeleteEntityExpression)expression;
+		
 		Entity entity = context.getLinkedEntityBundle().getRoot().getEntity();
 
 		for (int tableIndex = 0; tableIndex < linkedTableEntityBundle.getLinkedTableEntities().size(); tableIndex++) {
@@ -60,7 +63,9 @@ public class DeleteEntityTranslator implements Translator {
 			
 			StringBuilder deleteSql = new StringBuilder();
 			
-			deleteSql.append("delete " + linkedTableEntity.getTable()).append("\n  where ");
+			deleteSql.append("delete ")
+				.append(SQLUtils.getFullTableName(deleteExpression.getOverridingSchema(), context.getDefaultSchema(), linkedTableEntity.getTable()))
+				.append("\n  where ");
 			
 			EntityIdentifier identifier = entity.getEntityIdentifier();
 			

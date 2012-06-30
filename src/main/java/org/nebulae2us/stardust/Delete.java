@@ -13,24 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.expr.domain;
+package org.nebulae2us.stardust;
+
+import org.nebulae2us.stardust.expr.domain.DeleteExpression;
+import org.nebulae2us.stardust.translate.domain.ParamValues;
+import org.nebulae2us.stardust.translate.domain.TranslatorContext;
 
 /**
  * @author Trung Phan
  *
  */
-public class UpdateEntityExpression extends Expression {
+public class Delete<T> extends TranslationReady {
 
-	private final String overridingSchema;
-	
-	public UpdateEntityExpression(String expression, String overridingSchema) {
-		super(expression);
-		
-		this.overridingSchema = overridingSchema;
+	public Delete(TranslatorContext translatorContext, DeleteExpression deleteExpression,
+			ParamValues paramValues) {
+		super(translatorContext, deleteExpression, paramValues);
 	}
 
-	public final String getOverridingSchema() {
-		return overridingSchema;
-	}
-	
 }

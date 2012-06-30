@@ -209,7 +209,7 @@ public class DaoManager {
 				}
 			}
 			
-			InsertEntityExpression insertEntityExpression = new InsertEntityExpression("insert");
+			InsertEntityExpression insertEntityExpression = new InsertEntityExpression("insert", "");
 			
 			ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
 			Translator translator = controller.findTranslator(insertEntityExpression, paramValues);
@@ -244,17 +244,17 @@ public class DaoManager {
 		LinkedTableEntityBundle linkedTableEntityBundle = LinkedTableEntityBundle.newInstance(entityRepository, linkedEntityBundle, false);
 		
 		TranslatorContext context = new TranslatorContext(this.dialect, this.controller, linkedTableEntityBundle, linkedEntityBundle, false, defaultSchema);
+		UpdateEntityExpression updateEntityExpression = new UpdateEntityExpression("update", "");
+		
+		ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
+		Translator translator = controller.findTranslator(updateEntityExpression, paramValues);
+		SqlBundle translateResult = translator.translate(context, updateEntityExpression, paramValues);
+		
+		AssertState.isTrue(translateResult.size() > 0, "translated result is empty");
+		
 
 		jdbcExecutor.beginUnitOfWork();
 		try {
-			UpdateEntityExpression updateEntityExpression = new UpdateEntityExpression("update");
-			
-			ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
-			Translator translator = controller.findTranslator(updateEntityExpression, paramValues);
-			SqlBundle translateResult = translator.translate(context, updateEntityExpression, paramValues);
-			
-			AssertState.isTrue(translateResult.size() > 0, "translated result is empty");
-			
 			for (int i = 0; i < translateResult.size(); i++) {
 				String sql = translateResult.getSql(i);
 				List<?> values = translateResult.getParamValues(i);
@@ -276,7 +276,7 @@ public class DaoManager {
 
 		jdbcExecutor.beginUnitOfWork();
 		try {
-			DeleteEntityExpression deleteEntityExpression = new DeleteEntityExpression("delete");
+			DeleteEntityExpression deleteEntityExpression = new DeleteEntityExpression("delete", "");
 			
 			ParamValues paramValues = new ParamValues(Immutables.emptyStringMap(), Collections.singletonList(object));
 			Translator translator = controller.findTranslator(deleteEntityExpression, paramValues);

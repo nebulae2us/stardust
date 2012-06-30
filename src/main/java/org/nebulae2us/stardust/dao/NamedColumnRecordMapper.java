@@ -21,7 +21,7 @@ import org.nebulae2us.stardust.sql.domain.DataReader;
  * @author Trung Phan
  *
  */
-public class NamedColumnRecordMapper<T> extends RecordSetHandler<T> {
+public class NamedColumnRecordMapper<T> extends RecordMapper<T> {
 
 	private final Class<T> valueType;
 	
@@ -30,7 +30,6 @@ public class NamedColumnRecordMapper<T> extends RecordSetHandler<T> {
 	private transient int columnIndex;
 	
 	public NamedColumnRecordMapper(Class<T> valueType, String columnName) {
-		super(RecordSetHandler.MODE_DATA_READER);
 		this.valueType = valueType;
 		this.columnName = columnName;
 	}

@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.nebulae2us.electron.Pair;
+import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.exception.IllegalSyntaxException;
 
 /**
@@ -131,5 +132,11 @@ public class SQLUtils {
 		
 		return new Pair<String, List<String>>(newSql.toString(), params);
 	}		
+	
+	public static String getFullTableName(String overridingSchema, String defaultSchema, Table table) {
+		String schemaName = ObjectUtils.coalesce(overridingSchema, table.getSchemaName(), table.getCatalogName(), defaultSchema);
+		return ObjectUtils.isEmpty(schemaName) ? table.getName() : schemaName + '.' + table.getName();
+	}
+	
 
 }

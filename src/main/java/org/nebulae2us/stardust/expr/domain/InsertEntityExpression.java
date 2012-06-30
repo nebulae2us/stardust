@@ -15,16 +15,22 @@
  */
 package org.nebulae2us.stardust.expr.domain;
 
-import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
-
 /**
  * @author Trung Phan
  *
  */
 public class InsertEntityExpression extends Expression {
+	
+	private final String overridingSchema;
 
-	public InsertEntityExpression(String expression) {
+	public InsertEntityExpression(String expression, String overridingSchema) {
 		super(expression);
+		
+		this.overridingSchema = overridingSchema;
+	}
+
+	public final String getOverridingSchema() {
+		return overridingSchema;
 	}
 
 }

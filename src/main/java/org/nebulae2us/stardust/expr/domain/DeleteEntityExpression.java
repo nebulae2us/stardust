@@ -21,8 +21,17 @@ package org.nebulae2us.stardust.expr.domain;
  */
 public class DeleteEntityExpression extends Expression {
 
-	public DeleteEntityExpression(String expression) {
+	private final String overridingSchema;
+
+	public DeleteEntityExpression(String expression, String overridingSchema) {
 		super(expression);
+		
+		this.overridingSchema = overridingSchema;
 	}
 
+	public final String getOverridingSchema() {
+		return overridingSchema;
+	}
+
+	
 }

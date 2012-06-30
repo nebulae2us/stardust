@@ -23,16 +23,33 @@ import java.util.List;
  */
 public class DeleteExpression extends Expression {
 
-	private final List<PredicateExpression> predicates;
+	private final List<PredicateExpression> filters;
 	
-	public DeleteExpression(String expression, List<PredicateExpression> predicates) {
+	/**
+	 * In normal scenario, sql = "". Only useful for sql-backed query.
+	 */
+	private final String sql;
+
+	private final String overridingSchema;
+
+	public DeleteExpression(String expression, String sql, List<PredicateExpression> predicates, String overrideSchema) {
 		super(expression);
-		
-		this.predicates = predicates;
+
+		this.sql = sql;
+		this.filters = predicates;
+		this.overridingSchema = overrideSchema;
 	}
 
-	public final List<PredicateExpression> getPredicates() {
-		return predicates;
+	public final List<PredicateExpression> getFilters() {
+		return filters;
+	}
+
+	public final String getSql() {
+		return sql;
+	}
+
+	public final String getOverridingSchema() {
+		return overridingSchema;
 	}
 	
 	

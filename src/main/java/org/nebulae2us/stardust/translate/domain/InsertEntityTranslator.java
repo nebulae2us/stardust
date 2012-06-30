@@ -25,6 +25,7 @@ import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.InsertEntityExpression;
 import org.nebulae2us.stardust.generator.IdentityValueRetriever;
+import org.nebulae2us.stardust.internal.util.SQLUtils;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
@@ -66,7 +67,10 @@ public class InsertEntityTranslator implements Translator {
 			StringBuilder insertSql = new StringBuilder();
 			StringBuilder wildcardBuilder = new StringBuilder();
 			
-			insertSql.append("insert into " + linkedTableEntity.getTable()).append(" (");
+			insertSql.append("insert into ")
+				.append(SQLUtils.getFullTableName(insertEntityExpression.getOverridingSchema(), context.getDefaultSchema(), linkedTableEntity.getTable()))
+				.append(" (");
+			
 			wildcardBuilder.append("\n    values (");
 			
 			EntityDiscriminator entityDiscriminator = entity.getEntityDiscriminator();

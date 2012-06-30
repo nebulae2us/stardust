@@ -23,6 +23,7 @@ import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.expr.domain.Expression;
 import org.nebulae2us.stardust.expr.domain.UpdateEntityExpression;
+import org.nebulae2us.stardust.internal.util.SQLUtils;
 import org.nebulae2us.stardust.my.domain.Attribute;
 import org.nebulae2us.stardust.my.domain.Entity;
 import org.nebulae2us.stardust.my.domain.EntityAttribute;
@@ -50,6 +51,8 @@ public class UpdateEntityTranslator implements Translator {
 		
 		LinkedTableEntityBundle linkedTableEntityBundle = context.getLinkedTableEntityBundle();
 		
+		UpdateEntityExpression updateExpression = (UpdateEntityExpression)expression;
+		
 		Entity entity = context.getLinkedEntityBundle().getRoot().getEntity();
 
 		for (int tableIndex = 0; tableIndex < linkedTableEntityBundle.getLinkedTableEntities().size(); tableIndex++) {
@@ -62,7 +65,9 @@ public class UpdateEntityTranslator implements Translator {
 			
 			StringBuilder updateSql = new StringBuilder();
 			
-			updateSql.append("update " + linkedTableEntity.getTable()).append("\n  set ");
+			updateSql.append("update ")
+				.append(SQLUtils.getFullTableName(updateExpression.getOverridingSchema(), context.getDefaultSchema(), linkedTableEntity.getTable()))
+				.append("\n  set ");
 			
 			EntityDiscriminator entityDiscriminator = entity.getEntityDiscriminator();
 			if (tableIndex == 0 && entityDiscriminator != null) {

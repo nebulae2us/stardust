@@ -15,39 +15,18 @@
  */
 package org.nebulae2us.stardust;
 
-import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.expr.domain.QueryExpression;
 import org.nebulae2us.stardust.translate.domain.ParamValues;
-import org.nebulae2us.stardust.translate.domain.Translator;
 import org.nebulae2us.stardust.translate.domain.TranslatorContext;
-import org.nebulae2us.stardust.translate.domain.TranslatorController;
 
 /**
  * @author Trung Phan
  *
  */
-public class Query<T> {
+public class Query<T> extends TranslationReady {
 
-	private final QueryExpression queryExpression;
-	
-	private final TranslatorContext translatorContext;
-	
-	private final ParamValues paramValues;
-	
 	public Query(TranslatorContext translatorContext, QueryExpression queryExpression, ParamValues paramValues) {
-		this.translatorContext = translatorContext;
-		this.queryExpression = queryExpression;
-		this.paramValues = paramValues;
+		super(translatorContext, queryExpression, paramValues);
 	}
 
-	public SqlBundle translate() {
-		TranslatorController controller = translatorContext.getTranslatorController();
-		Translator translator = controller.findTranslator(this.queryExpression, this.paramValues);
-		return translator.translate(this.translatorContext, this.queryExpression, this.paramValues);
-	}
-
-	public TranslatorContext getTranslatorContext() {
-		return translatorContext;
-	}
-	
 }

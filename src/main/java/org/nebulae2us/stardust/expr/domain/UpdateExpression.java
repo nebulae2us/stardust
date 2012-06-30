@@ -26,20 +26,37 @@ public class UpdateExpression extends Expression {
 	private final List<SetExpression> setExpressions;
 	
 	private final List<PredicateExpression> filters;
+	
+	/**
+	 * In normal scenario, sql = "". Only useful for sql-backed query.
+	 */
+	private final String sql;
 
-	public UpdateExpression(String expression, List<SetExpression> setExpressions, List<PredicateExpression> filters) {
+	private final String overridingSchema;
+
+	public UpdateExpression(String expression, String sql, List<SetExpression> setExpressions, List<PredicateExpression> filters, String overridingSchema) {
 		super(expression);
 		
+		this.sql = sql;
 		this.setExpressions = setExpressions;
 		this.filters = filters;
+		this.overridingSchema = overridingSchema;
 	}
 
-	public List<SetExpression> getSetExpressions() {
+	public final List<SetExpression> getSetExpressions() {
 		return setExpressions;
 	}
 
-	public List<PredicateExpression> getFilters() {
+	public final List<PredicateExpression> getFilters() {
 		return filters;
+	}
+
+	public final String getOverridingSchema() {
+		return overridingSchema;
+	}
+
+	public final String getSql() {
+		return sql;
 	}
 
 	

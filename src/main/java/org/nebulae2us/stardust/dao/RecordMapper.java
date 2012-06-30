@@ -13,24 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.expr.domain;
+package org.nebulae2us.stardust.dao;
+
+import org.nebulae2us.stardust.sql.domain.DataReader;
 
 /**
  * @author Trung Phan
  *
  */
-public class UpdateEntityExpression extends Expression {
+public abstract class RecordMapper<T> extends RecordSetHandler<T> {
 
-	private final String overridingSchema;
-	
-	public UpdateEntityExpression(String expression, String overridingSchema) {
-		super(expression);
-		
-		this.overridingSchema = overridingSchema;
+	public RecordMapper() {
+		super(RecordSetHandler.MODE_DATA_READER);
 	}
 
-	public final String getOverridingSchema() {
-		return overridingSchema;
-	}
+	@Override
+	public abstract T mapRecord(DataReader dataReader);
 	
+
 }
