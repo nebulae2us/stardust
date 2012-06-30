@@ -63,7 +63,7 @@ public class DeleteEntityTranslator implements Translator {
 			
 			StringBuilder deleteSql = new StringBuilder();
 			
-			deleteSql.append("delete ")
+			deleteSql.append("delete from ")
 				.append(SQLUtils.getFullTableName(deleteExpression.getOverridingSchema(), context.getDefaultSchema(), linkedTableEntity.getTable()))
 				.append("\n  where ");
 			

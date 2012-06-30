@@ -225,6 +225,17 @@ public class OneEntity_IT extends BaseIntegrationTest {
 		assertEquals(Arrays.asList("First 4", "First 5", "First 6", "First 7", "First 8"), ObjectUtils.extractValues(Person.class, people, "firstName"));
 	}
 	
+	@Test
+	public void should_be_able_to_delete_record() {
+		insertPerson("First 1", "Last 1", null);
+		
+		Person person = daoManager.newQuery(Person.class).list().get(0);
+		
+		daoManager.delete(person);
+		
+		assertEquals(0, daoManager.newQuery(Person.class).list().size());
+	}
+	
 	
 	
 }
