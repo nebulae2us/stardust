@@ -496,6 +496,73 @@ public class JdbcExecutor {
 	public List<Boolean> queryForListOfBoolean(String sql, Map<String,?> paramValues, List<?> wildcardValues) {
 		return queryForListOf(Boolean.class, sql, paramValues, wildcardValues);
 	}
+	
+	
+	
+	public List<Long> queryForListOfLong(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Long.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<Integer> queryForListOfInteger(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Integer.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<Short> queryForListOfShort(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Short.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<Byte> queryForListOfByte(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Byte.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<Double> queryForListOfDouble(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Double.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<Float> queryForListOfFloat(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Float.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<BigDecimal> queryForListOfBigDecimal(String sql, Map<String,?> paramValues) {
+		return queryForListOf(BigDecimal.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<BigInteger> queryForListOfBigInteger(String sql, Map<String,?> paramValues) {
+		return queryForListOf(BigInteger.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<String> queryForListOfString(String sql, Map<String,?> paramValues) {
+		return queryForListOf(String.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<byte[]> queryForListOfBytes(String sql, Map<String,?> paramValues) {
+		return queryForListOf(byte[].class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<Clob> queryForListOfClob(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Clob.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<Blob> queryForListOfBlob(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Blob.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<Date> queryForListOfDate(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Date.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<Time> queryForListOfTime(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Time.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<Timestamp> queryForListOfTimestamp(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Timestamp.class, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public List<Boolean> queryForListOfBoolean(String sql, Map<String,?> paramValues) {
+		return queryForListOf(Boolean.class, sql, paramValues, Immutables.emptyList());
+	}
+	
 
 	public <T> List<T> query(String sql, RecordSetHandler<T> recordMapper) {
 		return query(sql, Immutables.emptyStringMap(), Immutables.emptyList(), recordMapper);

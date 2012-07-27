@@ -15,7 +15,7 @@
  */
 package org.nebulae2us.stardust.ddl.domain;
 
-import java.security.Timestamp;
+import java.sql.Timestamp;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;

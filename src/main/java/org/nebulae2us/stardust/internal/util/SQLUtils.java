@@ -16,6 +16,7 @@
 package org.nebulae2us.stardust.internal.util;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -67,8 +68,25 @@ public class SQLUtils {
 					if (!paramValues.containsKey(paramName)) {
 						throw new IllegalSyntaxException("Cannot find value for parameter \"" + paramName + "\"");
 					}
-					values.add(paramValues.get(paramName));
-					newSql.append('?').append(c);
+					Object paramValue = paramValues.get(paramName);
+					if (paramValue instanceof Collection) {
+						Collection<?> collection = (Collection<?>) paramValue;
+						if (collection.size() > 0) {
+							for (Object val : collection) {
+								values.add(val);
+								newSql.append("?,");
+							}
+							newSql.setCharAt(newSql.length() - 1, c);
+						}
+						else {
+							values.add(null);
+							newSql.append('?').append(c);
+						}
+					}
+					else {
+						values.add(paramValue);
+						newSql.append('?').append(c);
+					}
 				}
 			}
 			else {

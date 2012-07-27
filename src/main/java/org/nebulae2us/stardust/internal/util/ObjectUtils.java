@@ -108,11 +108,14 @@ public class ObjectUtils {
         else if (object instanceof StringBuilder) {
             return ((StringBuilder)object).length() == 0;
         }
+        else if (object instanceof StringBuffer) {
+            return ((StringBuffer)object).length() == 0;
+        }
         else if (object instanceof Collection) {
-            return ((Collection)object).size() == 0;
+            return ((Collection<?>)object).size() == 0;
         }
         else if (object instanceof Map) {
-            return ((Map)object).size() == 0;
+            return ((Map<?,?>)object).size() == 0;
         }
         else if (object.getClass().isArray()) {
             return Array.getLength(object) == 0;

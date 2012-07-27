@@ -136,14 +136,14 @@ public class GenericDataReader extends DataReader {
 				return result;
 			}
 			else if (Date.class.isAssignableFrom(valueType)) {
-				if (valueType == java.sql.Date.class) {
+				if (java.sql.Date.class.isAssignableFrom(valueType)) {
 					return (T)resultSet.getDate(columnIndex);
 				}
-				else if (valueType == Time.class) {
+				else if (Time.class.isAssignableFrom(valueType)) {
 					return (T)resultSet.getTime(columnIndex);
 				} else {
 					Timestamp ts = resultSet.getTimestamp(columnIndex);
-					return ts == null ? null : (T)new Date(ts.getTime());
+					return Timestamp.class.isAssignableFrom(valueType) ? (T)ts : ts == null ? null : (T)new Date(ts.getTime());
 				}
 			}
 			else if (valueType == Boolean.class) {

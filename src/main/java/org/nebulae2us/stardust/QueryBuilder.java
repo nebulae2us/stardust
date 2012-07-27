@@ -17,6 +17,7 @@ package org.nebulae2us.stardust;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -134,30 +135,40 @@ public class QueryBuilder<T> {
 		}
 		
 		Filter filter = filterBuilder.toFilter();
-		Pair<PredicateExpression, List<?>> result = filter.toExpression();
-		predicateExpressions.add(result.getItem1());
-		filterWildcardValues.addAll(result.getItem2());
+		addFilter(filter);
 		
+		return this;
+	}
+	
+	public QueryBuilder<T> filterBy(Filter filter) {
+		addFilter(filter);
+		return this;
+	}
+	
+	public QueryBuilder<T> filterBy(Collection<Filter> filters) {
+		for (Filter filter : filters) {
+			addFilter(filter);
+		}
 		return this;
 	}
 	
 	public QueryBuilder<T> filterBy(String expression, Object ...values) {
 		Filter filter = new FilterBuilder(expression, values).toFilter();
+		addFilter(filter);
+		return this;
+	}
+	
+	private void addFilter(Filter filter) {
 		Pair<PredicateExpression, List<?>> result = filter.toExpression();
 		predicateExpressions.add(result.getItem1());
 		filterWildcardValues.addAll(result.getItem2());
-		return this;
 	}
 	
 	public ChainedFilterBuilder<QueryBuilder<T>> filterBy() {
 		return new ChainedFilterBuilder<QueryBuilder<T>>(this, new Procedure() {
 			public void execute(Object... arguments) {
 				Filter filter = (Filter)arguments[0];
-				
-				Pair<PredicateExpression, List<?>> result = filter.toExpression();
-				predicateExpressions.add(result.getItem1());
-				
-				filterWildcardValues.addAll(result.getItem2());
+				addFilter(filter);
 			}
 		});
 	}
@@ -286,9 +297,9 @@ public class QueryBuilder<T> {
 		Query<T> query = toQuery();
 		List<T> result = daoManager.query(query);
 		
-		AssertState.isTrue(result.size() == 1, "Expected one record result.");
+		AssertState.isTrue(result.size() <= 1, "Expected one record result.");
 		
-		return result.get(0);
+		return result.size() == 1 ? result.get(0) : null;
 	}
 	
 	public long count() {
