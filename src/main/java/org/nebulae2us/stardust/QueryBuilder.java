@@ -26,6 +26,7 @@ import org.nebulae2us.electron.Pair;
 import org.nebulae2us.electron.Procedure;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
+import org.nebulae2us.stardust.dao.JdbcExecutor;
 import org.nebulae2us.stardust.dao.SqlBundle;
 import org.nebulae2us.stardust.db.domain.JoinType;
 import org.nebulae2us.stardust.expr.domain.OrderExpression;
@@ -291,6 +292,37 @@ public class QueryBuilder<T> {
 	public List<T> list() {
 		Query<T> query = toQuery();
 		return daoManager.query(query);
+	}
+	
+	/**
+	 * This method is used if select statement is used.
+	 * @param elementClass
+	 * @return
+	 */
+	public <E> List<E> listOf(Class<E> elementClass) {
+		Query<T> query = toQuery();
+		SqlBundle translateResult = query.translate();
+		
+		String sql = translateResult.getSql();
+		List<?> paramValues = translateResult.getParamValues();
+		
+		JdbcExecutor jdbcExecutor = daoManager.getJdbcExecutor();
+		
+		List<E> result = jdbcExecutor.queryForListOf(elementClass, sql, paramValues);
+
+		return result;
+	}
+	
+	public List<Long> listOfLong() {
+		return listOf(Long.class);
+	}
+	
+	public List<Integer> listOfInteger() {
+		return listOf(Integer.class);
+	}
+	
+	public List<String> listOfString() {
+		return listOf(String.class);
 	}
 
 	public T uniqueValue() {

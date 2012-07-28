@@ -195,4 +195,42 @@ public class EntityMappingTest {
 		assertNotNull(personAttributeMapping);
 	}
 	
+	
+	
+
+	/**
+	 * @see LinkedEntityBundleDataReaderTest#missing_all_id_values_should_return_null_entity()
+	 */
+	@Test
+	public void missing_all_id_columns_should_not_produce_id_attribute_mappings() {
+		new Expectations() {{
+			dataReader.findColumn(prefix + "GENDER"); result = 1;
+			dataReader.findColumn(anyString); result = -1;
+		}};
+		
+		Entity person = entityRepository.getEntity(Person.class);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(person, alias, Immutables.emptyList(AliasJoin.class));
+		EntityMapping personMapping = mappingRepository.getEntityMapping(bundle, alias, person, dataReader);
+		
+		assertTrue(personMapping.getIdentifierAttributeMappings().isEmpty());
+	}
+	
+
+	/**
+	 * @see LinkedEntityBundleDataReaderTest#missing_some_id_values_should_return_null_entity()
+	 */
+	@Test
+	public void missing_some_id_columns_should_not_produce_id_attribute_mappings() {
+		new Expectations() {{
+			dataReader.findColumn(prefix + "SSN"); result = 1;
+			dataReader.findColumn(anyString); result = -1;
+		}};
+		
+		Entity person = entityRepository.getEntity(Person.class);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(person, alias, Immutables.emptyList(AliasJoin.class));
+		EntityMapping personMapping = mappingRepository.getEntityMapping(bundle, alias, person, dataReader);
+		
+		assertTrue(personMapping.getIdentifierAttributeMappings().isEmpty());
+	}
+	
 }

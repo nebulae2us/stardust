@@ -22,6 +22,8 @@ import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.electron.util.ImmutableList;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.Table;
+import org.nebulae2us.stardust.internal.util.ObjectUtils;
+
 import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
 
 /**
@@ -54,6 +56,10 @@ public class AttributeHolder {
 
 	public List<Attribute> getAttributes() {
 		return attributes;
+	}
+	
+	public boolean isEmpty() {
+		return ObjectUtils.isEmpty(attributes);
 	}
 
 	public Attribute getAttribute(String attributeName) {

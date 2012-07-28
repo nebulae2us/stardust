@@ -110,10 +110,15 @@ public class EntityMappingRepository {
 			int sizeBefore = rootCache.size();
 			
 			Object rootEntityInstance = readObject(bundle, rootLinkedEntity.getAlias(), rootEntityMapping, dataReader);
+			
+			if (rootEntityInstance == null) {
+				continue;
+			}
+			
 			alias2Instance.put(rootLinkedEntity.getAlias(), rootEntityInstance);
 			
 			int sizeAfter = rootCache.size();
-			if (rootEntityMapping.getIdentifierAttributeMappings().size() == 0 || sizeAfter > sizeBefore) {
+			if (rootEntityMapping.getIdentifierAttributeMappings().isEmpty() || sizeAfter > sizeBefore) {
 				result.add(rootEntityInstance);
 			}
 			
@@ -128,7 +133,7 @@ public class EntityMappingRepository {
 					switch (entityAttribute.getRelationalType()) {
 					case MANY_TO_ONE: {
 						setValue(entityAttribute.getField(), parentInstance, entityInstance);
-						if (ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
+						if (entityInstance != null && ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
 							Attribute foreignAttribute = entityAttribute.getEntity().getAttribute(entityAttribute.getInverseAttributeName());
 							AssertState.isTrue(foreignAttribute instanceof EntityAttribute, "inverse attribute is invalid");
 							EntityAttribute foreignEntityAttribute = (EntityAttribute)foreignAttribute;
@@ -149,18 +154,21 @@ public class EntityMappingRepository {
 							setValue(entityAttribute.getField(), parentInstance, values);
 						}
 						AssertState.isTrue(values instanceof Collection, "Unknown collection type %s", values.getClass());
-						((Collection<Object>)values).add(entityInstance);
 						
-						if (ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
-							Attribute foreignAttribute = entityAttribute.getEntity().getAttribute(entityAttribute.getInverseAttributeName());
-							AssertState.isTrue(foreignAttribute instanceof EntityAttribute, "inverse attribute is invalid");
-							EntityAttribute foreignEntityAttribute = (EntityAttribute)foreignAttribute;
-							setValue(foreignEntityAttribute.getField(), entityInstance, parentInstance);
+						if (entityInstance != null) {
+							((Collection<Object>)values).add(entityInstance);
+							
+							if (ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
+								Attribute foreignAttribute = entityAttribute.getEntity().getAttribute(entityAttribute.getInverseAttributeName());
+								AssertState.isTrue(foreignAttribute instanceof EntityAttribute, "inverse attribute is invalid");
+								EntityAttribute foreignEntityAttribute = (EntityAttribute)foreignAttribute;
+								setValue(foreignEntityAttribute.getField(), entityInstance, parentInstance);
+							}
 						}
 						break; }
 					case ONE_TO_ONE: {
 						setValue(entityAttribute.getField(), parentInstance, entityInstance);
-						if (ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
+						if (entityInstance != null && ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
 							Attribute foreignAttribute = entityAttribute.getEntity().getAttribute(entityAttribute.getInverseAttributeName());
 							AssertState.isTrue(foreignAttribute instanceof EntityAttribute, "inverse attribute is invalid");
 							EntityAttribute foreignEntityAttribute = (EntityAttribute)foreignAttribute;
@@ -175,19 +183,23 @@ public class EntityMappingRepository {
 							setValue(entityAttribute.getField(), parentInstance, values);
 						}
 						AssertState.isTrue(values instanceof Collection, "Unknown collection type %s", values.getClass());
-						((Collection<Object>)values).add(entityInstance);
 						
-						if (ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
-							Attribute foreignAttribute = entityAttribute.getEntity().getAttribute(entityAttribute.getInverseAttributeName());
-							AssertState.isTrue(foreignAttribute instanceof EntityAttribute, "inverse attribute is invalid");
-							EntityAttribute foreignEntityAttribute = (EntityAttribute)foreignAttribute;
-							Object inverseValues = getValue(foreignEntityAttribute.getField(), entityInstance);
-							if (inverseValues == null) {
-								inverseValues = newCollectionInstance(foreignEntityAttribute.getField().getType());
-								setValue(foreignEntityAttribute.getField(), entityInstance, inverseValues);
+						if (entityInstance != null) {
+							((Collection<Object>)values).add(entityInstance);
+							
+							if (ObjectUtils.notEmpty(entityAttribute.getInverseAttributeName())) {
+								Attribute foreignAttribute = entityAttribute.getEntity().getAttribute(entityAttribute.getInverseAttributeName());
+								AssertState.isTrue(foreignAttribute instanceof EntityAttribute, "inverse attribute is invalid");
+								EntityAttribute foreignEntityAttribute = (EntityAttribute)foreignAttribute;
+								Object inverseValues = getValue(foreignEntityAttribute.getField(), entityInstance);
+								if (inverseValues == null) {
+									inverseValues = newCollectionInstance(foreignEntityAttribute.getField().getType());
+									setValue(foreignEntityAttribute.getField(), entityInstance, inverseValues);
+								}
+								AssertState.isTrue(inverseValues instanceof Collection, "Unknown collection type %s", inverseValues.getClass());
+								((Collection<Object>)inverseValues).add(parentInstance);
+								
 							}
-							AssertState.isTrue(inverseValues instanceof Collection, "Unknown collection type %s", inverseValues.getClass());
-							((Collection<Object>)inverseValues).add(parentInstance);
 							
 						}
 						
@@ -275,6 +287,12 @@ public class EntityMappingRepository {
 		
 		Object key = readIdValues(entityMapping.getIdentifierAttributeMappings(), dataReader);
 		
+		Entity entity = entityMapping.getEntity();
+		
+		if (key == null && !entity.getEntityIdentifier().isEmpty()) {
+			return null;
+		}
+		
 		Object result = key == null ? null : mainCache.get(key);
 		if (result != null) {
 			return result;
@@ -282,11 +300,11 @@ public class EntityMappingRepository {
 		
 		Entity expectedEntityByDiscriminator = readDiscriminatorEntity(entityMapping, dataReader);
 		
-		Class<?> expectedClass = entityMapping.getEntity().getDeclaringClass();
+		Class<?> expectedClass = entity.getDeclaringClass();
 		
 		EntityMapping expectedEntityMapping = entityMapping;
 		
-		if (expectedEntityByDiscriminator != null && expectedEntityByDiscriminator != entityMapping.getEntity()) {
+		if (expectedEntityByDiscriminator != null && expectedEntityByDiscriminator != entity) {
 			
 			expectedClass = expectedEntityByDiscriminator.getDeclaringClass();
 			expectedEntityMapping = getEntityMapping(linkedEntityBundle, alias, expectedEntityByDiscriminator, dataReader);

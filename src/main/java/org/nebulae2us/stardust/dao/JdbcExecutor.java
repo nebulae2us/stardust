@@ -433,6 +433,15 @@ public class JdbcExecutor {
 		return query(sql, paramValues, wildcardValues, new FirstColumnRecordMapper<T>(valueType));
 	}
 	
+	public <T> List<T> queryForListOf(Class<T> valueType, String sql, Map<String, ?> paramValues) {
+		return queryForListOf(valueType, sql, paramValues, Immutables.emptyList());
+	}
+	
+	public <T> List<T> queryForListOf(Class<T> valueType, String sql, List<?> wildcardValues) {
+		return queryForListOf(valueType, sql, Immutables.emptyStringMap(), wildcardValues);
+	}
+	
+	
 	public List<Long> queryForListOfLong(String sql, Map<String,?> paramValues, List<?> wildcardValues) {
 		return queryForListOf(Long.class, sql, paramValues, wildcardValues);
 	}

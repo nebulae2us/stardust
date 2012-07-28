@@ -22,6 +22,7 @@ import org.junit.Test;
 import org.nebulae2us.electron.util.Immutables;
 import org.nebulae2us.electron.util.ListBuilder;
 import org.nebulae2us.stardust.db.domain.JoinType;
+import org.nebulae2us.stardust.jpa.group1.Gender;
 import org.nebulae2us.stardust.jpa.group1.House;
 import org.nebulae2us.stardust.jpa.group1.Passport;
 import org.nebulae2us.stardust.jpa.group1.Person;
@@ -373,6 +374,58 @@ public class LinkedEntityBundleDataReaderTest {
 		assertEquals(2, people.size());
 		assertEquals(2, people.get(0).getHouses().get(0).getOwners().size());
 		
+	}
+	
+	/**
+	 * @see EntityMappingTest#missing_all_id_columns_should_not_produce_id_attribute_mappings()
+	 */
+	@Test
+	public void missing_all_id_values_should_return_null_entity() {
+		
+		// setup dataReader such that there is no id columns for person
+		List<String> columnNames = Arrays.asList("GENDER");
+		
+		List<Object[]> data = new ListBuilder<Object[]>().add(
+				new Object[]{Gender.FEMALE},
+				new Object[]{Gender.MALE},
+				new Object[]{}
+				).toList();
+		
+		DataReader dataReader = new MockedDataReader(columnNames, data);
+
+		Entity entity = entityRepository.getEntity(Person.class);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
+		
+		List<Person> people = (List<Person>)bundle.readData(this.entityRepository, dataReader);
+		
+		assertTrue(people.isEmpty());
+		
+	}
+	
+	/**
+	 * @see EntityMappingTest#missing_some_id_columns_should_not_produce_id_attribute_mappings()
+	 */
+	@Test
+	public void missing_some_id_values_should_return_null_entity() {
+		// setup dataReader such that some id column (e.g. dateBorn) is missing for Person
+		
+		List<String> columnNames = Arrays.asList("SSN", "GENDER");
+		
+		List<Object[]> data = new ListBuilder<Object[]>().add(
+				new Object[]{"123-12-0001", Gender.FEMALE},
+				new Object[]{"123-12-0001", Gender.MALE},
+				new Object[]{"123-12-0002", null}
+				).toList();
+		
+		DataReader dataReader = new MockedDataReader(columnNames, data);
+
+		Entity entity = entityRepository.getEntity(Person.class);
+		LinkedEntityBundle bundle = LinkedEntityBundle.newInstance(entity, "", Immutables.emptyList(AliasJoin.class));
+		
+		List<Person> people = (List<Person>)bundle.readData(this.entityRepository, dataReader);
+		
+		assertTrue(people.isEmpty());
+
 	}
 
 

@@ -142,7 +142,7 @@ public class OneEntity_IT extends BaseIntegrationTest {
 		should_be_able_to_insert_one_record();
 		
 		List<Person> people = daoManager.newQuery(Person.class)
-			.backedBySql("select first_name first_name, last_name from person")
+			.backedBySql("select id, first_name, last_name from person")
 			.filterBy()
 				.predicate("firstName = ?", "First")
 			.endFilter()
@@ -152,7 +152,6 @@ public class OneEntity_IT extends BaseIntegrationTest {
 		
 		Person person = people.get(0);
 		assertNull(person.dateBorn);
-		assertNull(person.id);
 		assertEquals("First", person.firstName);
 	}
 	
