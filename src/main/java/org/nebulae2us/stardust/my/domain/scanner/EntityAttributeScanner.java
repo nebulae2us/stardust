@@ -43,6 +43,7 @@ import static org.nebulae2us.stardust.internal.util.Builders.*;
 
 import org.nebulae2us.stardust.internal.util.NameUtils;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
+import org.nebulae2us.stardust.internal.util.ReflectionUtils;
 import org.nebulae2us.stardust.my.domain.EntityAttributeBuilder;
 import org.nebulae2us.stardust.my.domain.EntityBuilder;
 import org.nebulae2us.stardust.my.domain.FetchType;

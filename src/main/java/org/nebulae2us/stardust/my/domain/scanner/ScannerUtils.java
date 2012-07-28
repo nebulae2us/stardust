@@ -71,6 +71,20 @@ public class ScannerUtils {
 		return false;
 	}
 	
+	public static boolean isEntityType(Class<?> fieldClass) {
+		if (isScalarType(fieldClass)) {
+			return false;
+		}
+		if (fieldClass == Object.class) {
+			return false;
+		}
+		if (fieldClass.isInterface() || fieldClass.isAnnotation() || fieldClass.isAnonymousClass() || fieldClass.isArray() || fieldClass.isEnum() || fieldClass.isPrimitive() || fieldClass.isSynthetic()) {
+			return false;
+		}
+		
+		return true;
+	}
+	
 	
 	/**
 	 * Get list of strictly super class that has @Entity

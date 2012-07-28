@@ -280,9 +280,11 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
     public List<EntityAttributeBuilder<?>> getEntityAttributes() {
 		List<EntityAttributeBuilder<?>> result = new ArrayList<EntityAttributeBuilder<?>>();
 		
-		for (AttributeBuilder<?> attribute : this.getAttributes()) {
-			if (attribute instanceof EntityAttributeBuilder) {
-				result.add((EntityAttributeBuilder<?>)attribute);
+		if (this.getAttributes() != null) {
+			for (AttributeBuilder<?> attribute : this.getAttributes()) {
+				if (attribute instanceof EntityAttributeBuilder) {
+					result.add((EntityAttributeBuilder<?>)attribute);
+				}
 			}
 		}
 		
@@ -291,15 +293,17 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
     
     public List<ScalarAttributeBuilder<?>> getScalarAttributes() {
 		List<ScalarAttributeBuilder<?>> result = new ArrayList<ScalarAttributeBuilder<?>>();
-		
-		for (AttributeBuilder<?> attribute : this.getAttributes()) {
-			if (attribute instanceof ScalarAttributeBuilder) {
-				result.add((ScalarAttributeBuilder<?>)attribute);
-			}
-			else if (attribute instanceof ValueObjectAttributeBuilder) {
-				ValueObjectAttributeBuilder<?> valueObjectAttribute = (ValueObjectAttributeBuilder<?>)attribute;
-				ValueObjectBuilder<?> valueObject = valueObjectAttribute.getValueObject();
-				result.addAll(valueObject.getScalarAttributes());
+
+		if (this.getAttributes() != null) {
+			for (AttributeBuilder<?> attribute : this.getAttributes()) {
+				if (attribute instanceof ScalarAttributeBuilder) {
+					result.add((ScalarAttributeBuilder<?>)attribute);
+				}
+				else if (attribute instanceof ValueObjectAttributeBuilder) {
+					ValueObjectAttributeBuilder<?> valueObjectAttribute = (ValueObjectAttributeBuilder<?>)attribute;
+					ValueObjectBuilder<?> valueObject = valueObjectAttribute.getValueObject();
+					result.addAll(valueObject.getScalarAttributes());
+				}
 			}
 		}
 		
@@ -309,17 +313,19 @@ public class AttributeHolderBuilder<P> implements Wrappable<AttributeHolder> {
     
     public List<ColumnBuilder<?>> getColumns() {
 		List<ColumnBuilder<?>> result = new ArrayList<ColumnBuilder<?>>();
-		
-		for (AttributeBuilder<?> attribute : this.getAttributes()) {
-			if (attribute instanceof ScalarAttributeBuilder) {
-				result.add(((ScalarAttributeBuilder<?>)attribute).getColumn());
-			}
-			else if (attribute instanceof ValueObjectAttributeBuilder) {
-				ValueObjectAttributeBuilder<?> valueObjectAttribute = (ValueObjectAttributeBuilder<?>)attribute;
-				ValueObjectBuilder<?> valueObject = valueObjectAttribute.getValueObject();
-				for (ScalarAttributeBuilder<?> scalarAttribute : valueObject.getScalarAttributes()) {
-					result.add(scalarAttribute.getColumn());
-					
+
+		if (this.getAttributes() != null) {
+			for (AttributeBuilder<?> attribute : this.getAttributes()) {
+				if (attribute instanceof ScalarAttributeBuilder) {
+					result.add(((ScalarAttributeBuilder<?>)attribute).getColumn());
+				}
+				else if (attribute instanceof ValueObjectAttributeBuilder) {
+					ValueObjectAttributeBuilder<?> valueObjectAttribute = (ValueObjectAttributeBuilder<?>)attribute;
+					ValueObjectBuilder<?> valueObject = valueObjectAttribute.getValueObject();
+					for (ScalarAttributeBuilder<?> scalarAttribute : valueObject.getScalarAttributes()) {
+						result.add(scalarAttribute.getColumn());
+						
+					}
 				}
 			}
 		}

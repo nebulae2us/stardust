@@ -309,7 +309,7 @@ public class EntityScanner {
 					Type fieldSubType = ClassUtils.getGenericSubType(field.getGenericType());
 					Class<?> fieldSubClass = ClassUtils.getClass(fieldSubType);
 					
-					if (fieldSubClass == Object.class || fieldSubClass.getAnnotation(Embeddable.class) != null || ScannerUtils.isScalarType(fieldSubClass)) {
+					if (!ScannerUtils.isEntityType(fieldSubClass) || fieldSubClass.getAnnotation(Embeddable.class) != null) {
 						continue;
 					}
 					else {
@@ -322,7 +322,8 @@ public class EntityScanner {
 					}
 					
 				}
-				else {
+				else if (ScannerUtils.isEntityType(fieldClass)) {
+					
 					EntityBuilder<?> fieldEntity = new EntityScanner(fieldClass, scannedEntityBuilders, scannedEntities).produceRaw();
 					
 					EntityAttributeBuilder<?> attributeBuilder = new EntityAttributeScanner(result, field, fieldEntity).produce();
