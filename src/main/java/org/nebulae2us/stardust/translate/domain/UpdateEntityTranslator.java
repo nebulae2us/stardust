@@ -91,7 +91,7 @@ public class UpdateEntityTranslator implements Translator {
 					updateSql.append(scalarAttribute.getColumn().getName())
 						.append(" = ?,\n");
 					
-					Object value = attribute.extractValueForPersistence(entityToInsert);
+					Object value = scalarAttribute.extractValueForPersistence(entityToInsert);
 					values.add(value);
 					
 				}
