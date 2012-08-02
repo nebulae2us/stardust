@@ -18,6 +18,7 @@ package org.nebulae2us.stardust.sql.domain;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,6 +34,7 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import org.nebulae2us.electron.Mirror;
 import org.nebulae2us.electron.Pair;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.internal.util.ObjectUtils;
@@ -350,7 +352,8 @@ public class EntityMappingRepository {
 	}
 	
 	private Object readObject(String alias, Class<?> expectedClass, List<AttributeMapping> attributeMappings, DataReader dataReader) {
-		Object result = instantiateObject(expectedClass);
+		DataReaderMirror mirror = new DataReaderMirror(dataReader, attributeMappings);
+		Object result = instantiateObject(expectedClass, mirror);
 		
 		for (AttributeMapping attributeMapping : attributeMappings) {
 			
@@ -360,7 +363,9 @@ public class EntityMappingRepository {
 				ScalarAttribute scalarAttribute = scalarAttributeMapping.getAttribute();
 				Object value = dataReader.read(scalarAttribute.getPersistenceType(), scalarAttributeMapping.getColumnIndex());
 				value = scalarAttribute.convertValueToAttributeType(value);
-				setValue(attributeMapping.getAttribute().getField(), result, value);
+				if ((attributeMapping.getAttribute().getField().getModifiers() & Modifier.FINAL) == 0) {
+					setValue(attributeMapping.getAttribute().getField(), result, value);
+				}
 			}
 			else if (attributeMapping instanceof ValueObjectAttributeMapping) {
 				ValueObjectAttributeMapping valueObjectAttributeMapping = (ValueObjectAttributeMapping)attributeMapping;
@@ -388,32 +393,35 @@ public class EntityMappingRepository {
 	}
 	
 	
-	private Object instantiateObject(Class<?> type) {
-		try {
-			if (type.getEnclosingClass() != null && ReflectionUtils.findField(type, "this$0") != null) {
-				Constructor<?> constructor = ReflectionUtils.findConstructor(type, type.getEnclosingClass());
-				if (constructor != null) {
-					try {
-						constructor.setAccessible(true);
-						return constructor.newInstance((Class<?>)null);
-					} catch (IllegalArgumentException e) {
-						throw new IllegalStateException(e);
-					} catch (InvocationTargetException e) {
-						throw new IllegalStateException(e);
-					}
-				}
-				else {
-					throw new IllegalStateException("Cannot instantiate " + type);
-				}
+	private Object instantiateObject(Class<?> type, DataReaderMirror mirror) {
+		if (type.getEnclosingClass() != null && ReflectionUtils.findField(type, "this$0") != null) {
+			Constructor<?> constructor = ReflectionUtils.findConstructor(type, type.getEnclosingClass());
+			if (constructor != null) {
+				constructor.setAccessible(true);
+				return ReflectionUtils.newObject(constructor, (Class<?>)null);
 			}
-			else {
-				return type.newInstance();
+
+			constructor = ReflectionUtils.findConstructor(type, type.getEnclosingClass(), Mirror.class);
+			if (constructor != null) {
+				constructor.setAccessible(true);
+				return ReflectionUtils.newObject(constructor, (Class<?>)null, mirror);
 			}
-		} catch (InstantiationException e) {
-			throw new IllegalStateException(e.getMessage(), e);
-		} catch (IllegalAccessException e) {
-			throw new IllegalStateException(e.getMessage(), e);
 		}
+		else {
+			Constructor<?> constructor = ReflectionUtils.findPublicConstructor(type);
+			if (constructor != null) {
+				constructor.setAccessible(true);
+				return ReflectionUtils.newObject(constructor);
+			}
+			
+			constructor = ReflectionUtils.findPublicConstructor(type, Mirror.class);
+			if (constructor != null) {
+				constructor.setAccessible(true);
+				return ReflectionUtils.newObject(constructor, mirror);
+			}
+		}
+		
+		throw new IllegalStateException("Cannot instantiate " + type);
 	}
 	
 	/**

@@ -19,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.ArrayList;
@@ -45,6 +46,16 @@ public class ReflectionUtils {
 		}
 	}
 	
+	public static Constructor<?> findPublicConstructor(Class<?> objectClass, Class<?> ... parameterTypes) {
+		try {
+			return objectClass.getConstructor(parameterTypes);
+		} catch (SecurityException e) {
+			return null;
+		} catch (NoSuchMethodException e) {
+			return null;
+		}
+	}
+	
 	public static Constructor<?> findConstructor(Class<?> objectClass, Class<?> ... parameterTypes) {
 		try {
 			return objectClass.getDeclaredConstructor(parameterTypes);
@@ -52,6 +63,20 @@ public class ReflectionUtils {
 			return null;
 		} catch (NoSuchMethodException e) {
 			return null;
+		}
+	}
+	
+	public static Object newObject(Constructor<?> constructor, Object ... initargs) {
+		try {
+			return constructor.newInstance(initargs);
+		} catch (IllegalArgumentException e) {
+			throw new IllegalStateException(e.getMessage(), e);
+		} catch (InstantiationException e) {
+			throw new IllegalStateException(e.getMessage(), e);
+		} catch (IllegalAccessException e) {
+			throw new IllegalStateException(e.getMessage(), e);
+		} catch (InvocationTargetException e) {
+			throw new IllegalStateException(e.getMessage(), e);
 		}
 	}
 	

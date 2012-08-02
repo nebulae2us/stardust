@@ -165,8 +165,17 @@ public class AnnotationEntityDefinitionBuilder extends AbstractAnnotationDefinit
 				case SEQUENCE:
 					SequenceGenerator sequenceGenerator = searchForSequenceGeneratorAnnot(generatedValue.generator(), entityClass);
 					AssertSyntax.notNull(sequenceGenerator, "Cannot find definition for sequence generator \"%s\". Hint: define @SequenceGenerator.", generatedValue.generator());
+
+					String schemaName = "";
+					try {
+						schemaName = sequenceGenerator.schema();
+					}
+					catch (NoSuchMethodError e) {
+						// happen if this is jpa-api version 1.0
+					}
 					
-					builder.identifierGenerator(field.getName(), new SequenceValueGenerator(sequenceGenerator.schema(), sequenceGenerator.sequenceName()));
+					
+					builder.identifierGenerator(field.getName(), new SequenceValueGenerator(schemaName, sequenceGenerator.sequenceName()));
 					break;
 				default:
 					AssertSyntax.fail("Unsupported identifier generator strategy %s.", generatedValue.strategy().toString());

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.nebulae2us.stardust.dao;
+package org.nebulae2us.stardust.datasource;
 
 import java.io.PrintWriter;
 import java.sql.Connection;

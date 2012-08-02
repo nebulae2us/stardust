@@ -53,6 +53,7 @@ import org.nebulae2us.stardust.translate.domain.TranslatorTest;
 	EntityMappingWithJoinsTest.class,
 	LinkedEntityBundleDataReaderTest.class,
 	SingleLinkedEntityBundleDataReaderTest.class,
+	ObjectCreationTest.class,
 	SelectorExpressionTest.class,
 	ComparisonExpressionTest.class,
 	InListExpressionTest.class,
