@@ -77,51 +77,51 @@ daoManager.update(person);
 Let's make it a bit more sophisticated with inheritance:
 
 ```java
-        @Entity
-        @Inheritance(strategy= InheritanceType.JOINED)
-        @DiscriminatorColumn(name="PERSON_TYPE_ID", discriminatorType= DiscriminatorType.INTEGER)
-        @DiscriminatorValue("0")
-        class Person {
-            @Id
-            private Long personId;
+@Entity
+@Inheritance(strategy= InheritanceType.JOINED)
+@DiscriminatorColumn(name="PERSON_TYPE_ID", discriminatorType= DiscriminatorType.INTEGER)
+@DiscriminatorValue("0")
+class Person {
+    @Id
+    private Long personId;
 
-            private String firstName;
-            private String lastName;
-            private Integer age;
+    private String firstName;
+    private String lastName;
+    private Integer age;
 
-            // getter, setter, constructors and default constructor.
-        }
+    // getter, setter, constructors and default constructor.
+}
 
-        @Entity
-        @DiscriminatorValue("1")
-        class Student extends Person {
-            private BigDecimal gpa;
+@Entity
+@DiscriminatorValue("1")
+class Student extends Person {
+    private BigDecimal gpa;
 
-            // getter, setter, constructors and default constructor.
-        }
+    // getter, setter, constructors and default constructor.
+}
 
-        @Entity
-        @DiscriminatorValue("2")
-        class Teacher extends Person {
-            private Boolean fulltime;
+@Entity
+@DiscriminatorValue("2")
+class Teacher extends Person {
+    private Boolean fulltime;
 
-            // getter, setter, constructors and default constructor.
-        }
-```java
+    // getter, setter, constructors and default constructor.
+}
+```
 
 Create new students and teachers
 ```java
-        Student student1 = new Student(1L, "Dwight", "Schrute", 40, new BigDecimal("3.8"));
-        daoManager.save(student1);
+Student student1 = new Student(1L, "Dwight", "Schrute", 40, new BigDecimal("3.8"));
+daoManager.save(student1);
 
-        Teacher teacher1 = new Teacher(2L, "Michael", "Scott", 40, true);
-        daoManager.save(teacher1);
-```java
+Teacher teacher1 = new Teacher(2L, "Michael", "Scott", 40, true);
+daoManager.save(teacher1);
+```
 
 Query for all people
 ```java
 List<Person> allPeople = daoManager.newQuery(Person.class).orderBy("personId").list();
-```java
+```
 
 More sophisticated examples such as join and inheritance can be viewed at https://github.com/nebulae2us/stardust/wiki
 
