@@ -15,31 +15,22 @@
  */
 package org.nebulae2us.stardust.ddl.domain;
 
-import java.sql.Timestamp;
-import java.sql.Time;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.nebulae2us.electron.internal.util.ClassUtils;
 import org.nebulae2us.stardust.db.domain.Column;
 import org.nebulae2us.stardust.db.domain.LinkedTable;
 import org.nebulae2us.stardust.db.domain.Table;
 import org.nebulae2us.stardust.dialect.Dialect;
-import org.nebulae2us.stardust.generator.ValueGenerator;
 import org.nebulae2us.stardust.generator.IdentityValueRetriever;
 import org.nebulae2us.stardust.generator.SequenceValueGenerator;
-import org.nebulae2us.stardust.my.domain.Entity;
-import org.nebulae2us.stardust.my.domain.EntityAttribute;
-import org.nebulae2us.stardust.my.domain.EntityIdentifier;
-import org.nebulae2us.stardust.my.domain.EntityRepository;
-import org.nebulae2us.stardust.my.domain.ScalarAttribute;
+import org.nebulae2us.stardust.generator.ValueGenerator;
+import org.nebulae2us.stardust.my.domain.*;
 
-import static org.nebulae2us.stardust.internal.util.BaseAssert.*;
+import java.math.BigDecimal;
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.util.*;
+
+import static org.nebulae2us.stardust.internal.util.BaseAssert.AssertState;
 
 /**
  * @author Trung Phan
@@ -433,6 +424,9 @@ public class DDLGenerator {
 		else if (javaType.isEnum()) {
 			return new ColumnType("varchar", length == 0 ? 255 : length);
 		}
+        else if (javaType == BigDecimal.class) {
+            return new ColumnType("number");
+        }
 		
 		throw new IllegalStateException("Unknown type: " + javaType.getSimpleName());
 	}

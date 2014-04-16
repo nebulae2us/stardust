@@ -15,18 +15,17 @@
  */
 package org.nebulae2us.stardust;
 
-import java.util.List;
-
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-
+import cucumber.annotation.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.nebulae2us.electron.generator.GeneratorHint;
 import org.nebulae2us.stardust.ddl.domain.DDLGenerator;
-import org.nebulae2us.stardust.my.domain.EntityRepository;
+
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author Trung Phan
@@ -47,23 +46,31 @@ public class ExampleIT extends BaseIntegrationTest {
 		this.daoManager = new DaoManager(dataSource, dialect);
 		this.ddlGenerator = new DDLGenerator(dialect, daoManager.getEntityRepository());
 	}
+
+    @After
+    public void tearDown() {
+        List<String> ddls = ddlGenerator.generateDropSchemaObjectsDDL();
+        for (String ddl : ddls) {
+            jdbcExecutor.execute(ddl);
+        }
+    }
 	
 	@Test
 	public void example1() {
-		
+
 
 		class Person {
 			@Id
 			private Long personId;
-			
+
 			private String firstName;
 			private String lastName;
 			private Integer age;
-			
+
 			public Person() {
-				
+
 			}
-			
+
 			public Person(Long personId, String firstName, String lastName, Integer age) {
 				this.personId = personId;
 				this.firstName = firstName;
@@ -71,7 +78,7 @@ public class ExampleIT extends BaseIntegrationTest {
 				this.age = age;
 			}
 		}
-		
+
 		this.daoManager.getEntityRepository().scanEntities(Person.class);
 		
 		List<String> ddls = ddlGenerator.generateCreateSchemaObjectsDDL();
@@ -130,13 +137,84 @@ public class ExampleIT extends BaseIntegrationTest {
 		person = daoManager.get(Person.class, 1);
 		System.out.println(person.firstName);
 		
-		ddls = ddlGenerator.generateDropSchemaObjectsDDL();
-		for (String ddl : ddls) {
-			jdbcExecutor.execute(ddl);
-		}
-		
+
 	}
 
+    @Test
+    public void example2() {
+
+        @Entity
+        @Inheritance(strategy= InheritanceType.JOINED)
+        @DiscriminatorColumn(name="PERSON_TYPE_ID", discriminatorType= DiscriminatorType.INTEGER)
+        @DiscriminatorValue("0")
+        class Person {
+            @Id
+            private Long personId;
+
+            private String firstName;
+            private String lastName;
+            private Integer age;
+
+            public Person() {
+
+            }
+
+            public Person(Long personId, String firstName, String lastName, Integer age) {
+                this.personId = personId;
+                this.firstName = firstName;
+                this.lastName = lastName;
+                this.age = age;
+            }
+        }
+
+        @Entity
+        @DiscriminatorValue("1")
+        class Student extends Person {
+            private BigDecimal gpa;
+            public Student() {
+            }
+
+            public Student(Long personId, String firstName, String lastName, Integer age, BigDecimal gpa) {
+                super(personId, firstName, lastName, age);
+                this.gpa = gpa;
+            }
+        }
+
+        @Entity
+        @DiscriminatorValue("2")
+        class Teacher extends Person {
+            private Boolean fulltime;
+            public Teacher() {}
+            public Teacher(Long personId, String firstName, String lastName, Integer age, Boolean fulltime) {
+                super(personId, firstName, lastName, age);
+                this.fulltime = fulltime;
+            }
+        }
+
+        this.daoManager.getEntityRepository().scanEntities(Person.class, Student.class, Teacher.class);
+
+        List<String> ddls = ddlGenerator.generateCreateSchemaObjectsDDL();
+        for (String ddl : ddls) {
+            jdbcExecutor.execute(ddl);
+        }
+
+        Student student1 = new Student(1L, "Dwight", "Schrute", 40, new BigDecimal("3.8"));
+        daoManager.save(student1);
+
+        Teacher teacher1 = new Teacher(2L, "Michael", "Scott", 40, true);
+        daoManager.save(teacher1);
+
+//        List<Student> allStudents = daoManager.newQuery(Student.class).list();
+//        assertEquals(1, allStudents.size());
+//        assertEquals(new BigDecimal("3.8"), allStudents.get(0).gpa);
+
+        List<Person> allPersons = daoManager.newQuery(Person.class).orderBy("personId").list();
+        assertEquals(2, allPersons.size());
+        assertTrue(allPersons.get(0) instanceof Student);
+        assertTrue(allPersons.get(1) instanceof Teacher);
+
+
+    }
 	
 	
 }
