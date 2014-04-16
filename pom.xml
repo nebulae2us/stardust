@@ -21,14 +21,12 @@
     	<dependency>
     		<groupId>org.slf4j</groupId>
     		<artifactId>slf4j-api</artifactId>
-    		<version>1.6.4</version>
-    		<scope>runtime</scope>
+    		<version>1.7.6</version>
     	</dependency>
     	<dependency>
     		<groupId>org.slf4j</groupId>
     		<artifactId>slf4j-log4j12</artifactId>
-    		<version>1.6.4</version>
-    		<scope>test</scope>
+    		<version>1.7.6</version>
     	</dependency>
         <dependency>
         	<groupId>com.googlecode.jmockit</groupId>
@@ -48,12 +46,12 @@
             <version>1.1</version>
             <scope>test</scope>
         </dependency>
-    	<!-- dependency>
+    	<dependency>
     		<groupId>javax.persistence</groupId>
     		<artifactId>persistence-api</artifactId>
     		<version>1.0.2</version>
     		<scope>runtime</scope>
-    	</dependency -->
+    	</dependency>
 		<dependency>
 			<groupId>org.hibernate.javax.persistence</groupId>
 			<artifactId>hibernate-jpa-2.0-api</artifactId>
@@ -63,7 +61,6 @@
     		<groupId>org.nebulae2us</groupId>
     		<artifactId>electron</artifactId>
     		<version>1.0.0.RC1</version>
-    		<scope>runtime</scope>
     	</dependency>
     	<dependency>
     		<groupId>com.h2database</groupId>
@@ -136,6 +133,15 @@
     				</execution>
     			</executions>
     		</plugin>
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-compiler-plugin</artifactId>-->
+                <!--<version>2.5</version>-->
+                <!--<configuration>-->
+                    <!--<source>1.7</source>-->
+                    <!--<target>1.7</target>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
     		<plugin>
     			<groupId>org.codehaus.mojo</groupId>
     			<artifactId>failsafe-maven-plugin</artifactId>
