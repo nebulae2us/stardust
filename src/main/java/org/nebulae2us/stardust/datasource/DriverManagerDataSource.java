@@ -15,13 +15,14 @@
  */
 package org.nebulae2us.stardust.datasource;
 
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
 import java.util.Properties;
-
-import javax.sql.DataSource;
+import java.util.logging.Logger;
 
 /**
  * @author Trung Phan
@@ -61,7 +62,11 @@ public class DriverManagerDataSource implements DataSource {
 		return 0;
 	}
 
-	public <T> T unwrap(Class<T> iface) throws SQLException {
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
 		return null;
 	}
 

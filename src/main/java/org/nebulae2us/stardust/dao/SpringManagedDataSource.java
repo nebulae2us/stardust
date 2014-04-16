@@ -15,12 +15,13 @@
  */
 package org.nebulae2us.stardust.dao;
 
+import javax.sql.DataSource;
 import java.io.PrintWriter;
 import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
-
-import javax.sql.DataSource;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.logging.Logger;
 
 /**
  * @author Trung Phan
@@ -75,7 +76,11 @@ public class SpringManagedDataSource implements DataSource, ReleaseConnectionHan
 		return this.dataSource.getLoginTimeout();
 	}
 
-	public <T> T unwrap(Class<T> iface) throws SQLException {
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+    public <T> T unwrap(Class<T> iface) throws SQLException {
 		return this.dataSource.unwrap(iface);
 	}
 

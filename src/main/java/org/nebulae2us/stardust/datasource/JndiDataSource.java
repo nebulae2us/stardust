@@ -15,17 +15,18 @@
  */
 package org.nebulae2us.stardust.datasource;
 
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Properties;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.SQLFeatureNotSupportedException;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.logging.Logger;
 
 /**
  * @author Trung Phan
@@ -88,9 +89,13 @@ public class JndiDataSource implements DataSource {
 		return this.dataSource.getLoginTimeout();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.sql.Wrapper#unwrap(java.lang.Class)
-	 */
+    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+        throw new SQLFeatureNotSupportedException();
+    }
+
+    /* (non-Javadoc)
+     * @see java.sql.Wrapper#unwrap(java.lang.Class)
+     */
 	@SuppressWarnings("unchecked")
 	public <T> T unwrap(Class<T> iface) throws SQLException {
 		if (iface.isInstance(this.dataSource)) {
