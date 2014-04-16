@@ -126,9 +126,13 @@ List<Person> allPeople = daoManager.newQuery(Person.class).orderBy("personId").l
 More sophisticated examples such as join and inheritance can be viewed at https://github.com/nebulae2us/stardust/wiki
 
 ##Why Stardust
-__SQL centric__: Stardust's DaoManager not only automatically generates SQL for you, but also let you plugs your own SQL. Moreover, its JdbcExecutor let you execute SQL at ease.
+__SQL centric__: Stardust's DaoManager not only automatically generates SQL for you, but also let you plug your own SQL. Moreover, its JdbcExecutor let you execute SQL at ease.
 
 __Clean POJO object__: Objects are not proxied. No error like Hibernate's `LazyInitializationException`.
+
+__Support Immutable Model Object__: This will be helpful to create Value Object for Domain-Driven Design because Value Object is immutable in Domain-Driven Design.
+
+__Work with many Transaction Managers__: This includes Spring managed Transaction Manager, JTA Transaction Manager, etc.
 
 
 ##Getting Started
@@ -137,7 +141,7 @@ Required  JAR:
 * electron-1.0.0.jar
 * slf4-api.jar
 
-The heart of Stardust are JdbcExecutor and DaoManager. JdbcExecutor helps you execute SQL. DaoManagers help you to map relational data to java objects. DaoManager contains 2 engines behind the scene. The first engine translate query requirement into SQL. It then uses JdbcExecutor to execute the SQL. The second engine is to translate the SQL's result into java objects. As the 2 engines are separate, you can plugs your own SQL and utilize the second engine to convert data into java objects.
+The heart of Stardust are JdbcExecutor and DaoManager. JdbcExecutor helps you execute SQL. DaoManagers help you to map relational data to java objects. DaoManager contains 2 engines behind the scene. The first engine translate query requirement into SQL. It then uses JdbcExecutor to execute the SQL. The second engine is to translate the SQL's result into java objects. As the 2 engines are separate, you can plug your own SQL and utilize the second engine to convert data into java objects.
 
 ###JdbcExecutor
 
