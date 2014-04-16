@@ -70,9 +70,11 @@ daoManager.save(person);
 To update the person's name:
 ``` java
 person = daoManager.get(Person.class, 1);
-person.firstName = "Mike";
+person.setFirstName("Mike");
 daoManager.update(person);
 ```
+
+More sophisticated examples such as join and inheritance can be viewed at https://github.com/nebulae2us/stardust/wiki
 
 ##Why Stardust
 __SQL centric__: Stardust's DaoManager not only automatically generates SQL for you, but also let you plugs your own SQL. Moreover, its JdbcExecutor let you execute SQL at ease.
