@@ -1,0 +1,5 @@
+/target
+/.idea
+/mckoidb
+*.log
+*.iml
